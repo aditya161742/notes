@@ -1,0 +1,15 @@
+
+
+
+
+
+
+
+
+-> https://www.dineshonjava.com/microservices-inter-service-communication/
+
+-> https://dzone.com/articles/microservices-communication-service-to-service
+
+-> https://www.dineshonjava.com/microservices-with-spring-boot/#:~:text=Microservices%20architecture%20allows%20avoiding%20monolith,different%20environments%20with%20tight%20cohesion.
+
+-> https://www.javatpoint.com/spring-cloud

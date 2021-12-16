@@ -1,0 +1,25 @@
+
+
+-> https://www.youtube.com/watch?v=1V_L5PKYEVE
+
+
+-> Java, mongodb replication set -----> https://mongodb.github.io/mongo-java-driver/3.4/driver/tutorials/connect-to-mongodb/
+
+	Above tutorials provides detailed examplation with example about : 1) How to add mulitplereplica set of mongadb with Java.
+															2) CRUD operations with Java.
+															3) Handling when primary node or secondary node doesnot respond.
+	From above tutorial, make java connection to replicaset like this: MongoClient mongoClient = new MongoClient(
+    new MongoClientURI("mongodb://host1:27017,host2:27017,host3:27017")); 
+
+    If primary node is down then secondary servers are called.
+
+    It is recommended architecture to always call primary server first. So that we can get consistent data. We can use different archetirye like allow data to be available fr read only when atleast two server copies that data etc etc.
+
+-> https://spring.io/guides/gs/accessing-data-mongodb/  
+
+-> https://dzone.com/articles/mongodb-replication-lag-and
+
+-> https://docs.mongodb.com/manual/
+-> SQ to MongoDB ----> https://docs.mongodb.com/manual/reference/sql-comparison/
+
+-> https://docs.mongodb.com/manual/administration/replica-set-deployment/

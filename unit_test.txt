@@ -1,0 +1,603 @@
+Problem with jUnit 4:
+
+-> All functionalites are bundled into single JAR. All maven , gradle etc are in single JAR
+-> No flexible API. jUnit 4 has not desgined to be used in IDE's so IDE's started building there own class to support jUnit 4 because any change in jUnit JAR's could have breaked support for new versions.
+-> No java 8 feature. 
+
+
+Junit 5:
+
+
+-> Multiple small JAR's. Whatever functionalites we want we can include different JAR's.
+-> Have Flexible API such that developers can use the API and write the test and IDE's can use that so that they can discover the test and run test's. ie, it provides mechanism to discover and execute tests build build tools and IDE's.
+-> Supports java 8 features.
+
+jUnit 5 arctecture divided into 3 parts:
+
+1) jUnit platform:
+
+	At the core of junit 5 there is junit platform. It has two components :
+
+		i) junit platform launcher:
+		 It launches the frameworks based on its implementation and show test results to the console of IDE's like eciplse , intelliJ.
+
+
+		ii) junit platform engine:
+
+			It is used to launch different testing frameworks on JVM, based on weather junit jupitor or junit vintage is used. 
+
+
+2) junit jupitor
+	
+	This is nothing but modern way of writing junit tests, ie junit 5. We use junit-jupitor-api for wrtting junit 5 test cases.
+	junit jupitor-engine is the implementation of junit platform engine, which tells it is the implenemtation of junit 5.
+
+3) junit vintage:
+
+	It provides support for writting tests in junit 3 and 4. We use junit4-api for wrtting test cases in junt 4.
+	junit vintage-engine is the implementation of junit platform engine.
+
+
+First junit 5  test:
+
+
+-> Create new java project which should have java 8 or above.
+-> On test folder right click -> Select junit Test Case
+
+@Test in junit 5:
+
+-> Used to mark methods as test method, this will tell junit that it is our test method. It is present in package org.junit.jupitor.api.
+-> Visibility of @Test can be made public, default and protected.
+
+
+Assertion:
+
+-> It helps us in validating the expected output with the actual output of a test case.
+-> Assertions are static methods that we call in our tests to verify expected behaviour.
+-> junit jupitor assertions are present in package org.junit.jupitor.Assertions class
+-> Assertions methods supports features of java 8.
+
+
+AssertTrue / AssertFalse:
+
+-> assertTrue(boolean condition)  // It condition is true test will pass.
+-> assertTrue(boolean condition, String message) // It test will fail the customize message is provided which will be printed
+-> assertTrue(Boolean boolean condition,Supplier<String> supplier)
+			Supplier message is only evaluated if message fails (ie lazy intialzation) , in above constructr if only String message is passed then it will evaluate everytime
+
+			Ex:
+
+				assertTrue(listOfBooks.isEmpty(),() -> "List is empty");
+
+-> assertTrue(BooleanSupplier booleanSupplier) 
+		
+			Ex:
+
+				assertTrue(() -> listOfBooks.isEmpty());
+
+
+
+
+AssertNull/ AssertNotNull:
+
+-> assertNull(Object actual); // It object is null then it will pass.
+-> assertNull(Object actual,String message) //It asserts wheather actual value is null or not. In case, if the actual value is null then test will fail with provided message.
+-> assertNull(Object actual,Supplier<String> supplier)
+
+
+AssertEquals / AssertNotEquals:
+
+-> assertEquals(Object expected, Object actual)
+-> assertEquals(Object expected, Object actual,String message) // It fails the custom message will be printed
+-> assertEquals(Object expected, Object actual,Supplier<String> supplierMessage)
+
+AssertArrayEquals:
+
+-> Arrays euqlit means:
+
+	Elements of array are equal.
+	Order of elements should match.
+	number of elements should match.
+
+-> assertArrayEquals(Object[] expected,Object[] actual)
+-> assertArrayEquals(Object[] expected,Object[] actual,String message)
+-> assertArrayEquals(Object[] expected,Object[] actual,Supplier<String> supplierMessage)
+
+
+AssertIterableEquals:
+
+-> All class which are iterable like list, set etc. called Iterable.
+-> It helps in validating that actual and expected iterables are deeply equal.
+-> Iterable equality means:
+
+	elements are equal
+	Order of elements should match
+	number of elements should also match
+
+-> assertIterableEquals(Iterable<?> expected,Iterable<?> actual)
+-> assertIterableEquals(Iterable<?> expected,Iterable<?> actual,String message)
+-> assertIterableEquals(Iterable<?> expected,Iterable<?> actual,Suppier<String> messageSupplier)
+
+AssertTimeout:
+
+-> Used to test long running tasks.
+-> If the given task inside the test case take more than the specified duration , then the test case will fail.
+-> Executable will run in the same thread as that of calling code.
+
+-> assertTimeout(Duration timeout, Executable executable)
+
+	Ex:
+		java.time.Duration.ofMinutes;
+
+		assertTimeout(ofMinutes(2), () -> {
+	        // Perform task that takes less than 2 minutes.
+	    });
+
+-> assertTimeout(Duration timeout, Executable executable,String message)
+
+-> assertTimeout(Duration timeout, Executable executable,Supplier<String> messageSupplier)
+
+AssertTimeoutPreemptively:
+
+-> Similar to assertTimeout()
+-> Executable will run in the different thread as that of calling code.
+
+
+AssertThrows:
+
+-> If our code throws execption we can validate it by this method.
+-> If different or no exeption is thrown it will fail.
+
+-> assertThrows(Class<T> expectedType, Executable executable)
+-> assertThrows(Class<T> expectedType, Executable executable, String message)
+-> assertThrows(Class<T> expectedType, Executable executable, Supplier<String> messageSupplier)
+
+
+@DisplayName
+
+-> used to provide name of the test class, @test method
+-> if we donot use then class names and @Test methods name gets printed when test cases are executed.
+
+
+@Disabled
+
+-> Used to disable (ie skip) the test.
+-> It is part org.junit.jupitor.api package.
+-> It takes option parameter, that is reason that why we are disabling the test.
+
+Ex:
+	
+	@Disabled("Reason for disabling the test case")
+
+
+Assumptions:
+
+-> Assumptions are precondition that need to be satisfied to run subsequent assertions in test.
+-> If the assumptions are not satisfied then, TestAbortedException is thrown and test is skipped.
+-> In comparision to failed assertion, failed assumption donot result in a test failure , rather , a failed assumption results in a test being aborted or skipped.
+
+
+AssumeTrue / AssumeFalse:
+
+-> It hepls us in validating that provided assumption is true.
+-> assumeTrue(boolean assumption)
+			
+			Ex:
+
+				assertTrue("DEV".equals("DEV"));    //If this condition is not fulfilled then this test will get skipped.
+
+				assertEquals(3, 2+1);
+
+-> assumeTrue(boolean assumption,String message)
+-> assumeTrue(boolean assumption,Supplier<String> messageSupplier)
+-> assumeTrue(BooleanSupplier assumptionSupplier)
+-> assumeTrue(BooleanSupplier assumptionSupplier,Supplier<String> messageSupplier)
+
+
+AssumingThat:
+
+-> It takes tow things: boolean assumption and Executable
+-> If assumption is true then executable code is executed otherwise supplied execuatble is skipped and rest of the code will get executed.
+-> Note here we are not skipping complete test but rather we skip on Execuatble
+
+TestInstance:
+
+-> used to change lifecycle behaviour of test class.
+-> It has two modes:
+	
+		@TestInstance(Lifecycle.PER_METHOD) - If @TestInstance is not declared on a test class, the lifecycle mode will implicitly default to PER_METHOD. In this mode jUnit creates a new instance of test class before executable each test method.
+
+		@TestInstance(Lifecycle.PER_CLASS) - In this junit creates a new instance of test class only once.
+
+@BeforeAll in Lifecycycle.PER_METHOD:
+
+-> used on static methods in our test case. This it is called befre instance of test class is created ie before constructor called.
+-> It is called only ince throughout the life cycle.
+-> Used to intialize static resources like DB connection , server start etc. which are expensive to create during each test invocation.
+
+@AfterAll in Lifecycycle.PER_METHOD:
+
+-> used on static method and called after all methods are executed.
+-> Triggered only once throughout the lifecyce and used to close close DB connection, server stio etc.
+
+
+@BeforeEach /@AfterEach in Lifecycycle.PER_METHOD:
+
+-> Called before and after each @Test method on different test class instance.
+-> Used to setup instance variables and resources which can be used during @Test method execution.
+
+
+@BeforeAll in Lifecycle.PER_CLASS:
+
+-> must be used in non-static methods in our test class.
+-> Called after instance of test class is created.
+-> Called once throughout the lifecycle.
+
+@BeforeEach /@AfterEach in Lifecycycle.PER_CLASS:
+
+
+-> Called before/after each @Test method on the same test class instance.
+
+
+Parameterized test:
+
+-> It allows developers to run same test multiple times with different parameters.
+-> they are normal test methods but instead of using @Test , we use @ParameterizedTest annotation.
+-> we need to include junit-jupitor-params jar in order to use it.
+-> In order to pass different arguments we need to provide a source. If not provided test won't run. 
+
+types of sources:
+
+1) @ValueSource: it allows passing different arguments in form of array.
+
+	Ex:
+
+		@ParameterziedTest
+		@ValueSource(strings = {"Head first java","Effective java"})
+		public void valueSource(String title){}
+
+	Ex:
+
+		@ValueSource(ints = {2,5,8,9})
+		public void valueSource(int num){}@ParameterziedTest
+		
+
+2) @NullSource, @EmptySource and @NullAndEmptySource: It allows passing of null and empty values.
+		
+		@NullSource: it provide single null argument to test method. It cannot be preemptive type
+
+		@ParameterziedTest
+		@NullSource
+		public void valueSource(String title){}
+
+		@EmptySource: it provide single empty argument to test method. It supports Set, Map, List, Arrays, Strings
+
+		@ParameterziedTest
+		@NullSource
+		public void valueSource(String title){}
+
+3) @EnumSource: It allows to pass argument as enum values.
+	
+		Ex:
+
+		class Enum Animal{
+			DOG,
+			CAT,
+			LION
+		}
+
+		@ParameterziedTest
+		@EnumSource(value=Animal.class)
+		public void enumSource(Animal animal){}
+
+4) @MethodSource: It allows passing values from a method.
+		
+		@ParameterziedTest
+		@MethodSource("stringProvider")
+		public void enumSource(Strig val){}
+
+		public static Stream<String> stringProvider(){
+			return Stream.of("cat","dog","lion");
+		}
+
+5) @CsvSource: allows passing values in the form of comma seprated values.
+		
+		Ex:
+
+			@CsvSource({"car, bus"})
+			public void valueSource(Sring input){}
+
+6) @CsvFileSource: allows passing CSV file as value source.
+
+
+
+@RepeatedTest:
+
+-> ability to repeat a test multiple times.
+
+	Ex:
+
+		@RepeatedTest(5)
+		public void repeatedTest(){}
+
+
+		@RepeatedTest(value 5,name = "{displayName}")
+		@DisplayName("Simple repeated test")
+		public void repeatedTest(){}
+
+
+Run tests based on Condition :
+
+	Ex:
+		EnabledOnOs(OS.MAC) or @DisabledOnOs(OS.WINDOWS)
+
+
+	Ex:
+		@EnabledOnJre(JRE.JAVA_10) or DisabledOnJre(JRE.JAVA_8)
+
+
+--------------------------------------------------------------------------------------------
+
+
+Mockito 3:
+
+
+Test doubles:
+
+-> Test double is generic term for replacing productin object for testing purpose.
+
+-> Example if our class depends on some external dependnecy and at the time of test that dependcy is unavialble then we cannot test it. Exampe database is unavailble. 
+-> Or if we have service which sends email , it is not good to send email for every time we test.
+
+Types of test doubles:
+
+1) Dummy
+2) Fake 
+3) Stub 
+4) Mock
+5) Spy
+
+
+Fake test doubles:
+
+-> Fake objects have fucntional implementation , but in very basic form.
+
+-> For example, instead of actual production db we can use in-memory db, hashmaps, list etc. for testing.
+
+	ex:
+
+		class BookService{
+
+			BookRepository bookRepository;
+
+			public int findNumberOfBooks(){
+				return bookRepository.findAll().size();
+			}
+		}
+
+		BookRepository bookRepository = Mockito.mock(BookRepository.class); // If Mockito not static imported
+			
+			Or
+
+		BookRepository bookRepository = mock(BookRepository.class);  // If mockito static was imported
+
+		BookService bookService = new BookService(bookRepository);
+
+		Book book1 = new Book("Book 1");
+		Book book2 = new Book("Book 2");
+
+		Collection<Book> books = new ArrayList<>();
+		books.add(book1);
+		books.add(book2);
+
+		Mockito.when(bookRepository.findAll()).thenReturn(books);
+
+		assertEquals(2,bookService.findNumberOfBooks());
+
+
+Dummy:
+
+-> Donot have business logic. Used only for code to compile.
+-> Example, an object is passed as parameter to a constructor. It is passed just to make code compile.
+
+Ex:
+
+	BookRepository bookRepository = mock(BookRepository.class);  // If mockito static was imported
+
+	EmailService emailService = mock(EmailService.class);
+
+		BookService bookService = new BookService(bookRepository,emailService);
+
+		Book book1 = new Book("Book 1");
+		Book book2 = new Book("Book 2");
+
+		Collection<Book> books = new ArrayList<>();
+		books.add(book1);
+		books.add(book2);
+
+		Mockito.when(bookRepository.findAll()).thenReturn(books);
+
+		assertEquals(2,bookService.findNumberOfBooks());
+
+	Or
+
+//@InjectMocks annotation is used to create and inject the mock object
+   @InjectMocks 
+   MathApplication mathApplication = new MathApplication();
+
+   //@Mock annotation is used to create the mock object to be injected
+   @Mock
+   CalculatorService calcService;
+
+-> Setup method is used for pre-conditions like object/resource initialization like mock object,softassertions object etc .Its upto developers whether to use the method or not .Junit/TestNg what ever framework you take all the common object s intialization/object creation will be done in setup i.e @BeforeAll annotation. Moreover you know that @Before will be called prior to the execution of test case. Though for simple test method it wont't cause any impacts in your logic but for bulk classes with many test methods it may cause RunTimeException or even error related tomethod area in JVMor PermGen space if you keep on calling the same method stack.
+
+	ex:
+
+		private MathApplication mathApplication;
+	   private CalculatorService calcService;
+
+	   @BeforeAll
+	   public void setUp(){
+	      mathApplication = new MathApplication();
+	      calcService = mock(CalculatorService.class);
+	      mathApplication.setCalculatorService(calcService);
+	   }
+
+Verify:
+
+-> Mockito can ensure whether a mock method is being called with reequired arguments or not. It is done using the verify() method. Take a look at the following code snippet.
+
+	//test the add functionality
+	Assert.assertEquals(calcService.add(10.0, 20.0),30.0,0);
+
+	//verify call to calcService is made or not with same arguments.
+	verify(calcService).add(10.0, 20.0);
+
+Ex 2:
+
+	@Test
+   public void testAdd(){
+      //add the behavior of calc service to add two numbers
+      when(calcService.add(10.0,20.0)).thenReturn(30.00);
+		
+      //test the add functionality
+      Assert.assertEquals(calcService.add(10.0, 20.0),30.0,0);
+       
+      //verify the behavior
+      verify(calcService).add(10.0, 20.0);
+   }
+
+
+-> Mockito provides a special check on the number of calls that can be made on a particular method.
+
+
+	//add the behavior of calc service to add two numbers
+	when(calcService.add(10.0,20.0)).thenReturn(30.00);
+
+	//default call count is 1 
+      verify(calcService).subtract(20.0, 10.0);
+      
+      //check if add function is called three times
+      verify(calcService, times(3)).add(10.0, 20.0);
+      
+      //verify that method was never called on a mock
+      verify(calcService, never()).multiply(10.0,20.0);
+
+
+     //check a minimum 1 call count
+      verify(calcService, atLeastOnce()).subtract(20.0, 10.0);
+      
+      //check if add function is called minimum 2 times
+      verify(calcService, atLeast(2)).add(10.0, 20.0);
+      
+      //check if add function is called maximum 3 times
+      verify(calcService, atMost(3)).add(10.0,20.0);  
+
+
+Mockito provides a special Timeout option to test if a method is called within stipulated time frame.
+
+Syntax
+//passes when add() is called within 100 ms.
+verify(calcService,timeout(100)).add(20.0,10.0);
+
+
+
+-> Mockito provides the capability to a mock to throw exceptions, so exception handling can be tested. Take a look at the following code snippet.
+
+//add the behavior to throw exception
+doThrow(new Runtime Exception("divide operation not implemented"))
+   .when(calcService).add(10.0,20.0);
+
+
+-> Mockito provides Inorder class which takes care of the order of method calls that the mock is going to make in due course of its action.
+
+Syntax:
+
+//create an inOrder verifier for a single mock
+InOrder inOrder = inOrder(calcService);
+
+//following will make sure that add is first called then subtract is called.
+inOrder.verify(calcService).add(20.0,10.0);
+inOrder.verify(calcService).subtract(20.0,10.0);
+
+
+Pass different types of argument:
+
+-> Pass argument different types of arguments:
+
+verify(bar).doPrimitiveStuff(any()); // Compiles but throws NullPointerException
+verify(bar).doPrimitiveStuff(anyInt()); // This is what you have to do instead
+
+anyString(), anyfloat etc.
+
+
+Spy:
+
+-> Mockito provides option to create spy on real objects. When spy is called, then actual method of real object is called.
+
+-> Both @Mock and @Spy can be used to mock methods or fields. The difference is that in mock, you are creating a complete mock or fake object while in spy, there is the real object and you just spying or stubbing specific methods of it.
+
+While in spy objects, of course, since it is a real method, when you are not stubbing the method, then it will call the real method behavior. If you want to change and mock the method, then you need to stub it.
+
+When shoud you use mock or spy? If you want to be safe and avoid calling external services and just want to test the logic inside of the unit, then use mock. If you want to call external service and perform calling of real dependency, or simply say, you want to run the program as it is and just stub specific methods, then use spy.
+
+Argument captor:
+
+public class PersonService {
+
+    private PersonRepository personRepository;
+
+    public void setPersonRepository(final PersonRepository personRepository) {
+        this.personRepository = personRepository;
+    }
+
+    public void savePerson(final String name) {
+        this.personRepository.save(name.toUpperCase().trim());
+    }
+
+}
+
+public class PersonRepository {
+
+    public void save(final String person) {
+        System.out.println(".. saving person ..");
+    }
+}
+
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+class PersonServiceTest {
+
+    @Test
+    void testPersonService() {
+
+        // Create the repository mock
+        final PersonRepository personRepositoryMock = mock(PersonRepository.class);
+
+        // Create the service and set the repository mock
+        final PersonService personService = new PersonService();
+        personService.setPersonRepository(personRepositoryMock);
+
+        // Save a person
+        personService.savePerson("Mario ");
+
+        // Prepare an ArgumentCaptor to capture the value passed to repo.saveMethod
+        final ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+        // Capture the argument passed in the unique method invocation
+        verify(personRepositoryMock, times(1)).save(captor.capture());
+
+        // Check if the captured value is the expected one
+        final String capturedParameter = captor.getValue();
+        assertEquals("MARIO", capturedParameter);
+    }
+}
+
+

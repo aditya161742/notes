@@ -1,0 +1,323 @@
+Introduction:
+
+-> An unexcpected , unwanted event that disturbs normal flow of the program is called exception.
+	
+
+
+
+-> It is highly recommended to handle exceptions and the main objective of exception handling is graceful termination of the program.
+
+-> Exception handing doesn't mean reapiring an exception, we have to provide alternative way to continue rest of the program normally, is the concept of exception handing.
+
+Ex: Our programming requirement is to read data from remote file locating at london at run time if london file is not available our program should not be terminated abnoramlly. We have to provide some local file to continue rest of the program normally. This way of defiing alternative is nothing but exception handling. 
+
+		try{
+
+			read data from remote file located at london.
+
+		}	
+		catch(FileNotFoundException e){
+
+				use local file and continue rest of the program normally
+		}
+
+
+
+
+
+Run time stack mechanism:
+
+-> For every thread JVM will create run time stack each and every method call performed by that thread will be stored in the corresponding stack. Each entry in the stack is called stack frame or activation record. After completing every method call the corresponsing entry from the stack will be removed. After completing all method calls the stack will become empty and that empty stack will be destroyed by JVM just before terminating the thread.
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+
+Default Exception Handling:
+
+
+-> Inside a method if any exception occurs the method in which it is rised is responsible to create exception object by including the following information:
+
+	1) Name of exception
+	2) description of exception
+	3) Location at which exception occurs (Stack trees)
+
+-> After creating exception object method handovers that object to the JVM.
+
+-> JVM will check weather the method contains any exception handling code or not. If the method doesn't contain exception handling code then JVM terminates that method abnormally and removes the corresponding entry from the stack.
+
+-> Then JVM identifies caller method and checks weather called method contains any handling code or not. If the caller method doesn't contain handling code then JVM terminates that caller method also abnormally and removes the corresponding entry from the stack.This process will be continued untill main method and if the main method also doesn't contain handling code, then JVM terminates main method also abnormally and removes corresponding entry from the stack. Then JVM handovers responsibility of exception handling to default exception handler, which is the part of JVM. Default exception handler prints exception information in the following format and terminates program abnormally:
+	
+		Exception in Thread `main` Name of Exception : Description
+							Stack Trees
+
+
+		Ex: 
+
+			class Test{
+				public static void main(String[] args){
+					doStuff();
+				}
+
+				doStuff(){
+					doMoreStuff();
+				}
+
+				doMoreStuff(){
+					sop(10/0);                                 // Division by zero exception
+				}
+			}
+
+
+			Error:
+				Exception Thread `main` java.lang.ArthmaticException : Division by zero
+
+						at Test.doMoreStuff()
+						at Test.doStuff()
+						at Test.main()
+
+
+
+
+
+Exception hierarchy:
+
+-> Throwable class acts as root for java exception hierarchy.
+-> Throwable class defines 2 child classes:	
+	1) Exception
+	2) error
+
+1) Exception:
+
+-> Most of the times exceptions are caused by our program and these are recoverable.
+		
+		Ex:
+			If our programming requrement is to read data from remote file locating at london at run time if remote file is not available then we will get run time exception saying fileNotFoundException. If fileNotFoundException occurs we can provide local file and continue rest of the program normally.
+
+				try{
+
+						read data from remote file locating at london
+				}
+				catch(fileNotFoundException e){
+
+					use local file and continue rest of the program normally
+				}
+
+
+2) Error:
+
+-> Most of the times error are not caused by our program and these are due to lack of system resources.
+-> Errors are not recoverable. Ex: If outOfMemory error occurs being a programmer we can't do anything and the program will be terminated abnormally.System admin or server admin is responsible to increase heap memory.
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+
+checked vs unchecked exception   (Important):
+
+-> The exceptions which are checked by compiler for smooth execution of the program are called checked exceptions. 
+	Ex: 1) Hall ticket missing exception.
+		2) Pen not working excpetion
+		3) FileNotFoundException etc....
+
+-> In our program if there is a chance of rising checked excption then compulsory we should handle that checked exception (either by try/catch or throws keyword). Otherwise we will get compile time error.
+
+
+-> The exceptions which are not checked by compiler weather programmer handling or not such type of excpetions are called unchecked exceptions. Ex: 1) ArthematicException
+				2) BomBlastException
+
+
+-> Weather it is checked or unchecked every exception occurs at run time only there is no chance of occuring any exception at compile time.
+
+-> runTimeException and its child classes, error and its child classes are unchecked exception. Except these remaining are checked.
+
+
+Fully checked vs partially checked:
+
+-> A checked exception is said to be fully checked if and only if all its child classes also checked.. 
+	Ex:   IOException, interputtedException 
+
+-> A checked exception is said to be partially checked if and only if some of its child classes are unchecked.
+	Ex: exception, throwable
+
+Note :- The only possible partially checked exception are exception and throwable.
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+customized exception handling by using try catch:
+
+-> It is highly recommended to handle exceptions.
+-> The code which may rise an exception is called risky code and we have to define ONLY that code inside try block and corrsponding handling code we have to define inside catch block.
+		
+		Ex:
+
+				sop('start');
+
+				try{
+					sop(10/0);
+				}
+				catch(ArthematicException e){
+					sop(10/2);
+				}
+				
+				sop('close');
+
+
+
+
+		try{
+			stmt 1;
+			stmt 2;
+			stmt 3;
+		}
+		catch(Exception e){
+			stmt 4;
+		}
+
+		stmt 5;
+
+
+Case 1:
+	If there is no exception.
+	execution will be stmt 1,stmt 2,stmt 3 and stmt 5.
+
+Case 2:
+	If Exception rise at statement 2, then stmt 1, stmt 2, stmt 5 will occur. 
+	Note :- If any where within the try block if exception occurs then rest of the code in that block will not be executed. Hence within the try block we have to take only risky code and length of try block should be as less as possible.
+
+Case 3:
+	If exception rise at stmt 4 or stmt 5, then it is alsways abnormal termination. 
+
+
+-> In addition to try block there may be a chance of rising an exception inside catch and finally blocks. 
+
+
+
+
+
+
+Methods to print exception information:
+		
+
+		class Test{
+
+				public static void main(String[] args){
+					
+					try{
+
+					}
+					catch(ArthematicException e){
+						
+						e.printStackTrace();					// It will print full error along with stack trace
+						sop(e); or sop(e.toString());          // 	Java.lang.ArthematicException : Division by zero							
+						
+						sop(e.getMessage());                    // It will print Error: Division by zero
+
+					}
+				}
+
+		}
+
+
+
+
+
+try with multiple catch blocks:
+
+-> The way of handling an exception is varied from exception to exception. Hence for evry exception type it is highly recommended to take seperate catch block , i.e , try with multiple catch block is always possible and recommended to use.
+
+		try{
+
+		}
+		catch(){
+
+		}
+		catch(){
+
+		}
+		catch(){
+		
+		}
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+final:
+
+-> final is the modifier applicable for classes, methods and variables.
+-> If a class declared as final then we can't extend that class, i.e we can't create child class for that class.
+-> If a method is final then we can't override that method in the child class.
+-> If a variable declared as final then we can't perform reassignment for that variable.
+
+
+finally:
+
+-> It is a block always associated with try/catch to maintain clean up code.
+
+		try{
+			Risky code
+		}
+		catch(Exception e){
+			Handliing code
+		}
+		finally{
+			Clean up code (asspciated with try block) 
+		}
+
+-> The speciality of finally block is it will be executed always irrespective of weather exception is rised or not rised and weather handled or not handled.
+
+
+
+
+finalize:
+
+-> It is a method always invoked by garbage collector just before destroying an object to perform clean up activities. Once finalize method completes immediately garbage collector destroyes that object.
+
+-> finally block is responsible for clean up activities related to try block, i.e whatecer resources we open as the part of try block will be closed inside finally block. Whereas finalize method is responsible to perform clean up activities related to object,i.e whatever resources associated with the object will be deallocated before destroying an object by using finalize method.
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+(Very important) throw vs throws keyword:
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+Customized or user defined exceptions:
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+Top 10 exceptions in Java:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+-> Learn line by line git commit
+-> pull git by commit id
+-> git pipelining for deployment 
+
+Steps to use git in elcipse console:
+
+Right click on the project
+Select Team -> Share
+You will be prompted to select the tool you prefer
+Click Create -> Browseif you already have one
+Select git and go on
+
+Git init
+
+Git add .   // adds the files to local repo and this stages them for first commit 
+
+Git commit -m "first commit" // commits changes to local repo and making them ready to push on remote
+
+Remove your current origin  (If already created):
+
+git remote remove origin  
+
+And then:
+
+git remote add origin https://<TOKEN>@github.com/<USERNAME>/<REPO>.git  // Add token becasue form 13 Aug, 2021 it is requried to have token rather than useername / password
+
+//Git remote add origin << remote URL >>
+
+
+Git push origin master
+
+
+
+Git checkout -b sub-branch1 // remote branch is created automatically when we push
+
+Git push origin sub-branch1 // pushing to branch on github
+
+Remove remote branch  :
+
+git push origin --delete test
+
+Remove local branch :
+
+
+Pull other git branch :
+git pull origin develop
+
+
+

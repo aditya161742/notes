@@ -1,0 +1,1124 @@
+
+Concurrency vs Parellelism:
+
+-> Parallel tasks should be truly multitasking, executed "at the same time" whereas concurrent could mean that the tasks are sharing the execution thread while still appearing to be executing in parallel.
+
+Concurrency:
+
+-> Java 5 added a new Java package to the Java platform, the java.util.concurrent package.
+
+-> All these are part of Java Collections Framework.
+
+BlockingQueue interface:
+
+-> It represents a queue which is thread safe to put elements into, and take elements out of from. In other words, multiple threads can be inserting and taking elements concurrently from a Java BlockingQueue, without any concurrency issues arising.
+
+-> The producing thread will keep producing new objects and insert them into the BlockingQueue, until the queue reaches some upper bound.If the blocking queue reaches its upper limit, the producing thread is blocked while trying to insert the new object. It remains blocked until a consuming thread takes an object out of the queue.
+
+-> The consuming thread keeps taking objects out of the BlockingQueue to processes them. If the consuming thread tries to take an object out of an empty queue, the consuming thread is blocked until a producing thread puts an object into the queue.
+
+-> BlockingQueue is an interface, you need to use one of its implementations to use it. The java.util.concurrent package has the following implementations of the BlockingQueue interface:
+
+ArrayBlockingQueue
+DelayQueue
+LinkedBlockingQueue
+LinkedBlockingDeque
+LinkedTransferQueue
+PriorityBlockingQueue
+SynchronousQueue
+
+
+-> Important methds:
+
+	1) add(o) (it throws error) or put(o) (it blocks if there is no space in blocking queue).
+	2) remove(o) (it throws error) or take() (it blocks if there is no element in blocking queue).
+
+Example:
+
+public class BlockingQueueExample {
+
+    public static void main(String[] args) throws Exception {
+
+        BlockingQueue queue = new ArrayBlockingQueue(1024);
+
+        Producer producer = new Producer(queue);
+        Consumer consumer = new Consumer(queue);
+
+        new Thread(producer).start();
+        new Thread(consumer).start();
+
+        Thread.sleep(4000);
+    }
+}
+
+public class Producer implements Runnable{
+
+    protected BlockingQueue queue = null;
+
+    public Producer(BlockingQueue queue) {
+        this.queue = queue;
+    }
+
+    public void run() {
+        try {
+            queue.put("1");
+            Thread.sleep(1000);
+            queue.put("2");
+            Thread.sleep(1000);
+            queue.put("3");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+public class Consumer implements Runnable{
+
+    protected BlockingQueue queue = null;
+
+    public Consumer(BlockingQueue queue) {
+        this.queue = queue;
+    }
+
+    public void run() {
+        try {
+            System.out.println(queue.take());
+            System.out.println(queue.take());
+            System.out.println(queue.take());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+ArrayBlockingQueue:
+
+-> The ArrayBlockingQueue stores the elements internally in FIFO (First In, First Out) order.
+-> ArrayBlockingQueue is a bounded, blocking queue that stores the elements internally in an array. That it is bounded means that it cannot store unlimited amounts of elements. There is an upper bound on the number of elements it can store at the same time. You set the upper bound at instantiation time, and after that it cannot be changed.
+
+	Example: BlockingQueue queue = new ArrayBlockingQueue(1024);  // 1024 no of elements it cans store at a time.
+
+
+DelayQueue:
+
+-> The DelayQueue blocks the elements internally until a certain delay has expired.
+
+-> It orders elements based on their delay time. It means that only those elements can be taken from the queue whose time has expired. DelayQueue head contains the element that has expired in the least time. If no delay has expired, then there is no head and the poll will return null. DelayQueue accepts only those elements that belong to a class of type Delayed or those implement java.util.concurrent.Delayed interface. The DelayQueue blocks the elements internally until a certain delay has expired. DelayQueue implements the getDelay(TimeUnit.NANOSECONDS) method to return the remaining delay time. The TimeUnit instance passed to the getDelay() method is an Enum that tells which time unit the delay should be returned in. The TimeUnit enum can take DAYS, HOURS, MINUTES, SECONDS, MILLISECONDS, MICROSECONDS, NANOSECONDS. This queue does not permit null elements.
+
+
+Example:
+
+class DelayObject implements Delayed {
+   
+    private String name;
+    private long time;
+ 
+    // Constructor of DelayObject
+    public DelayObject(String name, long delayTime)
+    {
+        this.name = name;
+        this.time = System.currentTimeMillis()
+                    + delayTime;
+    }
+ 
+    // Implementing getDelay() method of Delayed
+    @Override
+    public long getDelay(TimeUnit unit)
+    {
+        long diff = time - System.currentTimeMillis();
+        return unit.convert(diff, TimeUnit.MILLISECONDS);
+    }
+ 
+    // Implementing compareTo() method of Delayed
+    @Override
+    public int compareTo(Delayed obj)
+    {
+        if (this.time < ((DelayObject)obj).time) {
+            return -1;
+        }
+        if (this.time > ((DelayObject)obj).time) {
+            return 1;
+        }
+        return 0;
+    }
+ 
+    // Implementing toString() method of Delayed
+    @Override
+    public String toString()
+    {
+        return "\n{"
+            + "name=" + name
+            + ", time=" + time
+            + "}";
+    }
+}
+ 
+// Driver Class
+public class GFG {
+    public static void main(String[] args)
+        throws InterruptedException
+    {
+ 
+        // create object of DelayQueue
+        // using DelayQueue() constructor
+        BlockingQueue<DelayObject> DQ
+            = new DelayQueue<DelayObject>();
+ 
+        // Add numbers to end of DelayQueue
+        DQ.add(new DelayObject("A", 1));
+        DQ.add(new DelayObject("B", 2));
+        DQ.add(new DelayObject("C", 3));
+        DQ.add(new DelayObject("D", 4));
+ 
+        // print DelayQueue
+        System.out.println("DelayQueue: "
+                           + DQ);
+ 
+        // create object of DelayQueue
+        // using DelayQueue(Collection c)
+        // constructor
+        BlockingQueue<DelayObject> DQ2
+            = new DelayQueue<DelayObject>(DQ);
+ 
+        // print DelayQueue
+        System.out.println("DelayQueue: "
+                           + DQ2);
+    }
+}
+
+
+SynchronousQueue:
+
+-> SynchronousQueue is a special kind of BlockingQueue in which each inserts operation must wait for a corresponding remove operation by another thread and vice versa. When you call to put() method on SynchronousQueue it blocks until another thread is there to take that element out of the Queue. Similarly, if a thread tries to remove an element and no element is currently present, that thread is blocked until another thread puts an element into the queue
+
+
+BlockingDequeue:
+
+
+-> It is a deque (double-ended queue) that is the insertion, deletion, and traversal operations can be performed from both ends.
+
+Example:
+
+BlockingDeque<String> deque = new LinkedBlockingDeque<String>();
+
+deque.addFirst("1");
+deque.addLast("2");
+
+String two = deque.takeLast();
+String one = deque.takeFirst();
+
+
+CocurrentHashMap:
+
+-> ConcurrentMap is an interface, you need to use one of its implementations in order to use it. 
+
+-> HashMap operations are not synchronized, while Hashtable provides synchronization. Though Hashtable is a thread-safe, it is not very efficient. To solve this issue, the Java Collections Framework introduced ConcurrentMap in Java 1.5.
+
+-> The ConcurrentHashMap is very similar to the java.util.HashTable class, except that ConcurrentHashMap offers better concurrency than HashTable does. ConcurrentHashMap does not lock the Map while you are reading from it. Additionally, ConcurrentHashMap does not lock the entire Map when writing to it. It only locks the part of the Map that is being written to, internally.
+
+Another difference is that ConcurrentHashMap does not throw ConcurrentModificationException if the ConcurrentHashMap is changed while being iterated. The Iterator is not designed to be used by more than one thread though.
+
+
+
+													Map
+													|
+													|
+													|
+													|
+												ConcurrentMap
+													|
+													|
+													|
+												ConcurrentNavigableMap
+										------------	---------------		 
+										|								|
+										|								|
+										|								|
+									ConcurrentHashMap               ConcurrentSkipListMap
+
+
+
+Example:
+
+		// Since ConcurrentMap is an interface,
+        // we create instance using ConcurrentHashMap
+        ConcurrentMap<Integer, String> m = new ConcurrentHashMap<Integer, String>();
+        m.put(100, "Geeks");
+        m.put(101, "For");
+        m.put(102, "Geeks");
+  
+        // Here we cant add Hello because 101 key
+        // is already present
+        m.putIfAbsent(101, "Hello");
+  
+        // We can remove entry because 101 key
+        // is associated with For value
+        m.remove(101, "For");
+  
+        // Now we can add Hello
+        m.putIfAbsent(101, "Hello");
+  
+        // We can replace Hello with For
+        m.replace(101, "Hello", "For");
+        System.out.println("Map contents : " + m);
+
+
+CountDownLatch:
+
+-> CountDownLatch is used to make sure that a task waits for other threads before it starts. To understand its application, let us consider a server where the main task can only start when all the required services have started.
+
+-> When we create an object of CountDownLatch, we specify the number of threads it should wait for, all such thread are required to do count down by calling CountDownLatch.countDown() once they are completed or ready to the job. As soon as count reaches zero, the waiting task starts running.
+
+Example:
+
+public class CountDownLatchDemo
+{
+    public static void main(String args[]) 
+                   throws InterruptedException
+    {
+        // Let us create task that is going to 
+        // wait for four threads before it starts
+        CountDownLatch latch = new CountDownLatch(4);
+  
+        // Let us create four worker 
+        // threads and start them.
+        Worker first = new Worker(1000, latch, 
+                                  "WORKER-1");
+        Worker second = new Worker(2000, latch, 
+                                  "WORKER-2");
+        Worker third = new Worker(3000, latch, 
+                                  "WORKER-3");
+        Worker fourth = new Worker(4000, latch, 
+                                  "WORKER-4");
+        first.start();
+        second.start();
+        third.start();
+        fourth.start();
+  
+        // The main task waits for four threads
+        latch.await();
+  
+        // Main thread has started
+        System.out.println(Thread.currentThread().getName() +
+                           " has finished");
+    }
+}
+  
+// A class to represent threads for which
+// the main thread waits.
+class Worker extends Thread
+{
+    private int delay;
+    private CountDownLatch latch;
+  
+    public Worker(int delay, CountDownLatch latch,
+                                    String name)
+    {
+        super(name);
+        this.delay = delay;
+        this.latch = latch;
+    }
+  
+    @Override
+    public void run()
+    {
+        try
+        {
+            Thread.sleep(delay);
+            latch.countDown();
+            System.out.println(Thread.currentThread().getName()
+                            + " finished");
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+CyclicBarrier:
+
+-> CyclicBarrier is used to make threads wait for each other. It is used when different threads process a part of computation and when all threads have completed the execution, the result needs to be combined in the parent thread. In other words, a CyclicBarrier is used when multiple thread carry out different sub tasks and the output of these sub tasks need to be combined to form the final output. After completing its execution, threads call await() method and wait for other threads to reach the barrier. Once all the threads have reached, the barriers then give the way for threads to proceed.
+
+Example:
+
+Runnable barrier1Action = new Runnable() {
+    public void run() {
+        System.out.println("BarrierAction 1 executed ");
+    }
+};
+Runnable barrier2Action = new Runnable() {
+    public void run() {
+        System.out.println("BarrierAction 2 executed ");
+    }
+};
+
+CyclicBarrier barrier1 = new CyclicBarrier(2, barrier1Action);
+CyclicBarrier barrier2 = new CyclicBarrier(2, barrier2Action);
+
+CyclicBarrierRunnable barrierRunnable1 =
+        new CyclicBarrierRunnable(barrier1, barrier2);
+
+CyclicBarrierRunnable barrierRunnable2 =
+        new CyclicBarrierRunnable(barrier1, barrier2);
+
+new Thread(barrierRunnable1).start();
+new Thread(barrierRunnable2).start();
+
+
+Runnable barrier1Action = new Runnable() {
+    public void run() {
+        System.out.println("BarrierAction 1 executed ");
+    }
+};
+Runnable barrier2Action = new Runnable() {
+    public void run() {
+        System.out.println("BarrierAction 2 executed ");
+    }
+};
+
+CyclicBarrier barrier1 = new CyclicBarrier(2, barrier1Action);
+CyclicBarrier barrier2 = new CyclicBarrier(2, barrier2Action);
+
+CyclicBarrierRunnable barrierRunnable1 =
+        new CyclicBarrierRunnable(barrier1, barrier2);
+
+CyclicBarrierRunnable barrierRunnable2 =
+        new CyclicBarrierRunnable(barrier1, barrier2);
+
+new Thread(barrierRunnable1).start();
+new Thread(barrierRunnable2).start();
+Here is the CyclicBarrierRunnable class:
+
+public class CyclicBarrierRunnable implements Runnable{
+
+    CyclicBarrier barrier1 = null;
+    CyclicBarrier barrier2 = null;
+
+    public CyclicBarrierRunnable(
+            CyclicBarrier barrier1,
+            CyclicBarrier barrier2) {
+
+        this.barrier1 = barrier1;
+        this.barrier2 = barrier2;
+    }
+
+    public void run() {
+        try {
+            Thread.sleep(1000);
+            System.out.println(Thread.currentThread().getName() +
+                                " waiting at barrier 1");
+            this.barrier1.await();
+
+            Thread.sleep(1000);
+            System.out.println(Thread.currentThread().getName() +
+                                " waiting at barrier 2");
+            this.barrier2.await();
+
+            System.out.println(Thread.currentThread().getName() +
+                                " done!");
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+Output:
+
+Thread-0 waiting at barrier 1
+Thread-1 waiting at barrier 1
+BarrierAction 1 executed
+Thread-1 waiting at barrier 2
+Thread-0 waiting at barrier 2
+BarrierAction 2 executed
+Thread-0 done!
+Thread-1 done!
+
+
+Exchanger:
+
+
+-> Exchanging objects is done via one of the two exchange() methods.
+
+Example:
+
+Exchanger exchanger = new Exchanger();
+
+ExchangerRunnable exchangerRunnable1 =
+        new ExchangerRunnable(exchanger, "A");
+
+ExchangerRunnable exchangerRunnable2 =
+        new ExchangerRunnable(exchanger, "B");
+
+new Thread(exchangerRunnable1).start();
+new Thread(exchangerRunnable2).start();
+
+
+public class ExchangerRunnable implements Runnable{
+
+    Exchanger exchanger = null;
+    Object    object    = null;
+
+    public ExchangerRunnable(Exchanger exchanger, Object object) {
+        this.exchanger = exchanger;
+        this.object = object;
+    }
+
+    public void run() {
+        try {
+            Object previous = this.object;
+
+            this.object = this.exchanger.exchange(this.object);
+
+            System.out.println(
+                    Thread.currentThread().getName() +
+                    " exchanged " + previous + " for " + this.object
+            );
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+Semaphore:
+
+-> As semaphore typically has two uses:
+
+To guard a critical section against entry by more than N threads at a time.
+To send signals between two threads.
+
+-> The counting semaphore is initialized with a given number of "permits". For each call to acquire() a permit is taken by the calling thread. For each call to release() a permit is returned to the semaphore. Thus, at most N threads can pass the acquire() method without any release() calls, where N is the number of permits the semaphore was initialized with. The permits are just a simple counter. Nothing fancy here.
+
+Example:
+
+	Semaphore semaphore = new Semaphore(1);
+
+	//critical section
+	semaphore.acquire();
+
+	...
+
+	semaphore.release();
+
+
+ExecutorService:
+
+-> It is thread pool.
+
+
+Example:
+
+ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+executorService.execute(new Runnable() {
+    public void run() {
+        System.out.println("Asynchronous task");
+    }
+});
+
+executorService.shutdown();
+
+-> First an ExecutorService is created using the Executors newFixedThreadPool() factory method. This creates a thread pool with 10 threads executing tasks.
+
+Second, an anonymous implementation of the Runnable interface is passed to the execute() method. This causes the Runnable to be executed by one of the threads in the ExecutorService.
+
+
+-> ExecutorService is an interface, you need to its implementations in order to make any use of it. The ExecutorService has the following implementation in the java.util.concurrent package:
+
+ThreadPoolExecutor
+ScheduledThreadPoolExecutor
+
+
+-> Few examples of creating ExecutorService:
+
+ExecutorService executorService1 = Executors.newSingleThreadExecutor();
+
+ExecutorService executorService2 = Executors.newFixedThreadPool(10);
+
+ExecutorService executorService3 = Executors.newScheduledThreadPool(10);
+
+
+-> There are a few different ways to delegate tasks for execution to an ExecutorService:
+
+1) Execute Runnable (execute(Runnable)):
+
+	Example:
+
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+		executorService.execute(new Runnable() {
+		    public void run() {
+		        System.out.println("Asynchronous task");
+		    }
+		});
+
+		executorService.shutdown();
+
+		There is no way of obtaining the result of the executed Runnable, if necessary. You will have to use a Callable for that
+
+2) Submit Runnable (submit(Runnable)):
+
+
+Future future = executorService.submit(new Runnable() {
+    public void run() {
+        System.out.println("Asynchronous task");
+    }
+});
+
+future.get();  //returns null if the task has finished correctly.
+
+The submit() method returns a Java Future object which can be used to check when the Runnable has completed.
+
+
+3) Submit Callable (submit(Callable)):
+
+Future future = executorService.submit(new Callable(){
+    public Object call() throws Exception {
+        System.out.println("Asynchronous Callable");
+        return "Callable Result";
+    }
+});
+
+System.out.println("future.get() = " + future.get());
+The above code example will output this:
+
+Asynchronous Callable
+future.get() = Callable Result
+
+
+4) invokeAny():
+
+The invokeAny() method takes a collection of Callable objects, or subinterfaces of Callable. Invoking this method does not return a Future, but returns the result of one of the Callable objects. You have no guarantee about which of the Callable's results you get. Just one of the ones that finish.
+
+ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+Set<Callable<String>> callables = new HashSet<Callable<String>>();
+
+callables.add(new Callable<String>() {
+    public String call() throws Exception {
+        return "Task 1";
+    }
+});
+callables.add(new Callable<String>() {
+    public String call() throws Exception {
+        return "Task 2";
+    }
+});
+callables.add(new Callable<String>() {
+    public String call() throws Exception {
+        return "Task 3";
+    }
+});
+
+String result = executorService.invokeAny(callables);
+
+System.out.println("result = " + result);
+
+executorService.shutdown();
+
+
+5) invokeAll():
+
+-> The invokeAll() method invokes all of the Callable objects you pass to it in the collection passed as parameter. The invokeAll() returns a list of Future objects via which you can obtain the results of the executions of each Callable.
+
+Keep in mind that a task might finish due to an exception, so it may not have "succeeded". There is no way on a Future to tell the difference.
+
+ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+Set<Callable<String>> callables = new HashSet<Callable<String>>();
+
+callables.add(new Callable<String>() {
+    public String call() throws Exception {
+        return "Task 1";
+    }
+});
+callables.add(new Callable<String>() {
+    public String call() throws Exception {
+        return "Task 2";
+    }
+});
+callables.add(new Callable<String>() {
+    public String call() throws Exception {
+        return "Task 3";
+    }
+});
+
+List<Future<String>> futures = executorService.invokeAll(callables);
+
+for(Future<String> future : futures){
+    System.out.println("future.get = " + future.get());
+}
+
+executorService.shutdown();
+
+
+-> You can cancel a task (Runnable or Callable) submitted to a Java ExecutorService by calling the cancel() method on the Future returned when the task is submitted. Cancelling the task is only possible if the task has not yet started executing. Here is an example of cancelling a task by calling the Future.cancel() method:
+
+future.cancel();
+
+
+ExecutorService Shutdown:
+
+-> When you are done using the Java ExecutorService you should shut it down, so the threads do not keep running.
+
+-> To terminate the threads inside the ExecutorService you call its shutdown() method. The ExecutorService will not shut down immediately, but it will no longer accept new tasks, and once all threads have finished current tasks, the ExecutorService shuts down. 
+
+executorService.shutdown();
+
+
+-> If you want to shut down the ExecutorService immediately, you can call the shutdownNow() method. This will attempt to stop all executing tasks right away, and skips all submitted but non-processed tasks.
+
+executorService.shutdownNow();
+
+-> awaitTermination()
+The ExecutorService awaitTermination() method will block the thread calling it until either the ExecutorService has shutdown completely, or until a given time out occurs. The awaitTermination() method is typically called after calling shutdown() or shutdownNow(). Here is an example of calling ExecutorService awaitTermination():
+
+executorService.shutdown();
+
+executorService.awaitTermination(10_000L, TimeUnit.MILLISECONDS );
+
+
+
+
+Future:
+
+-> Future, represents the result of an asynchronous computation. When the asynchronous task is created, a Java Future object is returned. This Future object functions as a handle to the result of the asynchronous task. Once the asynchronous task completes, the result can be accessed via the Future object returned when the task was started.
+
+-> As mentioned earlier, a Java Future represents the result of an asynchronous task. To obtain the result, you call one of the two get() methods on the Future. The get() methods both return an Object, but the return type can also be a generic return type (meaning an object of a specific class, and not just an Object). Here is an example of obtaining the result from a Java Future via its get() method:
+
+Future future = ... // get Future by starting async task
+
+// do something else, until ready to check result via Future
+
+// get result from Future
+try {
+    Object result = future.get();
+} catch (InterruptedException e) {
+    e.printStackTrace();
+} catch (ExecutionException e) {
+    e.printStackTrace();
+}
+If you call the get() method before the asynchronous task has completed, the get() method will block until the result is ready.
+
+There is a version of the get() method which can time out after an amount of time has passed which you can specify via method parameters. Here is an example of calling that get() version:
+
+try {
+    Object result =
+        future.get(1000, TimeUnit.MILLISECONDS);
+} catch (InterruptedException e) {
+
+} catch (ExecutionException e) {
+
+} catch (TimeoutException e) {
+    // thrown if timeout time interval passes
+    // before a result is available.
+}
+
+The example above waits for a maximum of 1000 milliseconds for the result to be available in the Future. If no result is available within 1000 milliseconds, a TimeoutException is thrown.
+
+Cancel Task via Future cancel():
+
+-> You can cancel the asynchronous task represented by a Java Future instance by calling the Future cancel() method. The asynchronous task execution must be implemented in to support cancellation. Without such support, calling cancel() will have no effect. Here is an example of canceling a task via the Java Future cancel() method:
+
+future.cancel();
+
+Check if Task is Done:
+
+-> You can check if the asynchronous task is done (and a result available) by calling the Future isDone() method. Here is an example of calling the Java Future isDone() method:
+
+Future future = ... // Get Future from somewhere
+
+if(future.isDone()) {
+    Object result = future.get();
+} else {
+    // do something else
+}
+
+Check if Task is Cancelled:
+
+-> It is also possible to check if the asynchronous task represented by a Java Future is cancelled. You check that by calling the Future isCancelled() method. Here is an example of checking if a task was cancelled:
+
+Future future = ... // get Future from somewhere
+
+if(future.isCancelled()) {
+
+} else {
+
+}
+
+
+ScheduledExecutorService :
+
+-> can schedule tasks to run after a delay, or to execute repeatedly with a fixed interval of time in between each execution. Tasks are executed asynchronously.
+
+Example:
+
+ScheduledExecutorService scheduledExecutorService =
+        Executors.newScheduledThreadPool(5);
+
+ScheduledFuture scheduledFuture =
+    scheduledExecutorService.schedule(new Callable() {
+        public Object call() throws Exception {
+            System.out.println("Executed!");
+            return "Called!";
+        }
+    },
+    5,
+    TimeUnit.SECONDS);
+
+First a ScheduledExecutorService is created with 5 threads in. Then an anonymous implementation of the Callable interface is created and passed to the schedule() method. The two last parameters specify that the Callable should be executed after 5 seconds.
+
+
+ForkJoinPool:
+
+-> The ForkJoinPool makes it easy for tasks to split their work up into smaller tasks which are then submitted to the ForkJoinPool too. Tasks can keep splitting their work into smaller subtasks for as long as it makes to split up the task..
+
+
+Lock:
+
+-> Lock, represents a concurrent lock which can be used to guard against race conditions inside critical sections. Thus, the Java Lock interface provides a more flexible alternative to a Java synchronized block.
+
+-> You cannot pass any parameters to the entry of a synchronized block. Thus, having a timeout trying to get access to a synchronized block is not possible.
+
+-> The synchronized block must be fully contained within a single method. A Lock can have it's calls to lock() and unlock() in separate methods.
+
+
+-> Lock is an interface, you cannot create an instance of Lock directly. You must create an instance of a class that implements the Lock interface
+
+Example:
+
+Lock lock = new ReentrantLock();
+
+lock.lock();
+
+    //critical section
+
+lock.unlock();
+
+-> If you look at the example in the previous section, imagine what happens if an exception is thrown between the call to lock.lock() and lock.unlock() . The exception would interrupt the program flow, and the call to lock.unlock() would never be executed. The Lock would thus remain locked forever.
+
+To avoid exceptions locking a Lock forever, you should lock and unlock it from within a try-finally block, like this:
+
+Lock lock = new ReentrantLock();
+
+try{
+    lock.lock();
+      //critical section
+} finally {
+    lock.unlock();
+}
+
+
+Example:
+
+public class CounterLock {
+
+    private long count = 0;
+
+    private Lock lock = new ReentrantLock();
+
+    public void inc() {
+        try {
+            lock.lock();
+            this.count++;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public long getCount() {
+        try {
+            lock.lock();
+            return this.count;
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+
+
+-> An unfair lock does not guarantee the order in which threads waiting to lock the lock will be given access to lock it. That means, that a waiting thread could risk waiting forever, if other threads keep trying to lock the lock, and are given priority over the waiting thread. This situation can lead to starvation.
+
+ReentrantLock lock = new ReentrantLock(true); // This will enable fairness
+
+
+AtomicInteger:
+
+Example:
+
+With standard ints:
+
+private volatile int counter;
+
+public int getNextUniqueIndex() {
+    return counter++; // Not atomic, multiple threads could get the same result
+}
+
+
+With AtomicInteger:
+
+private AtomicInteger counter;
+
+public int getNextUniqueIndex() {
+    return counter.getAndIncrement();
+}
+
+
+Q) What is happen-before relation ?? 
+
+Ans)
+
+	static int x = 0;
+
+	public static void main(String[] args) {
+	    x = 1;
+	    Thread t = new Thread() {
+	        public void run() {
+	            int y = x;
+	        };
+	    };
+	    t.start();
+	}
+
+	The main thread has changed field x. Java memory model does not guarantee that this change will be visible to other threads if they are not synchronized with the main thread. But thread t will see this change because the main thread called t.start() and JLS guarantees that calling t.start() makes the change to x visible in t.run() so y is guaranteed to be assigned 1.
+
+	The join() method acts as a barrier that guarantees that any piece of data published by the thread is visible completely and consistently by the other thread.
+
+
+
+Q) Program to create Race condition , DeadLock condition and starvation ?
+
+
+Ans)
+
+	Race Condition:
+
+		when more than one thread try to access a shared resource (modify, write) at the same time. It is safe if multiple threads are trying to read a shared resource as long as they are not trying to change it.
+
+		Example:
+
+			class Counter  implements Runnable{
+			  private int c = 0;
+
+			  public void increment() {
+			    try {
+			      Thread.sleep(10);
+			    } catch (InterruptedException e) {
+			      // TODO Auto-generated catch block
+			      e.printStackTrace();
+			    }
+			    c++;
+			  }
+
+			  public void decrement() {    
+			    c--;
+			  }
+
+			  public int getValue() {
+			    return c;
+			  }
+			    
+			  @Override
+			  public void run() {
+			    //incrementing
+			    this.increment();
+			    System.out.println("Value for Thread After increment " 
+			    + Thread.currentThread().getName() + " " + this.getValue());
+			    //decrementing
+			    this.decrement();
+			    System.out.println("Value for Thread at last " 
+			    + Thread.currentThread().getName() + " " + this.getValue());        
+			  }
+			}
+
+			public class RaceConditionDemo{
+			  public static void main(String[] args) {
+			    Counter counter = new Counter();
+			    Thread t1 = new Thread(counter, "Thread-1");
+			    Thread t2 = new Thread(counter, "Thread-2");
+			    Thread t3 = new Thread(counter, "Thread-3");
+			    t1.start();
+			    t2.start();
+			    t3.start();
+			  }    
+			}
+
+		Output:
+
+		Value for Thread After increment Thread-2 3
+		Value for Thread at last Thread-2 2
+		Value for Thread After increment Thread-1 2
+		Value for Thread at last Thread-1 1
+		Value for Thread After increment Thread-3 1
+		Value for Thread at last Thread-3 0
+
+
+	-> To fix the race condition we need to have a way to restrict resource access to only one thread at a time. We have to use synchronized keyword to synchronize the access to the shared resource. 
+
+	Example:
+
+		//This class' shared object will be accessed by threads
+		class Counter  implements Runnable{
+		  private int c = 0;
+
+		  public  void increment() {
+		    try {
+		      Thread.sleep(10);
+		    } catch (InterruptedException e) {
+		      // TODO Auto-generated catch block
+		      e.printStackTrace();
+		    }
+		    c++;
+		  }
+
+		  public  void decrement() {    
+		    c--;        
+		  }
+
+		  public  int getValue() {
+		    return c;
+		  }
+		    
+		  @Override
+		  public void run() {
+		    synchronized(this){
+		      // incrementing
+		      this.increment();
+		      System.out.println("Value for Thread After increment " 
+		       + Thread.currentThread().getName() + " " + this.getValue());
+		      //decrementing
+		      this.decrement();
+		      System.out.println("Value for Thread at last " + Thread.currentThread().getName() 
+		          + " " + this.getValue());
+		    }        
+		  }
+		}
+
+		public class RaceConditionDemo{
+		  public static void main(String[] args) {
+		    Counter counter = new Counter();
+		    Thread t1 = new Thread(counter, "Thread-1");
+		    Thread t2 = new Thread(counter, "Thread-2");
+		    Thread t3 = new Thread(counter, "Thread-3");
+		    t1.start();
+		    t2.start();
+		    t3.start();
+		  }    
+		}
+
+		Output:
+
+			Value for Thread After increment Thread-2 1
+			Value for Thread at last Thread-2 0
+			Value for Thread After increment Thread-3 1
+			Value for Thread at last Thread-3 0
+			Value for Thread After increment Thread-1 1
+			Value for Thread at last Thread-1 0
+
+
+	-> DeadLock condition:
+
+		Example:
+
+			public class DeadLockDemo {
+
+			    /*
+			     * This method request two locks, first String and then Integer
+			     */
+			    public void method1() {
+			        synchronized (String.class) {
+			            System.out.println("Aquired lock on String.class object");
+
+			            synchronized (Integer.class) {
+			                System.out.println("Aquired lock on Integer.class object");
+			            }
+			        }
+			    }
+
+			    /*
+			     * This method also requests same two lock but in exactly
+			     * Opposite order i.e. first Integer and then String. 
+			     * This creates potential deadlock, if one thread holds String lock
+			     * and other holds Integer lock and they wait for each other, forever.
+			     */
+			    public void method2() {
+			        synchronized (Integer.class) {
+			            System.out.println("Aquired lock on Integer.class object");
+
+			            synchronized (String.class) {
+			                System.out.println("Aquired lock on String.class object");
+			            }
+			        }
+			    }
+			}
+
+
+
+		-> To solve the issue we will have to simply re-order the statements where the code is accessing shared resources.
+
+		Tools to analyze deadlock thread??
+
+		-> jConsole/VisualVM. It will show you exactly which threads are getting locked and on which object. 
+
+			How to solve deadlock ??
+
+				-> Avoid Nested Locks: We must avoid giving locks to multiple threads, this is the main reason for a deadlock condition. It normally happens when you give locks to multiple threads.
+
+				-> Avoid Unnecessary Locks: The locks should be given to the important threads. Giving locks to the unnecessary threads that cause the deadlock condition.
+		
+		-> If you have looked at the above code carefully, then you may have figured out that the real reason for deadlock is not multiple threads, but it is the way that they are requesting a lock. If you provide an ordered access, then the problem will be resolved.
+
+		Example:
+
+			public class DeadLockFixed {
+
+			    /**
+			     * Both method are now requesting lock in same order, first Integer and then String.
+			     * You could have also done reverse e.g. first String and then Integer,
+			     * both will solve the problem, as long as both method are requesting lock
+			     * in consistent order.
+			     */
+			    public void method1() {
+			        synchronized (Integer.class) {
+			            System.out.println("Aquired lock on Integer.class object");
+
+			            synchronized (String.class) {
+			                System.out.println("Aquired lock on String.class object");
+			            }
+			        }
+			    }
+
+			    public void method2() {
+			        synchronized (Integer.class) {
+			            System.out.println("Aquired lock on Integer.class object");
+
+			            synchronized (String.class) {
+			                System.out.println("Aquired lock on String.class object");
+			            }
+			        }
+			    }
+			}
+
+
+	Starvation:
+
+
+	-> Starvation of thread in java is said to occur when a particular thread does not get access to the object or the resource which leads to an increase in waiting and execution time.
+
+	There are many reasons for causes of starvation of threads in java, some of them are described below:
+
+	1) High Priority Running Thread: There may be a case where a high priority thread is running by occupying the C.P.U. and it needs heavy processing which requires a lot of time in completion, so for this work to get completely executed the other threads which have a low priority order have to wait for a long time which leads to starvation.
+
+	2) Threads Waiting On An Object Remains Waiting Forever: The notify() method in java has no track on the threads that which particular thread is wakening if there are multiple threads, therefore there may be a risk that any of the thread is being processed and the other threads are never called for execution.
+
+	How to remoe starvation problem ?
+
+	-> By implementation of the Thread.yield() method, so that when the thread in the process after releasing the lock gets a fair chance to occupy the C.P.U. and can get some time to complete its execution till the original thread again gets the control over the C.P.U.

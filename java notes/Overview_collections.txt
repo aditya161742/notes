@@ -1,0 +1,41 @@
+															Overview Of collections
+
+
+
+
+
+-> Limitations of array:
+
+	1) Arrays are fixed in size. i.e we should know size of aray before using it.
+	2) Array can hold only homogenous elements.
+	Example:
+
+	 	Student[] s = new Student[10000];
+
+	 	s[0] = new Student();		(Correct)
+	 	s[1] = new Customer();     (Wrong)
+
+	 	We can solve this problem by using Object type Arryas.
+
+	 		Example:
+
+	 		Object[] a = new Object[10000];
+	 		a[0] = new Student();	(Correct)
+	 		a[1] = new Customer();   (correct)
+	3) There is no underline data structure , therefore there are no readymade method support is not available for every requeremnet we have to write the code expicitly which increses compexity of programming.
+
+
+
+	To overcome above problems of array we should go for Collections concept.
+
+
+-> Performance point of view Arrays are recommended over Collections, because for example
+
+
+		if we have collection of size 1 crore and we want add one more element, then new array will be created by collections and all 1 crore elements are copied in this new array and then 1 element will be added and previous array is ready for garbage collection.
+		Therefore to add 1 element it has to copy all elements first.
+
+
+-> Arays can hold both primitives and Objects but Collections can hold only Object types.
+
+-> Collection Framework contains several Classes and Interfaces which can be used to represent a group of individual objects as single entity.

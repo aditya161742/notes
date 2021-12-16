@@ -1,0 +1,930 @@
+
+
+Factory pattern:
+
+-> It is one of the best ways of creating an object. In factory pattern, we create object without exposing the creation logic to the client and refer to newly created object using a common interface.
+
+
+Example:
+	
+	There are Customers and they can use mode of contact either mobile or email (used for dual authentication). 
+
+	public class Employee{
+
+		private String name;
+		private String city;
+		private String modeOfContact;
+		private String email;
+		private String phoneNumber;
+		
+		..............
+
+	}
+
+
+	public interface Communication{
+
+		public void process(Employee emp);
+	}
+
+
+	public EmailCommunication implements Communication{
+
+		@Override
+		public void process(Employee emp){
+
+			Systemout.println(emp.getName()+" communicaton via email "+emp.getEmail());
+		}
+
+	}
+
+
+	public MobileCommunication implements Communication{
+
+		@Override
+		public void process(Employee emp){
+
+			Systemout.println(emp.getName()+" communicaton via mobile "+emp.getPhoneNumber());
+		}
+
+	}
+
+
+	public class CommuncationFactory{
+
+			private Communication getProcess(String modeOfCommunication){
+
+						if("Email".equalsIgnoreCase(modeOfCommunication)){
+							return new EmailCommunication();
+						}
+						else if("mobile".equalsIgnoreCase(modeOfCommunication){
+							return new MobileCommuncation();
+						}	
+
+						return null;
+			}
+	}
+
+
+	public static void  main(String[] args){
+
+		List<Employee> empList = new ArrayList<Employee>();
+
+		empList.add(new Employee("Ram","delhi","mobile","ram@ram.com","98468535"));
+		empList.add(new Employee("Vijay","mumbai","email","vijay@vijay.com","898485154"));
+
+		CommunicationFactory factory = new CommunicationFactory(empList);
+
+		Communcation processor;
+
+		for(Employee emp:empList){
+			processor = factory.getProcess(emp.geModeOfContact());
+			processor.process(emp);
+		}
+
+	}
+
+
+Builder patter:
+
+-> It seperate constructotion of complex object from its representation so that same constriction process can create different representation.
+
+Example:
+	
+	Make ClaimsCalculator class immutable, image if there 100 fields some are optional and some are required then becomes diffucult to create objects, in that situation we will go with builder pattern.
+	
+	public class ClaimsCalculator{
+
+		
+		//Rewuired fields
+		private final String claimId;
+		private final String custId;
+		private final String submitDate;
+		private final String amount;
+		
+		//Non required
+		private final String age;
+		private final String address;
+		private final String limits;
+		private final String location;
+		
+		ClaimsCalculator(ClaimBuilder builder){
+			this.claimId = builder.claimId;
+			this.custId = builder.custId;
+			this.submitDate = builder.submitDate;
+			this.amount = builder.amount;
+
+			this.age = builder.age;
+			this.address = builder.address;
+			this.limits = builder.limits;
+			this.location = builder.location;
+			
+
+		}
+
+		//create only getter as this class needs to be immutable
+		.....
+	
+		public static class ClaimBuilder{
+
+				private  String claimId;
+				private  String custId;
+				private  String submitDate;
+				private  String amount;
+				
+				private  String age;
+				private  String address;
+				private  String limits;
+				private  String location;
+
+				//required fields constructor
+				public ClaimBuilder(String claimId,String custId,String submitDate, String amount){
+
+					this.claimId = claimId;
+					this.custId = custId;
+					this.submitDate = submitDate;
+					this.amount = amount;
+				}
+
+				public String age(String age){
+					this.age = age;
+
+					return this;
+				}
+
+				public String address(String address){
+					this.address = address;
+
+					return this;
+				}
+
+				public String limits(String limits){
+					this.limits = limits;
+
+					return this;
+				}
+
+				public String location(String location){
+					this.location = location;
+
+					return this;
+				}
+
+				public ClaimsCalculator build(){
+					ClaimsCalculator ct = new ClaimsCalculator(this);
+					return ct;
+				}
+
+		}
+
+
+	}
+
+
+	main(Stringp[] args){
+
+		ClaimsCalculator cc = new ClaimsCalculator.ClaimsBuilder("CLA-123","Sunny123","01/01/2021","500")
+							.address("Some street")
+							.age("25")
+							.build();  // We can call required and optional as optional only if needed.
+
+
+
+	}
+
+
+
+Prototype pattern:
+
+
+-> It is also creational object.It is used when we need to create multiple objects of same values. We can simply clone it.
+
+-> We need to implement Clonable interface.
+
+	Ex:
+
+		class Vehicle implements Clonable{
+
+				private List<String> vehicleList;
+
+				public Vehicle(List<String> list){
+					this.vehicleList = list;
+				}
+
+				public void insertData(){
+					vehicleList.add("Honda");
+					vehicleList.add("Audi");
+					vehicleList.add("Matuti");
+					vehicleList.add("Renault");
+				}
+
+				public Lis<String> geVehicleList(){
+					return this.vehicleList;
+
+				}
+
+				@Override
+				public Object clonne() throws CloneNotSupportedException{
+
+					List<String> tempList = new ArrayList<String>();
+
+					for(String s:this.getVehicleList()){
+						templList.add(s);
+					}
+
+					return new Vehicle(tempList);
+
+				}
+
+		}
+
+
+		main(){
+			Vehicle a = new Vehicle();
+			a.insertData();
+
+			Vehicle b = (Vehicle)a.clone();
+			
+
+		}
+
+
+Strategy pattern:
+
+-> It is behavioral design pattern. 
+
+Example:
+
+	An organzation have employees and employees have different roles. Now each role have different responsibiliy. 
+
+	public interface Role{
+
+			String descrption;
+			String responsibilities;
+
+	}
+
+	public class Consultant implements Role{
+
+		@override
+		public String description(){
+
+			return Consultant.class.getSimpleName();
+		}
+
+		@Override
+		public String responsibilites(){
+			return "Write code";
+		}
+	}
+
+	public class SeniorConsultant implements Role{
+
+		@override
+		public String description(){
+
+			return SeniorConsultant.class.getSimpleName();
+		}
+
+		@Override
+		public String responsibilites(){
+			return "Review code";
+		}
+	}
+
+	public class LeadConsultant implements Role{
+
+		@override
+		public String description(){
+
+			return LeadConsultant.class.getSimpleName();
+		}
+
+		@Override
+		public String responsibilites(){
+			return "Make tech decisions";
+		}
+	}
+
+	public class Employee{
+		private String name;
+		private Role role;
+
+		Employee(String name, Role role){
+			this.name = name;
+			this.role = role;
+		}
+
+		public void promote(Role newRole){
+			role = newRole;
+		}
+
+		public String grade(){
+			return this.name + "is a "+role.description;
+		}
+
+		public void doWork(){
+			System.out.println(name+ " will "+role.responsibilities);
+		}
+
+	}
+
+	main(){
+
+		Employee ram = new Employee("Ram",new Consultant());
+		Employee rahul = new Employee("Rahul",new SeniorConsultant());
+
+		ram.doWork();
+		rahul.doWork();
+
+		ram.promote(new SeniorConultant());
+		rahul.promote(new LeadConsultant());
+		
+		ram.promote();
+		rahul.promote();
+
+	}
+
+
+Observer pattern:
+
+-> Used when we are intrested in the state of an object and want to get notified whenever there is any change.
+-> The object that watch on the state another object are called Observer and the object that is being watched is called Subject.
+
+-> subject contains a list of observers to notify of any change in it's state, so it should provide methods using which observers can register and unregister themselves.Subjectt also contain a method to notify all the observers of any change and either it can send the update while notifyig the observer or it can provide another method to get the update.
+
+-> Observer should have a method to set the object to watch amd another method that will be used by Subject to notify them of any updates.
+
+Example:
+
+	public interface Subject{
+
+		public void register(Observer observer);
+		public void unregister(Observer observer);
+		public void notifyUpdate(Message message);
+
+	}
+
+
+	public class MessagePublisher implements Subject{
+
+		private Set<Observer> observers = new HashSet<>;
+
+		@override
+		public void register(Observer observer){
+			observers.add(observer);
+		}
+
+		@override
+		public void unregister(Observer observer){
+			observers.add(observer);
+		}
+
+		@override
+		public void nofifyUpdate(Message message){
+			
+			for(Observer observer:observers){
+				observer.updateObserver(message);
+			}
+		}
+
+	}
+
+
+	pbulic interface Observer{
+		public void updateObserver(Message message);
+	}
+
+	public class FirstMessageSubscriber implements Observer{
+
+		@Override
+		public void updateObserver(Message message){
+			System.out.println("Message from first sbscriber: "+message.getMessage());
+		}
+
+	}
+
+	public class SecondMessageSubscriber implements Observer{
+
+		@Override
+		public void updateObserver(Message message){
+			System.out.println("Message from second sbscriber: "+message.getMessage());
+		}
+
+	}
+
+
+	public final class Message{
+
+		private final String message;
+
+		public Message(String message){
+			this.message = message;
+		}
+
+		public String getMessage(){
+			return message;
+		}
+
+	}
+
+
+	main(){
+
+			FirstMessageSubscriber firstMessageSubscriber = new FirstMessageSubscriber();
+			SecondMessageSubscriber secondMessageSubscriber = new SecondMessageSubscriber();
+
+			MessagePublisher messagePublisher = new MessagePublisher();
+
+			messagePublisher.regsiter(firstMessageSubscriber);
+			messagePublisher.regsiter(secondMessageSubscriber);
+
+			messagePublisher.notifyUpdate(new Message("This is the First message"));
+
+			System.out.println("----------------------------------------");
+
+			messagePublisher.notifyUpdate(new Message("This is the Second message"));
+
+			messagePublisher.unregsiter(secondMessageSubscriber);
+
+			messagePublisher.notifyUpdate(new Message("This is the Third message")); // Only first subscriber will receive this message
+	}
+
+
+
+Adaptor pattern:
+
+
+-> It is structural design pattern.
+-> used so that two unrealted interfaces can work together.
+-> The object that joins these unrelated interface called Adaptor.
+
+Example:
+
+	Mobile needs 3 volts to charge but normal socket produces 240 volts. So mobile charger works as a adaptor which converts 240 volts to 3 volt.
+
+
+	public class Volt{
+
+		private int volts;
+
+		public Volt(int volts){
+			this.volts = volts;
+		}
+
+		public int getVolts(){
+			return volts;
+		}
+
+		public String toString(){
+			return "Volt [volts="+volts+"]";
+		}
+
+	}
+
+
+	public interface MobileAdaptor{
+
+			public Volt get3Volt();
+	}
+
+
+	public interface WallSocket{
+		public abstract Volt getVolts();
+	}
+
+
+	public class WallSocketImpl implements WallSocket{
+
+		@Override
+		public Volt getVolts(){
+
+				return new Volt(240);
+		}
+
+	}
+
+
+	public class MobileAdaptorImpl implements MobileAdaptor{
+
+		private WallSocket wallSocket;
+
+		public MobileAdaptorImpl(WallSocket wallSocket){
+			this.wallSocket = wallSocket;
+		}
+
+		@Override
+		public Volt get3Volt(){
+			Volt v240 = wallSocket.getVolts();
+			int v3 = v240.getVolts()/80;
+			return v3;
+		}
+
+	}
+
+
+	main(){
+
+		WallSocket wallSocket = new WallSocket();
+		Volt v240 = wallSocket.getVolts();
+
+		System.out.println(v240);
+
+		MobileAdaptor mobileAdaptor = new MobileAdaptorImpl(wallSocket);
+
+		Volt v3 = mobileAdaptor.get3Volt();
+
+		System.out.println(v3);
+
+	}
+
+
+=================================================================================
+
+
+Solid principles:
+
+Single responsibilty principle:
+
+-> A class should have one, and only one, reason to change.
+One class should serve only one purpose. This does not imply that each class should have only one method, but they should all relate directly to the responsibility of the class. All the methods and properties should work towards the same goal. When a class serves multiple purposes or responsibilities, it should be made into a new class.
+
+<?php
+namespace Demo;
+use DB;
+
+class OrdersReport
+{
+    public function getOrdersInfo($startDate, $endDate)
+    {
+        $orders = $this->queryDBForOrders($startDate, $endDate);
+        
+        return $this->format($orders);
+    }
+
+    protected function queryDBForOrders($startDate, $endDate)
+    {   // If we would update our persistence layer in the future,
+        // we would have to do changes here too. <=> reason to change!
+        return DB::table('orders')->whereBetween('created_at', [$startDate, $endDate])->get();
+    }
+
+    protected function format($orders)
+    {   // If we changed the way we want to format the output,
+        // we would have to make changes here. <=> reason to change!
+        return '<h1>Orders: ' . $orders . '</h1>';
+    }
+}
+
+The above class violates the single responsibility principle. Why should this class retrieve data from the database? It is related to the persistence layer. The persistence layer deals with persisting (storing and retrieving) data from a data store (such as a database, for example). So it is not the responsibility of this class.
+
+Method format is also not the responsibility of this class, because we may need different data formats such as XML, JSON, HTML, etc.
+So finally the refactored code will be described as below:
+
+<?php
+namespace Report;
+use Report\Repositories\OrdersRepository;
+
+class OrdersReport
+{
+	protected $repo;
+	protected $formatter;
+
+	public function __construct(OrdersRepository $repo, OrdersOutPutInterface $formatter)
+	{
+		$this->repo = $repo;
+		$this->formatter = $formatter;
+	}
+
+	public function getOrdersInfo($startDate, $endDate)
+	{
+		$orders = $this->repo->getOrdersWithDate($startDate, $endDate);
+
+		return $this->formatter->output($orders);
+	}
+}
+
+namespace Report;
+
+interface OrdersOutPutInterface
+{
+	public function output($orders);
+}
+
+namespace Report;
+
+class HtmlOutput implements OrdersOutPutInterface
+{
+	public function output($orders)
+	{
+		return '<h1>Orders: ' . $orders . '</h1>';
+	}
+
+}
+
+namespace Report\Repositories;
+use DB;
+
+class OrdersRepository
+{
+    public function getOrdersWithDate($startDate, $endDate)
+    {
+        return DB::table('orders')->whereBetween('created_at', [$startDate, $endDate])->get();
+    }
+}
+
+
+Open-Closed Principle:
+
+-> Entities should be open for extension, but closed for modification.
+
+Software entities (classes, modules, functions, etc.) should be extendable without actually changing the contents of the class you’re extending. If we could follow this principle strongly enough, it is possible to then modify the behavior of our code without ever touching a piece of the original code.
+
+Ex:
+
+	<?php
+class Rectangle
+{
+    public $width;
+    public $height;
+    public function __construct($width, $height)
+    {
+        $this->width = $width;
+        $this->height = $height;
+    }
+}
+
+class Circle
+{
+    public $radius;
+    public function __construct($radius)
+    {
+        $this->radius = $radius;
+    }
+}
+
+class CostManager
+{
+    public function calculate($shape)
+    {
+        $costPerUnit = 1.5;
+        if ($shape instanceof Rectangle) {
+            $area = $shape->width * $shape->height;
+        } else {
+            $area = $shape->radius * $shape->radius * pi();
+        }
+        
+        return $costPerUnit * $area;
+    }
+}
+
+$circle = new Circle(5);
+$rect = new Rectangle(8,5);
+$obj = new CostManager();
+echo $obj->calculate($circle);
+
+
+If we want to calculate the area of a square, we have to modify the calculate method in the CostManager class. It breaks the open-closed principle. According to this principle, we can’t modify, but we can extend.
+
+<?php
+interface AreaInterface
+{
+    public  function calculateArea();
+}
+
+class Rectangle implements AreaInterface
+{
+    public $width;
+    public $height;
+
+    public function __construct($width, $height)
+    {
+        $this->width = $width;
+        $this->height = $height;
+    }
+    public  function calculateArea(){
+        $area = $this->height *  $this->width;
+        return $area;
+    }
+}
+  
+class Circle implements  AreaInterface
+{
+    public  $radius;
+
+    public function __construct($radius)
+    {
+        $this->radius = $radius;
+    }
+    
+    public  function calculateArea(){
+        $area = $this->radius * $this->radius * pi();
+        return $area;
+    }
+}
+
+class CostManager
+{
+    public function calculate(AreaInterface $shape)
+    {
+        $costPerUnit = 1.5;
+        $totalCost = $costPerUnit * $shape->calculateArea();
+        return $totalCost;
+    }
+}
+
+$circle = new Circle(5);
+$obj = new CostManager();
+echo $obj->calculate($circle);
+
+
+Liskov Substitution Principle:
+
+It states that any implementation of an abstraction (interface) should be substitutable in any place that the abstraction is accepted. 
+
+Basically, it takes care that while coding using interfaces in our code, we not only have a contract of input that the interface receives, but also the output returned by different classes implementing that interface; they should be of the same type.
+
+The Liskov Substitution Principle is supported by object-oriented design abstraction concepts of inheritance and polymorphism.
+
+Example:
+
+	To exemplify the LSP let us consider a hypothetical Stock trading application. This application needs to facilitate Transactions like Buy and Sell. In addition, the application needs to support multiple transaction types for different security types such as bonds, stocks, and options. We can approach this with the Liskov Substitution Principle in mind by inheriting from a base Transaction class as such:
+
+	/**
+* The base Transaction class that defines a buy and sell feature.
+*/
+class Transaction{
+    
+    public void buy(String stock, int quantity, float price){
+        // implement buy logic here
+    };
+    public void sell(String stock, int quantity, float price){
+        // implement sell logic here
+    }; 
+}
+
+
+/**
+* A subclass implementation of the Transaction class that 
+* defines Stock-specific buy and sell action logic.
+*/
+class StockTransaction extends Transaction{
+    
+    @Override
+    public void buy(String stock, int quantity, float price){
+        // implement Stock-specific buy logic here
+    }
+
+    @Override
+    public void sell(String stock, int quantity, float price){
+        // implement Stock-specific sell logic here
+    }
+}
+
+In this example, the Transaction class is subclassed by StockTransaction where the base buy() and sell() methods are overridden to provide the desired functionality. This approach, while basic and lackluster in many regards, conforms to the Liskov Substitution Principle by assuring that substituting a subclass instance of StockTransaction for a superclass instance of Transaction will not break core functionality. More concretely, the substituted subclass instance will still provide buy and sell functionality that could be called in the same manner.
+
+Interface Segregation Principle:
+
+This rule means that we should break our interfaces into many smaller ones, so they better satisfy the exact needs of our clients.
+Similar to the Single Responsibility Principle, the goal of the Interface Segregation Principle is to minimize side consequences and repetition by dividing the software into multiple, independent parts.
+
+<?php
+interface workerInterface
+{
+    public  function work();
+    public  function  sleep();
+}
+
+class HumanWorker implements workerInterface
+{
+    public  function work()
+    {
+        var_dump('works');
+    }
+
+    public  function  sleep()
+    {
+        var_dump('sleep');
+    }
+}
+
+class RobotWorker implements workerInterface
+{
+    public  function work()
+    {
+        var_dump('works');
+    }
+
+    public  function sleep()
+    {
+        // No need
+    }
+}
+
+
+In the above code, RobotWorker doesn’t need sleep, but the class has to implement the sleep method because we know that all methods are abstract in the interface. It breaks the Interface Segregation law. Please see the following code for how we can fix it:
+
+
+<?php
+interface WorkAbleInterface
+{
+    public  function work();
+}
+
+interface SleepAbleInterface
+{
+    public  function  sleep();
+}
+
+class HumanWorker implements WorkAbleInterface, SleepAbleInterface
+{
+    public  function work()
+    {
+        var_dump('works');
+    }
+    
+    public  function  sleep()
+    {
+        var_dump('sleep');
+    }
+}
+
+class RobotWorker implements WorkAbleInterface
+{
+    public  function work()
+    {
+        var_dump('works');
+    }
+}
+
+Dependency Inversion Principle:
+
+By applying the Dependency Inversion Principle, the modules can be easily changed by other modules just changing the dependency module. Any changes to the low-level module won’t affect the high-level module.
+
+<?php
+class MySQLConnection
+{
+   /**
+   * db connection
+   */
+   public function connect()
+   {
+      var_dump('MYSQL Connection');
+   }
+}
+
+class PasswordReminder
+{    
+    /**
+     * @var MySQLConnection
+     */
+     private $dbConnection;
+     
+
+    public function __construct(MySQLConnection $dbConnection) 
+    {
+      $this->dbConnection = $dbConnection;
+    }
+}
+
+There’s a common misunderstanding that dependency inversion is simply another way to say dependency injection. However, the two are not the same.
+
+In the above code, in spite of injecting the MySQLConnection class in the PasswordReminder class, it depends on MySQLConnection. The high-level module PasswordReminder shouldn’t depend on the low-level module MySQLConnection.
+
+If we want to change the connection from MySQLConnection to MongoDBConnection, we have to change the hard-coded constructor injection in the PasswordReminder class.
+
+The PasswordReminder class should depend on abstractions, not on concretions. But how can we do it? Please see the following example:
+
+
+<?php
+interface ConnectionInterface
+{
+    public function connect();
+}
+
+class DbConnection implements ConnectionInterface
+{
+
+    /**
+     * db connection
+     */
+    public function connect()
+    {
+        var_dump('MYSQL Connection');
+    }
+}
+
+class PasswordReminder
+{
+    /**
+     * @var MySQLConnection
+     */
+
+    private $dbConnection;
+
+    public  function __construct(ConnectionInterface $dbConnection)
+    {
+        $this->dbConnection =  $dbConnection;
+    }
+}
+
+In the above code, we want to change the connection from MySQLConnection to MongoDBConnection. We don’t need to change constructor injection in the PasswordReminder class. Because here the PasswordReminder class depends on abstractions, not concretions.

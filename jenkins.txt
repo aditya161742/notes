@@ -1,0 +1,72 @@
+Jenkins:
+
+-> Download/Install:
+
+1) Download and keep war file anywhere on PC
+2) On CMD goto that location and run: java -jar jenkins.war
+3) on CMD it will give password for starting jenkins, copy that password.
+4) Goto http://localhost:8080, 8080 is default port used , we can change it by changing in xml file.
+5) On starting http://localhost:8080, it will ask for password. Paste the password copied from CMD.
+
+Via these steps , jenkins will start as standalone server.
+
+-> All jenkins related plugs, config files, logs etc are stored in "/users/Aditya/.jenkins" folder
+
+-> How to change home directory of jenkins, i.e "/users/Aditya/.jenkins".  ??
+
+Why we want to change default home directory of jenkins  ??
+
+So that we can move it to a location which has enough space. As there is lot of data stored by jenkins, so we might need more space.
+
+1) start jenkins: by running CMD: java -jar jenkins.war
+2) Goto http:localhost:8080 -> manage jenkins -> configure system, here we can see our home directory.
+3) suppose we want to make "C:/tools" as home directory. So we need to copy all data to our new directory.
+4) change environment variables - JENKINS_HOME and set to new directory.
+5) restart jenkins, by going http://localhost:8080/restart
+
+This change is temporary , to make it parmanent goto "users/Aditya/" and search for ".bash_profile" and add "export JENKINS_HOME="C:/tools" and save it.
+
+-> CLI for jenkins:
+
+1) Goto: manage jenkins -> configure global security -> enable security (check)
+2) Goto http:localhost:8080/cli and download cli-jar and save at any location.
+3) Goto that location and Then run java -jar jenkins-cli.jar, then it will ask passphrase. For that goto admin(drop down at top right) -> configure -> SSH public keys (use this keys)
+
+
+-> How to create users + manage + assign roles.
+
+1) Goto manage jenkins -> manage users
+2) Roles strategy plugin -> used for assigning roles to users. Download plugins manually using browser and move that file to "jenkins home directory / plugins" folder
+
+OR
+
+manage jenkins -> manage plugins and search and install and restart jenkins
+
+3) Goto: manage jenkins -> configure global security -> enable security (check)
+
+and in Authorization section --> choose Role based strategy
+
+4) Goto: manage jenkins -> manage and assign roles 
+
+
+-> Baisc configuration:
+
+1) Goto: manage jenkins-> configure system
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

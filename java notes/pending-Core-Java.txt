@@ -1,0 +1,10 @@
+
+Core Java Pending Tasks:
+
+
+1) Scrapping data
+2) Read xls files
+3) Generate PDF
+4) Learn apache commons
+5) Learn manipulating Date and string
+6) Streams and Lamda functions

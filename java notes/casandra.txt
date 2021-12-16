@@ -1,0 +1,127 @@
+
+
+Cassandra installation gudie:
+
+
+
+
+--> https://phoenixnap.com/kb/install-cassandra-on-windows
+--> Cassandra running version is 3.11.4, not later versions giving error "unsable to create replaca on c:/cassandra/.........".
+--> Currently cassandra works with till java 8u251 JDK (it will giver sigar libarary error with version 8u261) only, caasandra 4 will support higher versions of java.
+--> Currently cassandra works with Python 2.7
+
+
+
+
+Steps to run cassandra:
+
+1) Goto bin directory of cassandra and enter "cassandra" on CMD.
+2) Goto bin directory of cassandra and enter "cqlsh" on CMD.
+
+***** Introduction: *******
+
+
+Cassandra is a partitioned row store. Rows are organized into tables with a required primary key.
+
+Partitioning means that Cassandra can distribute your data across multiple machines in an application-transparent matter. Cassandra will automatically repartition as machines are added and removed from the cluster.
+
+Row store means that like relational databases, Cassandra organizes data by rows and columns.
+
+-> Column oriented or columnar databases are stored on disk column wise.
+
+
+-> e.g: Table Bonuses table
+
+ ID         Last    First   Bonus
+ 1          Doe     John    8000
+ 2          Smith   Jane    4000
+ 3          Beck    Sam     1000
+
+-> In a row-oriented database management system, the data would be stored like this: 1,Doe,John,8000;2,Smith,Jane,4000;3,Beck,Sam,1000;
+
+-> In a column-oriented database management system, the data would be stored like this:
+1,2,3;Doe,Smith,Beck;John,Jane,Sam;8000,4000,1000;
+
+-> Cassandra is basically a column-family store
+
+-> Cassandra would store the above data as, 
+ "Bounses" : {
+       row1 : { "ID":1, "Last":"Doe", "First":"John", "Bonus":8000},
+       row2 : { "ID":2, "Last":"Smith", "First":"Jane", "Bonus":4000}
+       ...
+ }
+
+
+**** CAP Theorm ****
+
+-> This theorum is very important in big data world.
+
+-> This theorm states that a distributed database system can only have 2 of the 3: Consistency, Availability and Partition Tolerance. We cannot have all 3 at the same time.
+
+-> Consistent:  Every node should return recent data inserted or updated, e.g , if we update car column from BMW to mercedes then all nodes should return mercedes rather then BMW.
+
+-> Available: Database should always available to read or write data to database. Availability is a guarantee that every request receives a response about whether it was successful or failed.
+
+-> Partition Tolerance: It Partition Tolerance is a guarantee that the system continues to operate despite arbitrary message loss or failure of part of the system. In other words, even if there is a network outage in the data center and some of the computers are unreachable, still the system continues to perform.
+
+-> Out of these three guarantees, no system can provide more than 2 guarantees. Since in the case of a distributed systems, the partitioning of the network is must, the tradeoff is always between consistency and availability.
+
+****** Query First Approach ******
+
+-> We cannot use RDBMS approach like joins in a distributed system because tables might be present in other machine, and we cannot join tables from different machines.
+
+-> Cassandra do not have joins like RDBMS, therefore we take Query based approach. We design table for specific query. So we have to query only one table when reading data. Cassendra is designed to operate in such a way that only one table can be queried. If table is not designed for the query then query is not possible to perform or it will be very slow.
+
+
+Example:
+
+
+
+
+**** Partitioning, Rings , tokens ****
+
+How cansandra decides what data to store in what node in a cluster ??
+
+-> Cansandra acheives this by partitioning the data on something called partition key. Every piece of data with same partition key will be stored at the same node on the cluster.
+
+-> Partiton key is passed to hash function which will generate unique token. Every same partiton key will have same unique token , therefore it will be stored in same node.
+	
+	Example: "BMW" (Partiton key)     -> Hash function --> 234 (Token)
+			"AUDI" (Partiton key)     -> Hash function --> 238	(Token)
+			"BMW" (Partiton key)     -> Hash function --> 234	(Token)
+
+
+Therefore all BMW partiton key data will be stored on same node, so that when we query "get all employees who drive BMW" we can get data.
+
+-> Cassandra ring diagram https://www.researchgate.net/figure/Apache-Cassandra-Ring_fig2_321768377
+
+-> Each node in ring diagram will be assigned a token and it will be responsible for storing data less then the value of that token or greater then the value assigned to the previous node.
+
+
+
+Example: If node 1 is assigned value 10 and node 8 was assigned value 5 , then node 1 will store all data whose unique token is less then 10 and greater then 5.
+
+
+
+**** Replication, Data centers and Racks ****
+
+-> Cansandra can be used to replicate data at multiple data centers at different geographic locations as backup.
+
+-> Rack is a cluster of smaller machines. An Apache Cassandra Rack is a grouped set of servers. The architecture of Cassandra uses racks so that no replica is stored redundantly inside a singular rack, ensuring that replicas are spread around through different racks in case one rack goes down.
+
+-> Default replication factor for casandra is 3.
+
+-> We can change repliaction factor, racks or data center properties by modifying cassendra's configuration file.
+
+
+
+***** CQL(cassandra query language), keyspaces, tables *****
+
+-> CQL is similar to SQL but it has no joins.
+
+-> https://www.tutorialspoint.com/cassandra/cassandra_create_keyspace.htm
+
+
+
+
+

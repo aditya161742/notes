@@ -1,0 +1,102 @@
+Object Oriented Programming:
+
+
+
+Data hiding:
+
+-> Outside person can't access our internal data directly or our internal data should not go out directly this OOP feature is nothing but data hiding. After validation/Authentication outside person can access our internal data. 
+			
+			Ex 1: After providing proper username and password we can able to access our GMAIL inbox information
+			Ex 2: Even though we are valid customer of the bank we can able to access our account information and we can't access 			others account information.
+
+-> By declaring data member (Variable) as private we can acheive data hiding. 
+		
+				Ex: 
+					public class Account{
+						private double balance;
+
+						public double getBalance{
+
+							validation();
+
+							return balance;
+						}
+					}
+
+-> The main advantage of data hiding is security.
+-> It is highly recommended to decalre data member(variable) as private.
+
+
+Abstraction:
+
+-> Abstraction means displaying only essential information and hiding the details. Data abstraction refers to providing only essential information about the data to the outside world, hiding the background details or implementation.
+
+Consider a real life example of a man driving a car. The man only knows that pressing the accelerators will increase the speed of car or applying brakes will stop the car but he does not know about how on pressing accelerator the speed is actually increasing, he does not know about the inner mechanism of the car or the implementation of accelerator, brakes etc in the car. This is what abstraction is.
+
+Ex: Through bank ATM GUI screen bank people are highlighting the set of services what they are offering without highlighting internal implementation.
+
+-> The main advantages of abstraction are:
+
+	1) We can acheive security because we are not highlighting our internal implementation.
+	2) Without effecting outside person we can able to perform any type of changes in our internal system and hence enhancement will became easy.
+	3) It improves maintainibility of the application.
+	4) It improves easiness to use our system.
+
+-> By using interfaces and abstract classes we can implement abstraction.
+
+
+
+
+
+Encapsulation:
+
+-> The process of binding data and corresposnding methods into a single unit is nothing but encapsulation.
+	Ex: 
+		class Student{
+				data members;
+
+				methods();
+		}
+
+-> If any compnenent follow data hiding and abstraction such type of component is said to be encapsulated compnenet.
+
+-> Encapsulation = data hiding + abstraction.
+
+		Ex:	
+			public class Account{
+
+					private double balance;
+
+					public double getBalance{
+
+						validation();
+
+						return balance;
+					}
+			}
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+is-a relationship (also called inheritence):
+
+-> the main advatgae of is-a relationship is code reusaubility.
+-> by using extends keyword we can implement is-a relationship.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,20 @@
+
+
+
+
+
+
+
+
+-> Goto https://start.spring.io/, generate project with dependencies WebMvc, h2 DB and JPA data or any other as needed.
+-> Goto to STS or eclipse import download project as existing maven project.
+
+Setting up JPA model:
+
+-> JPA is Java persistence model.
+
+-> Create two POJO classes, Author (firstname ,lastname) and Book (title, isbn) With many to many realationship.
+
+-> Note: JPA does require zero args contructor so create it when creating POJO with constructor
+
+-> #Entity is from persistnece package (i.e javax.persistence.Entity) donot choose hibernate package.

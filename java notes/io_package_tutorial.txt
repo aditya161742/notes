@@ -1,0 +1,1020 @@
+Introduction:
+
+
+
+Java I/O (Input and Output) is used to process the input and produce the output.
+
+Java uses the concept of a stream to make I/O operation fast. 
+
+A stream is a sequence of data. In Java, a stream is composed of bytes. It's called a stream because it is like a stream of water that continues to flow.
+
+In Java, 3 streams are created for us automatically. All these streams are attached with the console.
+
+1) System.out: standard output stream
+
+2) System.in: standard input stream
+
+3) System.err: standard error stream
+
+Let's see the code to print output and an error message to the console.
+
+System.out.println("simple message");  
+System.err.println("error message");  
+Let's see the code to get input from console.
+
+Ex:
+
+int i=System.in.read();//returns ASCII code of 1st character  
+System.out.println((char)i);//will print the character
+
+
+-> OutputStream class is an abstract class. It is the superclass of all classes representing an output stream of bytes. An output stream accepts output bytes and sends them to some sink.
+
+Useful methods of OutputStream:
+
+1) public void write(int)throws IOException	is used to write a byte to the current output stream.
+2) public void write(byte[])throws IOException	is used to write an array of byte to the current output stream.
+3) public void flush()throws IOException	flushes the current output stream.
+4) public void close()throws IOException	is used to close the current output stream.
+
+OutputStream Hierarchy:
+
+https://static.javatpoint.com/java/javaio/images/java-outputstream.png
+
+-> InputStream class is an abstract class. It is the superclass of all classes representing an input stream of bytes.
+
+Useful methods of InputStream:
+
+Method	Description
+1) public abstract int read()throws IOException	reads the next byte of data from the input stream. It returns -1 at the end of the file.
+2) public int available()throws IOException	returns an estimate of the number of bytes that can be read from the current input stream.
+3) public void close()throws IOException	is used to close the current input stream.
+
+
+InputStream Hierarcy:
+
+https://static.javatpoint.com/java/javaio/images/java-inputstream.png
+
+
+*****************************************************************
+
+
+Java FileOutputStream Class:
+
+-> If you have to write primitive values into a file, use FileOutputStream class. You can write byte-oriented as well as character-oriented data through FileOutputStream class. But, for character-oriented data, it is preferred to use FileWriter than FileOutputStream.
+
+Ex 1:
+
+Java FileOutputStream Example 1: write byte
+
+import java.io.FileOutputStream;  
+public class FileOutputStreamExample {  
+    public static void main(String args[]){    
+           try{    
+             FileOutputStream fout=new FileOutputStream("D:\\testout.txt");    
+             fout.write(65);    
+             fout.close();    
+             System.out.println("success...");    
+            }catch(Exception e){System.out.println(e);}    
+      }    
+}  
+
+
+The content of a text file testout.txt is set with the data A.
+
+testout.txt
+
+A
+
+
+Ex 2:
+
+Java FileOutputStream example 2: write string
+
+import java.io.FileOutputStream;  
+public class FileOutputStreamExample {  
+    public static void main(String args[]){    
+           try{    
+             FileOutputStream fout=new FileOutputStream("D:\\testout.txt");    
+             String s="Welcome to javaTpoint.";    
+             byte b[]=s.getBytes();//converting string into byte array    
+             fout.write(b);    
+             fout.close();    
+             System.out.println("success...");    
+            }catch(Exception e){System.out.println(e);}    
+      }    
+}  
+
+
+
+The content of a text file testout.txt is set with the data Welcome to javaTpoint.
+
+testout.txt
+
+Welcome to javaTpoint.
+
+
+****** Java FileInputStream Class *********
+
+-> Java FileInputStream class obtains input bytes from a file. It is used for reading byte-oriented data (streams of raw bytes) such as image data, audio, video etc. You can also read character-stream data. But, for reading streams of characters, it is recommended to use FileReader class.
+
+
+Ex 1 :
+
+Java FileInputStream example 1: read single character
+import java.io.FileInputStream;  
+public class DataStreamExample {  
+     public static void main(String args[]){    
+          try{    
+            FileInputStream fin=new FileInputStream("D:\\testout.txt");    
+            int i=fin.read();  
+            System.out.print((char)i);    
+  
+            fin.close();    
+          }catch(Exception e){System.out.println(e);}    
+         }    
+        }  
+Note: Before running the code, a text file named as "testout.txt" is required to be created. In this file, we are having following content:
+
+Welcome to javatpoint.
+
+After executing the above program, you will get a single character from the file which is 87 (in byte form). To see the text, you need to convert it into character.
+
+Output:
+
+W
+
+
+
+Ex 2:
+
+
+Java FileInputStream example 2: read all characters
+
+package com.javatpoint;  
+  
+import java.io.FileInputStream;  
+public class DataStreamExample {  
+     public static void main(String args[]){    
+          try{    
+            FileInputStream fin=new FileInputStream("D:\\testout.txt");    
+            int i=0;    
+            while((i=fin.read())!=-1){    
+             System.out.print((char)i);    
+            }    
+            fin.close();    
+          }catch(Exception e){System.out.println(e);}    
+         }    
+        }  
+Output:
+
+Welcome to javaTpoint
+
+
+*****************************************************************************************
+
+BufferedOutputStream Class:
+
+
+-> The BufferedOutputStream maintains an internal buffer of 8192 bytes.
+
+-> During the write operation, the bytes are written to the internal buffer instead of the disk. Once the buffer is filled or the stream is closed, the whole buffer is written to the disk. Hence, the number of communication to the disk is reduced. This is why writing bytes is faster using BufferedOutputStream.
+
+-> Java BufferedOutputStream class constructors
+
+ 1) BufferedOutputStream(OutputStream os)	It creates the new buffered output stream which is used for writing the data to the specified output stream.
+ 2) BufferedOutputStream(OutputStream os, int size)	It creates the new buffered output stream which is used for writing the data to the specified output stream with a specified buffer size.
+
+-> Useful methods:
+
+void flush()	It flushes the buffered output stream.
+
+
+Ex: 
+
+package com.javatpoint;  
+import java.io.*;  
+public class BufferedOutputStreamExample{    
+public static void main(String args[])throws Exception{    
+     FileOutputStream fout=new FileOutputStream("D:\\testout.txt");    
+     BufferedOutputStream bout=new BufferedOutputStream(fout);    
+     String s="Welcome to javaTpoint.";    
+     byte b[]=s.getBytes();    
+     bout.write(b);    
+     bout.flush();    
+     bout.close();    
+     fout.close();    
+     System.out.println("success");    
+}    
+}  
+
+Output:
+
+testout.txt
+
+Welcome to javaTpoint.
+
+Java BufferedInputStream Class:
+
+-> 1. BufferedInputStream can read from any InputStream object, whereas FileInputStream reads only from a File.
+2. FileInputStream is more time expensive as compared to BufferedInputStream because it doesn't use a internal buffer, resulting in more function calls while executing. Whereas, a BufferedInputStream uses a buffer which allows faster I/O.
+
+useful methods:
+
+void reset()	It repositions the stream at a position the mark method was last called on this input stream.
+void mark(int readlimit)	It sees the general contract of the mark method for the input stream.
+long skip(long x)	It skips over and discards x bytes of data from the input stream.
+
+
+Ex:
+
+package com.javatpoint;  
+   
+import java.io.*;  
+public class BufferedInputStreamExample{    
+ public static void main(String args[]){    
+  try{    
+    FileInputStream fin=new FileInputStream("D:\\testout.txt");    
+    BufferedInputStream bin=new BufferedInputStream(fin);    
+    int i;    
+    while((i=bin.read())!=-1){    
+     System.out.print((char)i);    
+    }    
+    bin.close();    
+    fin.close();    
+  }catch(Exception e){System.out.println(e);}    
+ }    
+}  
+
+Here, we are assuming that you have following data in "testout.txt" file:
+
+javaTpoint
+
+Output:
+
+javaTpoint
+
+**************************************************************************************************************
+
+Java SequenceInputStream Class:
+
+-> Java SequenceInputStream class is used to read data from multiple streams. It reads data sequentially (one by one).
+
+
+Constructors of SequenceInputStream class:
+
+-> SequenceInputStream(InputStream s1, InputStream s2)	creates a new input stream by reading the data of two input stream in order, first s1 and then s2.
+
+-> SequenceInputStream(Enumeration e)	creates a new input stream by reading the data of an enumeration whose type is InputStream.
+
+
+Ex:
+
+package com.javatpoint;  
+  
+import java.io.*;  
+class InputStreamExample {    
+  public static void main(String args[])throws Exception{    
+   FileInputStream input1=new FileInputStream("D:\\testin.txt");    
+   FileInputStream input2=new FileInputStream("D:\\testout.txt");    
+   SequenceInputStream inst=new SequenceInputStream(input1, input2);    
+   int j;    
+   while((j=inst.read())!=-1){    
+    System.out.print((char)j);    
+   }    
+   inst.close();    
+   input1.close();    
+   input2.close();    
+  }    
+}    
+
+
+Here, we are assuming that you have two files: testin.txt and testout.txt which have following information:
+
+testin.txt:
+
+Welcome to Java IO Programming.
+testout.txt:
+
+It is the example of Java SequenceInputStream class.
+After executing the program, you will get following output:
+
+Output:
+
+Welcome to Java IO Programming. It is the example of Java SequenceInputStream class.
+
+-----------------------------------------
+
+SequenceInputStream example that reads data using enumeration
+If we need to read the data from more than two files, we need to use Enumeration. Enumeration object can be obtained by calling elements() method of the Vector class. Let's see the simple example where we are reading the data from 4 files: a.txt, b.txt, c.txt and d.txt.
+
+package com.javatpoint;  
+import java.io.*;    
+import java.util.*;    
+class Input2{    
+public static void main(String args[])throws IOException{    
+//creating the FileInputStream objects for all the files    
+FileInputStream fin=new FileInputStream("D:\\a.txt");    
+FileInputStream fin2=new FileInputStream("D:\\b.txt");    
+FileInputStream fin3=new FileInputStream("D:\\c.txt");    
+FileInputStream fin4=new FileInputStream("D:\\d.txt");    
+//creating Vector object to all the stream    
+Vector v=new Vector();    
+v.add(fin);    
+v.add(fin2);    
+v.add(fin3);    
+v.add(fin4);              
+//creating enumeration object by calling the elements method    
+Enumeration e=v.elements();      
+//passing the enumeration object in the constructor    
+SequenceInputStream bin=new SequenceInputStream(e);    
+int i=0;      
+while((i=bin.read())!=-1){    
+System.out.print((char)i);    
+}     
+bin.close();    
+fin.close();    
+fin2.close();    
+}    
+}    
+
+The a.txt, b.txt, c.txt and d.txt have following information:
+
+a.txt:
+
+Welcome
+
+b.txt:
+
+to
+
+c.txt:
+
+java
+
+d.txt:
+
+programming
+
+Output:
+
+Welcometojavaprogramming
+
+
+*************************************************************************************************
+
+Java ByteArrayOutputStream Class:
+
+-> Java ByteArrayOutputStream class is used to write common data into multiple files. In this stream, the data is written into a byte array which can be written to multiple streams later.
+
+-> The ByteArrayOutputStream holds a copy of data and forwards it to multiple streams.
+
+
+
+Useful methods:
+
+int size()	It is used to returns the current size of a buffer.
+
+String toString()	It is used for converting the content into a string decoding bytes using a platform default character set.
+
+void writeTo(OutputStream out)	It is used for writing the complete content of a byte array output stream to the specified output stream.
+
+void reset()	It is used to reset the count field of a byte array output stream to zero value.
+
+
+Ex:
+
+package com.javatpoint;  
+import java.io.*;  
+public class DataStreamExample {  
+public static void main(String args[])throws Exception{    
+      FileOutputStream fout1=new FileOutputStream("D:\\f1.txt");    
+      FileOutputStream fout2=new FileOutputStream("D:\\f2.txt");    
+        
+      ByteArrayOutputStream bout=new ByteArrayOutputStream();    
+      bout.write(65);    
+      bout.writeTo(fout1);    
+      bout.writeTo(fout2);    
+        
+      bout.flush();    
+      bout.close();//has no effect    
+      System.out.println("Success...");    
+     }    
+    }   
+
+Output:
+
+Success...
+
+f1.txt:
+
+A
+
+f2.txt:
+
+A
+
+Java ByteArrayInputStream Class:
+
+-> The ByteArrayInputStream is composed of two words: ByteArray and InputStream. As the name suggests, it can be used to read byte array as input stream.
+
+-> Java ByteArrayInputStream class contains an internal buffer which is used to read byte array as stream. In this stream, the data is read from a byte array.
+
+Ex:
+
+package com.javatpoint;  
+import java.io.*;  
+public class ReadExample {  
+  public static void main(String[] args) throws IOException {  
+    byte[] buf = { 35, 36, 37, 38 };  
+    // Create the new byte array input stream  
+    ByteArrayInputStream byt = new ByteArrayInputStream(buf);  
+    int k = 0;  
+    while ((k = byt.read()) != -1) {  
+      //Conversion of a byte into character  
+      char ch = (char) k;  
+      System.out.println("ASCII value of Character is:" + k + "; Special character is: " + ch);  
+    }  
+  }  
+}  
+
+Output:
+
+ASCII value of Character is:35; Special character is: #
+ASCII value of Character is:36; Special character is: $
+ASCII value of Character is:37; Special character is: %
+ASCII value of Character is:38; Special character is: &
+
+
+************************************************************************************
+
+Java DataOutputStream Class:
+
+-> Java DataOutputStream class allows an application to write primitive Java data types to the output stream in a machine-independent way.
+
+
+Useful methods:
+
+void writeBoolean(boolean v)	It is used to write Boolean to the output stream as a 1-byte value.
+void writeChar(int v)	It is used to write char to the output stream as a 2-byte value.
+void writeChars(String s)	It is used to write string to the output stream as a sequence of characters.
+void writeByte(int v)	It is used to write a byte to the output stream as a 1-byte value.
+void writeBytes(String s)	It is used to write string to the output stream as a sequence of bytes.
+void writeInt(int v)	It is used to write an int to the output stream
+void writeShort(int v)	It is used to write a short to the output stream.
+void writeShort(int v)	It is used to write a short to the output stream.
+void writeLong(long v)	It is used to write a long to the output stream.
+void writeUTF(String str)	It is used to write a string to the output stream using UTF-8 encoding in portable manner.
+
+
+Ex:
+
+package com.javatpoint;  
+  
+import java.io.*;  
+public class OutputExample {  
+    public static void main(String[] args) throws IOException {  
+        FileOutputStream file = new FileOutputStream(D:\\testout.txt);  
+        DataOutputStream data = new DataOutputStream(file);  
+        data.writeInt(65);  
+        data.flush();  
+        data.close();  
+        System.out.println("Succcess...");  
+    }  
+}  
+
+Output:
+
+Succcess...
+
+testout.txt:
+
+A
+
+Java DataInputStream Class:
+
+-> Java DataInputStream class allows an application to read primitive data from the input stream in a machine-independent way.
+
+
+Useful methods:
+
+int readInt()	It is used to read input bytes and return an int value.
+byte readByte()	It is used to read and return the one input byte.
+char readChar()	It is used to read two input bytes and returns a char value.
+double readDouble()	It is used to read eight input bytes and returns a double value.
+boolean readBoolean()	It is used to read one input byte and return true if byte is non zero, false if byte is zero.
+int skipBytes(int x)	It is used to skip over x bytes of data from the input stream.
+String readUTF()	It is used to read a string that has been encoded using the UTF-8 format.
+void readFully(byte[] b)	It is used to read bytes from the input stream and store them into the buffer array.
+void readFully(byte[] b, int off, int len)	It is used to read len bytes from the input stream.
+
+Ex:
+
+package com.javatpoint;  
+import java.io.*;    
+public class DataStreamExample {  
+  public static void main(String[] args) throws IOException {  
+    InputStream input = new FileInputStream("D:\\testout.txt");  
+    DataInputStream inst = new DataInputStream(input);  
+    int count = input.available();  
+    byte[] ary = new byte[count];  
+    inst.read(ary);  
+    for (byte bt : ary) {  
+      char k = (char) bt;  
+      System.out.print(k+"-");  
+    }  
+  }  
+}  
+
+Here, we are assuming that you have following data in "testout.txt" file:
+
+JAVA
+
+Output:
+
+J-A-V-A
+
+
+***************************************************************************************************
+
+Java Writer:
+
+-> It is an abstract class for writing to character streams.
+-> Most subclasses will override some of the methods defined here to provide higher efficiency, functionality or both.
+
+Useful methods:
+
+Writer	append(char c)	It appends the specified character to this writer.
+Writer	append(CharSequence csq)	It appends the specified character sequence to this writer
+Writer	append(CharSequence csq, int start, int end)	It appends a subsequence of the s
+write(char[] cbuf)	It writes an array of characters.
+abstract void	write(char[] cbuf, int off, int len)	It writes a portion of an array of characters.
+void	write(int c)	It writes a single character.
+void	write(String str)	It writes a string.
+void	write(String str, int off, int len)	It writes a portion of a string.
+
+Ex:
+
+import java.io.*;  
+public class WriterExample {  
+    public static void main(String[] args) {  
+        try {  
+            Writer w = new FileWriter("output.txt");  
+            String content = "I love my country";  
+            w.write(content);  
+            w.close();  
+            System.out.println("Done");  
+        } catch (IOException e) {  
+            e.printStackTrace();  
+        }  
+    }  
+}  
+
+Output:
+
+Done
+
+output.txt:
+
+I love my country
+
+Java reader:
+
+-> Java Reader is an abstract class for reading character streams. 
+
+Useful methods:
+
+void	mark(int readAheadLimit)	It marks the present position in the stream.
+boolean	markSupported()	It tells whether this stream supports the mark() operation.
+int	read()	It reads a single character.
+int	read(char[] cbuf)	It reads characters into an array.
+abstract int	read(char[] cbuf, int off, int len)	It reads characters into a portion of an array.
+int	read(CharBuffer target)	It attempts to read characters into the specified character buffer.
+boolean	ready()	It tells whether this stream is ready to be read.
+void	reset()	It resets the stream.
+long	skip(long n)	It skips characters.
+
+Ex:
+
+import java.io.*;  
+public class ReaderExample {  
+    public static void main(String[] args) {  
+        try {  
+            Reader reader = new FileReader("file.txt");  
+            int data = reader.read();  
+            while (data != -1) {  
+                System.out.print((char) data);  
+                data = reader.read();  
+            }  
+            reader.close();  
+        } catch (Exception ex) {  
+            System.out.println(ex.getMessage());  
+        }  
+    }  
+}  
+
+file.txt:
+
+I love my country
+
+Output:
+
+I love my country
+
+
+*****************************************************************************************************************
+
+FileWriter:
+
+-> Java FileWriter class is used to write character-oriented data to a file. It is character-oriented class which is used for file handling in java.
+
+-> Unlike FileOutputStream class, you don't need to convert string into byte array because it provides method to write string directly.
+
+Ex:
+
+package com.javatpoint;  
+import java.io.FileWriter;  
+public class FileWriterExample {  
+    public static void main(String args[]){    
+         try{    
+           FileWriter fw=new FileWriter("D:\\testout.txt");    
+           fw.write("Welcome to javaTpoint.");    
+           fw.close();    
+          }catch(Exception e){System.out.println(e);}    
+          System.out.println("Success...");    
+     }    
+}  
+
+Output:
+
+Success...
+
+testout.txt:
+
+Welcome to javaTpoint.
+
+FileReader:
+
+-> Java FileReader class is used to read data from the file. It returns data in byte format like FileInputStream class.
+
+-> It is character-oriented class which is used for file handling in java.
+
+Constructors:
+
+FileReader(String file)	It gets filename in string. It opens the given file in read mode. If file doesn't exist, it throws FileNotFoundException.
+FileReader(File file)	It gets filename in file instance. It opens the given file in read mode. If file doesn't exist, it throws FileNotFoundException.
+
+Ex:
+
+package com.javatpoint;  
+  
+import java.io.FileReader;  
+public class FileReaderExample {  
+    public static void main(String args[])throws Exception{    
+          FileReader fr=new FileReader("D:\\testout.txt");    
+          int i;    
+          while((i=fr.read())!=-1)    
+          System.out.print((char)i);    
+          fr.close();    
+    }    
+}    
+Here, we are assuming that you have following data in "testout.txt" file:
+
+Welcome to javaTpoint.
+Output:
+
+Welcome to javaTpoint.
+
+*****************************************************************************************
+
+Java BufferedWriter Class:
+
+-> Java BufferedWriter class is used to provide buffering for Writer instances. It makes the performance fast. It inherits Writer class. The buffering characters are used for providing the efficient writing of single arrays, characters, and strings.
+
+Ex:
+
+package com.javatpoint;  
+import java.io.*;  
+public class BufferedWriterExample {  
+public static void main(String[] args) throws Exception {     
+    FileWriter writer = new FileWriter("D:\\testout.txt");  
+    BufferedWriter buffer = new BufferedWriter(writer);  
+    buffer.write("Welcome to javaTpoint.");  
+    buffer.close();  
+    System.out.println("Success");  
+    }  
+}  
+
+Output:
+
+success
+
+testout.txt:
+
+Welcome to javaTpoint.
+
+---------------
+
+Java BufferedReader class:
+
+-> Java BufferedReader class is used to read the text from a character-based input stream. It can be used to read data line by line by readLine() method. It makes the performance fast. It inherits Reader class.
+
+Ex:
+
+package com.javatpoint;  
+import java.io.*;  
+public class BufferedReaderExample {  
+    public static void main(String args[])throws Exception{    
+          FileReader fr=new FileReader("D:\\testout.txt");    
+          BufferedReader br=new BufferedReader(fr);    
+  
+          int i;    
+          while((i=br.read())!=-1){  
+          System.out.print((char)i);  
+          }  
+          br.close();    
+          fr.close();    
+    }    
+}    
+Here, we are assuming that you have following data in "testout.txt" file:
+
+Welcome to javaTpoint.
+Output:
+
+Welcome to javaTpoint.
+
+*********************************************************************
+
+CharArrayReader Class:
+
+
+Ex:
+
+package com.javatpoint;  
+  
+import java.io.CharArrayReader;  
+public class CharArrayExample{  
+  public static void main(String[] ag) throws Exception {  
+    char[] ary = { 'j', 'a', 'v', 'a', 't', 'p', 'o', 'i', 'n', 't' };  
+    CharArrayReader reader = new CharArrayReader(ary);  
+    int k = 0;  
+    // Read until the end of a file  
+    while ((k = reader.read()) != -1) {  
+      char ch = (char) k;  
+      System.out.print(ch + " : ");  
+      System.out.println(k);  
+    }  
+  }  
+}  
+
+Output
+
+j : 106
+a : 97
+v : 118
+a : 97
+t : 116
+p : 112
+o : 111
+i : 105
+n : 110
+t : 116
+
+-----------------------------
+
+CharArrayWriter class:
+
+-> The CharArrayWriter class can be used to write common data to multiple files. This class inherits Writer class. Its buffer automatically grows when data is written in this stream. Calling the close() method on this object has no effect.
+
+Ex:
+
+package com.javatpoint;  
+  
+import java.io.CharArrayWriter;  
+import java.io.FileWriter;  
+public class CharArrayWriterExample {  
+public static void main(String args[])throws Exception{    
+          CharArrayWriter out=new CharArrayWriter();    
+          out.write("Welcome to javaTpoint");    
+          FileWriter f1=new FileWriter("D:\\a.txt");    
+          FileWriter f2=new FileWriter("D:\\b.txt");    
+          FileWriter f3=new FileWriter("D:\\c.txt");    
+          FileWriter f4=new FileWriter("D:\\d.txt");    
+          out.writeTo(f1);    
+          out.writeTo(f2);    
+          out.writeTo(f3);    
+          out.writeTo(f4);    
+          f1.close();    
+          f2.close();    
+          f3.close();    
+          f4.close();    
+          System.out.println("Success...");    
+         }    
+        }    
+Output
+
+Success...
+After executing the program, you can see that all files have common data: Welcome to javaTpoint.
+
+a.txt:
+
+Welcome to javaTpoint
+b.txt:
+
+Welcome to javaTpoint
+c.txt:
+
+Welcome to javaTpoint
+d.txt:
+
+Welcome to javaTpoint
+
+***************************************************************************************************
+
+Java PrintStream Class:
+
+-> The PrintStream class provides methods to write data to another stream. The PrintStream class automatically flushes the data so there is no need to call flush() method. Moreover, its methods don't throw IOException.
+
+Useful methods:
+
+void print(char c)	It prints the specified char value.
+void print(char[] c)	It prints the specified character array values.
+void print(int i)	It prints the specified int value.
+void print(long l)	It prints the specified long value.
+void print(float f)	It prints the specified float value.
+void print(double d)	It prints the specified double value.
+void print(String s)	It prints the specified string value.
+void print(Object obj)	It prints the specified object value.
+void println(boolean b)	It prints the specified boolean value and terminates the line.
+void println(char c)	It prints the specified char value and terminates the line.
+void println(char[] c)	It prints the specified character array values and terminates the line.
+void println(int i)	It prints the specified int value and terminates the line.
+void println(long l)	It prints the specified long value and terminates the line.
+void println(float f)	It prints the specified float value and terminates the line.
+void println(double d)	It prints the specified double value and terminates the line.
+void println(String s)	It prints the specified string value and terminates the line.
+
+Ex:
+
+package com.javatpoint;  
+  
+import java.io.FileOutputStream;  
+import java.io.PrintStream;  
+public class PrintStreamTest{    
+ public static void main(String args[])throws Exception{    
+   FileOutputStream fout=new FileOutputStream("D:\\testout.txt ");    
+   PrintStream pout=new PrintStream(fout);    
+   pout.println(2016);    
+   pout.println("Hello Java");    
+   pout.println("Welcome to Java");    
+   pout.close();    
+   fout.close();    
+  System.out.println("Success?");    
+ }    
+}    
+   
+Output
+
+Success...
+The content of a text file testout.txt is set with the below data
+
+2016
+Hello Java
+Welcome to Java
+
+
+------------------------------------------
+
+Java PrintWriter class:
+
+-> Java PrintWriter class is the implementation of Writer class. It is used to print the formatted representation (Like println, print etc ) of objects to the text-output stream.
+
+Useful methods:
+
+void println(boolean x)	It is used to print the boolean value.
+void println(char[] x)	It is used to print an array of characters.
+void println(int x)	It is used to print an integer.
+PrintWriter append(char c)	It is used to append the specified character to the writer.
+PrintWriter append(CharSequence ch)	It is used to append the specified character sequence to the writer.
+
+Ex:
+
+package com.javatpoint;  
+  
+import java.io.File;  
+import java.io.PrintWriter;  
+public class PrintWriterExample {  
+    public static void main(String[] args) throws Exception {  
+     
+//Data to write in File using PrintWriter       
+      PrintWriter writer1 =null;      
+         writer1 = new PrintWriter(new File("D:\\testout.txt"));  
+         writer1.write("Like Java, Spring, Hibernate, Android, PHP etc.");                                                   
+                         writer1.flush();  
+         writer1.close();  
+    }  
+}  
+
+
+
+*****************************************************************
+
+Java Scanner class:
+
+
+-> The Java Scanner class breaks the input into tokens using a delimiter which is whitespace by default. It provides many methods to read and parse various primitive values.
+
+-> The Java Scanner class is widely used to parse text for strings and primitive types using a regular expression. It is the simplest way to get input in Java. By the help of Scanner in Java, we can get input from the user in primitive types such as int, long, double, byte, float, short, etc.
+
+Ex 1 :
+
+import java.util.*;  
+public class ScannerExample {  
+public static void main(String args[]){  
+          Scanner in = new Scanner(System.in);  
+          System.out.print("Enter your name: ");  
+          String name = in.nextLine();  
+          System.out.println("Name is: " + name);             
+          in.close();             
+          }  
+}  
+Output:
+
+Enter your name: sonoo jaiswal
+Name is: sonoo jaiswal
+
+
+Ex 2:
+
+import java.util.*;  
+public class ScannerClassExample1 {    
+      public static void main(String args[]){                       
+          String s = "Hello, This is JavaTpoint.";  
+          //Create scanner Object and pass string in it  
+          Scanner scan = new Scanner(s);  
+          //Check if the scanner has a token  
+          System.out.println("Boolean Result: " + scan.hasNext());  
+          //Print the string  
+          System.out.println("String: " +scan.nextLine());  
+          scan.close();           
+          System.out.println("--------Enter Your Details-------- ");  
+          Scanner in = new Scanner(System.in);  
+          System.out.print("Enter your name: ");    
+          String name = in.next();   
+          System.out.println("Name: " + name);           
+          System.out.print("Enter your age: ");  
+          int i = in.nextInt();  
+          System.out.println("Age: " + i);  
+          System.out.print("Enter your salary: ");  
+          double d = in.nextDouble();  
+          System.out.println("Salary: " + d);         
+          in.close();           
+          }    
+}  
+
+Output:
+
+Boolean Result: true
+String: Hello, This is JavaTpoint.
+-------Enter Your Details--------- 
+Enter your name: Abhishek
+Name: Abhishek
+Enter your age: 23
+Age: 23
+Enter your salary: 25000
+Salary: 25000.0
+
+
+Ex 3:
+
+
+import java.util.*;  
+public class ScannerClassExample2 {    
+      public static void main(String args[]){                       
+          String str = "Hello/This is JavaTpoint/My name is Abhishek.";  
+          //Create scanner with the specified String Object  
+          Scanner scanner = new Scanner(str);  
+          System.out.println("Boolean Result: "+scanner.hasNextBoolean());            
+          //Change the delimiter of this scanner  
+          scanner.useDelimiter("/");  
+          //Printing the tokenized Strings  
+          System.out.println("---Tokenizes String---");   
+        while(scanner.hasNext()){  
+            System.out.println(scanner.next());  
+        }  
+          //Display the new delimiter  
+          System.out.println("Delimiter used: " +scanner.delimiter());            
+          scanner.close();  
+          }    
+}  
+
+Output:
+
+Boolean Result: false
+---Tokenizes String---
+Hello
+This is JavaTpoint
+My name is Abhishek.
+Delimiter used: /
+
+

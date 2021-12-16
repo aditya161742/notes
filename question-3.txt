@@ -1,0 +1,272 @@
+
+
+Q)  what do you mean by abstraction and how to achieve it in java?? 
+
+Ans)
+  
+  Consider a real-life example of a man driving a car. The man only knows that pressing the accelerators will increase the speed of a car or applying brakes will stop the car, but he does not know about how on pressing the accelerator the speed is actually increasing, he does not know about the inner mechanism of the car or the implementation of the accelerator, brakes, etc in the car. This is what abstraction is. 
+
+  In java, abstraction is achieved by interfaces and abstract classes. We can achieve 100% abstraction using interfaces.
+
+
+Q) how have you written jUnit case for repository class?? 
+
+Ans)  
+use any in-memory DB to test you JPA repository and dont use mock test framework like Mockito, EasyMock, etc. As in Dao layer, there should not be any business logic to mock. it should be simple read/write operation.
+
+
+public class ChartRepositoryTest { 
+
+  @Autowired
+  private ChartRepository cartRepository;
+
+  @Test 
+  public void testfind() {
+     // do find , insert and validate the response
+  } 
+}
+
+Create new properties file named applications-test.properties and define datasource details in that. 
+
+ Then use active profile in test class.
+@ActiveProfiles("test")
+
+Q)  is hibernate session thread safe?? 
+
+Ans)  No
+
+Q)  how to call store procedure in hibernate?? 
+
+Ans)  
+DELIMITER //
+    CREATE PROCEDURE GetFoosByName(IN fooName VARCHAR(255))
+        LANGUAGE SQL
+        DETERMINISTIC
+        SQL SECURITY DEFINER
+        BEGIN
+            SELECT * FROM foo WHERE name = fooName;
+        END //
+DELIMITER;
+
+Query query = session.createSQLQuery("CALL GetFoosByName(:fooName)")
+  .addEntity(Foo.class)
+  .setParameter("fooName","New Foo");
+
+
+ALTER PROCEDURE Masterinsertupdatedelete (@id            INTEGER,
+                                          @first_name    VARCHAR(10),
+                                          @last_name     VARCHAR(10),
+                                          @salary        DECIMAL(10, 2),
+                                          @city          VARCHAR(20),
+                                          @StatementType NVARCHAR(20) = '')
+AS
+  BEGIN
+      IF @StatementType = 'Insert'
+        BEGIN
+            INSERT INTO employee
+                        (id,
+                         first_name,
+                         last_name,
+                         salary,
+                         city)
+            VALUES     ( @id,
+                         @first_name,
+                         @last_name,
+                         @salary,
+                         @city)
+        END
+
+      IF @StatementType = 'Select'
+        BEGIN
+            SELECT *
+            FROM   employee
+        END
+
+      IF @StatementType = 'Update'
+        BEGIN
+            UPDATE employee
+            SET    first_name = @first_name,
+                   last_name = @last_name,
+                   salary = @salary,
+                   city = @city
+            WHERE  id = @id
+        END
+      ELSE IF @StatementType = 'Delete'
+        BEGIN
+            DELETE FROM employee
+            WHERE  id = @id
+        END
+  END
+
+Q)  Multi threading use example?? 
+
+Ans)  
+Consider for example you have a Web application that activates a user's state on a GSM network (e.g activate 4G plan) and sends a confirmatory SMS or email message at the end.
+
+Knowing that the Web call would take several minutes - especially if the GSM network is stressed - it does not make sense to call it directly from the Web thread.
+
+So basically, when a user clicks "Activate", the Server returns something like "Thanks for activating the 4G plan. Your plan will be activated in a few minutes and you will receive a confirmation SMS/email".
+
+In that case, you server has to spawn a new thread, ideally using a thread pool, in an asynchronous manner, and immediately return a response to the user.
+
+
+Q)  limitations of mockito?? 
+
+Ans)  we cannot mock constructors and static methods. 
+
+It also cannot mock hasCode(), equals() method. 
+
+It requires java version 6+
+
+Q)  what happens when stack or heap memory is full?? 
+
+Ans)  If stack memory is full it will throw StackoverFlow exception and if heap memory is full it will throw OutOfMemory exception.
+
+Q)  Can we have try block without catch block?? 
+
+Ans)
+
+  Yes, It is possible to have a try block without a catch block by using a final block.
+
+  try {
+         System.out.println("Try Block");
+      } finally {
+         System.out.println("Finally Block");
+      }
+
+Q)  try with resources block?? 
+
+Ans)
+    Support for try-with-resources — introduced in Java 7 — allows us to declare resources to be used in a try block with the assurance that the resources will be closed after the execution of that block.
+
+    In Java, the try-with-resources statement is a try statement that declares one or more resources. The resource is as an object that must be closed after finishing the program. The try-with-resources statement ensures that each resource is closed at the end of the statement execution.
+
+    A try-with-resources block can still have the catch and finally blocks, which will work in the same way as with a traditional try block.
+
+    The following example writes a string into a file. It uses an instance of FileOutputStream to write data into the file. FileOutputStream is a resource that must be closed after the program is finished with it. So, in this example, closing of resource is done by itself try.
+
+    Ex:
+
+        import java.io.FileOutputStream;    
+        
+        public class TryWithResources {    
+            public static void main(String args[]){      
+                  
+                  // Using try-with-resources  
+                  try(FileOutputStream fileOutputStream =new FileOutputStream("/java7-new-features/src/abc.txt")){      
+                  
+                  String msg = "Welcome to javaTpoint!";      
+                  
+                  byte byteArray[] = msg.getBytes(); //converting string into byte array      
+                  
+                  fileOutputStream.write(byteArray);  
+                  
+                  System.out.println("Message written to file successfuly!");      
+                  
+                  }catch(Exception exception){  
+                  
+                         System.out.println(exception);  
+                  
+                  }      
+            }      
+        }   
+
+
+Q)  primary key vs unique key?? 
+
+Asn)
+
+  Primary key will not accept NULL values whereas Unique key can accept NULL values.
+
+  A table can have only one primary key whereas there can be multiple unique key on a table
+
+  A Clustered index automatically created when a primary key is defined whereas Unique key generates the non-clustered index.
+
+
+Q) hibernate vs jpa?? 
+
+ans)
+
+  A JPA (Java Persistence API) is a specification of Java which is used to access, manage, and persist data between Java object and relational database. JPA can be seen as a bridge between object-oriented domain models and relational database systems.
+
+  Hibernate is an implementation of JPA. So, it follows the common standards provided by the JPA  
+
+Q)  ways to create objects in java?? 
+
+Ans) 
+1) using new keyword 
+  
+2) using new instance:
+
+If we know the name of the class & if it has a public default constructor we can create an object Class.forName. We can use it to create the Object of a Class. Class.forName actually loads the Class in Java but doesn’t create any Object. To create an Object of the Class you have to use the new Instance Method of the Class.
+
+Class cls = Class.forName("GFG");
+ 
+          // Creating object of main class
+
+            // using instance method
+
+            GFG obj = (GFG)cls.newInstance();
+ 
+            // Print and display
+
+            System.out.println(obj.name);
+
+3) using clone object:
+
+Whenever clone() is called on any object, the JVM actually creates a new object and copies all content of the previous object into it. Creating an object using the clone method does not invoke any constructor. In order to use the clone() method on an object we need to implement Cloneable and define the clone() method in it.
+
+class GFG implements Cloneable{
+
+public static void main(String[] args) {
+
+GFG obj1 = new GFG();
+
+GFG obj2 = (GFG)obj1.clone();
+
+}
+
+}
+
+Q)  Exception vs error?? 
+
+Ans)  Error occur only when system resources are deficient whereas, an exception is caused if a code has some problem. An error can never be recovered whereas, an exception can be recovered by preparing the code to handle the exception.
+
+Throwable : has 2 types Exception and Error. 
+
+Exception first level example: IOException,  SQLExeception,  ClassNotFound , RuntimeException etc. 
+
+RuntimeException subtypes: ArthematicException, NULLPointerExeception,  IndexOutBondExecption etc
+
+IndexOutBondException subtypes :  ArrayIndexOutOfBound,  StringIndexOutOfBond etc
+
+Error example: OutOfMemoryError,  StackOverflowError etc
+
+Q)  difference between  classnotfoundexeception vs noclassdeffounderror. 
+
+Ans)  
+They both occur when particular class is not found at runtime. But they occur at different scenarios. 
+
+
+Classnotfound occurs when you try to load class at runtime using Class. forName() or loadClass()  methods and mentioned classes are not found in the classpath. 
+
+NoClassDefError occur when a particular class is present at compile time , but was missing at runtime
+
+
+Q)  While reviewing the code what are the key things you look for?? 
+
+Ans) 
+
+https://blog.jetbrains.com/upsource/2015/07/23/what-to-look-for-in-a-code-review/
+
+Q)  Naming conventions to follow ?? What should be class name,  method name ,Variable name ?? 
+
+Ans)  https://www.oreilly.com/library/view/java-pocket-guide/9781491938683/ch01.html
+
+Q) How you analyze the code quality ??
+
+Asn)
+    
+    https://www.baeldung.com/sonar-qube
+
+Q) explain your project architecture and stack?? 

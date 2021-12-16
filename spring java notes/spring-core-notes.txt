@@ -1,0 +1,233 @@
+#Bean life cycle
+---> https://howtodoinjava.com/spring-core/spring-bean-life-cycle/
+
+
+Reference: https://dzone.com/articles/spring-bean-lifecycle
+
+---------------------------------------------------------------------------------------------
+
+#Spring based web application initialization
+
+Ref:- https://stackoverflow.com/questions/33163441/spring-why-root-application-context-and-servlet-application-context-are-cre/33163715
+
+Step 1: Servlet container (e.g. Tomcat) locates the implementation of ServletContainerInitializer, which is SpringServletContainerInitializer.
+
+Step 2: SpringServletContainerInitializer creates DispatcherServlet and ContextLoaderListener
+
+Step 3: DispatcherServlet creates servlet application context. And ContextLoaderListener creates root application context.
+
+Step 1 is defined by Servlet 3.0 spec. Step 2, 3 are totally defined by Spring.
+
+----------------------------------------------------------------------------------------------
+
+# ContextLoaderListener vs DispatcherServlet
+
+Ref:-- https://howtodoinjava.com/spring-mvc/contextloaderlistener-vs-dispatcherservlet/
+
+In XML based Spring MVC configuration, you must have seen two declarations in web.xml file i.e. ContextLoaderListener and DispatcherServlet. 
+
+Before reading further, please understand that –
+
+-> Spring can have multiple contexts at a time. One of them will be root context, and all other contexts will be child contexts.
+-> All child contexts can access the beans defined in root context; but opposite is not true. Root context cannot access child contexts beans.
+
+DispatcherServlet is essentially a Servlet (it extends HttpServlet) whose primary purpose is to handle incoming web requests matching the configured URL pattern. It take an incoming URI and find the right combination of controller and view. So it is the front controller.
+
+When you define a DispatcherServlet in spring configuration, you provide an XML file or Java configuration with entries of controller classes, views mappings etc. using contextConfigLocation attribute.
+
+
+DispatcherServlet can be configured programmatically by implementing or extending either of these three support classes provided by Spring –
+
+1) WebAppInitializer interface
+2) AbstractDispatcherServletInitializer abstract class
+3) AbstractAnnotationConfigDispatcherServletInitializer abstract class
+
+1) using WebApplicationInitializer:
+
+In below class, WebApplicationInitializer ensures that class ApplicationInitializer is detected by SpringServletContainerInitializer (which itself is bootstrapped automatically) and used to initialize any Servlet 3 container.
+
+Ex:
+
+public class ApplicationInitializer implements WebApplicationInitializer 
+{
+    @Override
+    public void onStartup(ServletContext container) 
+    {
+        // Create the 'root' Spring application context
+        AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
+        rootContext.register(AppConfig.class);
+ 
+        // Manage the lifecycle of the root application context
+        container.addListener(new ContextLoaderListener(rootContext));
+ 
+        // Create the dispatcher servlet's Spring application context
+        AnnotationConfigWebApplicationContext dispatcherContext = new AnnotationConfigWebApplicationContext();
+        dispatcherContext.register(DispatcherConfig.class);
+ 
+        ServletRegistration.Dynamic dispatcher = container.addServlet("dispatcher", 
+                        new DispatcherServlet(dispatcherContext));   // addServlet(java.lang.String servletName, java.lang.Class<? extends Servlet> servletClass) . Add servlet to context.
+        dispatcher.setLoadOnStartup(1);  // You set load on startup for the dispatcher servlet so the spring container will be                              //initialized on app server (tomcat etc) startup.
+        
+        dispatcher.addMapping("/");  
+    }
+}
+
+2) using AbstractDispatcherServletInitializer: 
+
+This is base (Parent) class for WebApplicationInitializer implementations that register a DispatcherServlet in the servlet context.
+
+public class ApplicationInitializer extends AbstractDispatcherServletInitializer {
+ 
+    @Override
+    protected WebApplicationContext createRootApplicationContext() {
+            return null;
+    }
+ 
+    @Override
+    protected WebApplicationContext createServletApplicationContext() {
+            XmlWebApplicationContext cxt = new XmlWebApplicationContext();
+            cxt.setConfigLocation("/WEB-INF/dispatcher-servlet-context.xml");
+            return cxt;
+    }
+ 
+    @Override
+    protected String[] getServletMappings() {
+            return new String[] { "/" };
+    }
+ 
+    //Register filters
+    @Override
+    protected Filter[] getServletFilters() {
+        return new Filter[] { new HiddenHttpMethodFilter(), new CharacterEncodingFilter() };
+    }
+}
+
+Please note that if you need to customize the DispatcherServlet, you can override the createDispatcherServlet() method.
+
+3) using AbstractAnnotationConfigDispatcherServletInitializer :
+
+This class extends AbstractDispatcherServletInitializer.  
+It is the preferred approach for applications that use Java-based Spring configuration. It enables you to start servlet application context as well as root application context.
+
+
+
+Ex:
+
+public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+ 
+   @Override
+   protected Class<?>[] getRootConfigClasses() {
+      return new Class[] { RootConfig.class };
+   }
+ 
+   @Override
+   protected Class<?>[] getServletConfigClasses() {
+      return new Class[] { WebMvcConfig.class };
+   }
+ 
+   @Override
+   protected String[] getServletMappings() {
+      return new String[] { "/" };
+   }
+}
+
+
+If you do not provide configuration file then it will load its own configuration file using [servlet_name]-servlet.xml. Web applications can define any number of DispatcherServlet entries. Each servlet will operate in its own namespace, loading its own application context with mappings, handlers, etc.
+
+It means that each DispatcherServlet has access to web application context. Until specified, each DispatcherServlet creates own internal web application context.
+
+
+# Root context  / ApplicationContext
+
+Application context creates singleton bean but when multiple application context are created in application then all application context will create sepearte bean.
+
+Every Spring webapp has an associated application context that is tied to its lifecycle: the root web application context.
+
+This is an old feature that predates Spring Web MVC, so it's not tied specifically to any web framework technology.
+
+The context is started when the application starts, and it's destroyed when it stops, thanks to a servlet context listener. The most common types of contexts can also be refreshed at runtime, although not all ApplicationContext implementations have this capability.
+
+The context in a web application is always an instance of WebApplicationContext. That's an interface extending ApplicationContext with a contract for accessing the ServletContext.
+
+Anyway, applications usually should not be concerned about those implementation details: the root web application context is simply a centralized place to define shared beans.
+
+ApplicationContext is an interface for providing configuration information to an application. There are multiple classes provided by springframework that implements this interface and helps us use configuration information in applications. ApplicationContext provides standard bean factory lifecycle capabilities. 
+
+BeanFactory is a subset of ApplicaitonContext and provides lesser functionalities. When we need full capabilities with respect to configuration handling then we go for ApplicationContext. ApplicaitonContext extends BeanFactory.
+
+Ex: 
+
+ApplicationContext cxt = new XmlWebApplicationContext();
+cxt.setConfigLocation("/WEB-INF/dispatcher-servlet-context.xml");
+
+#ContextLoaderListner
+
+	In Spring Web MVC, the ContextLoaderListener reads the Spring configuration file where all the beans are declared. It will then initialize all the singleton beans defined in this file. Kindly note it will not initialize any “prototype” beans because the prototype beans are initialized every time when requested.
+
+
+Ex:
+
+public class ApplicationInitializer implements WebApplicationInitializer{
+    @Override
+    public void onStartup(ServletContext servletContext) throws ServletException {
+
+        //On charge le contexte de l'app
+        AnnotationConfigWebApplicationContext rootContext = new AnnotationConfigWebApplicationContext();
+        rootContext.setDisplayName("scrumtracker");
+        rootContext.register(ApplicationContext.class);
+
+        //Context loader listener
+        servletContext.addListener(new ContextLoaderListener(rootContext));
+
+        //Dispatcher servlet
+        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(rootContext));
+        dispatcher.setLoadOnStartup(1);
+        dispatcher.addMapping("/");
+    }
+
+
+}
+
+
+The ContextLoaderListner is one of the essential components of the Spring MVC framework, probably the most important after the DispatcherServlet itself. It is used to create the root context and responsible for loading beans, which are shared by multiple DispatcherServlet like beans related to the service layer and data access layer. In general, When you develop Spring MVC based web application and also using Spring in the services layer, you need to provide two application-contexts. The first one is configured using ContextLoaderListener, and the other is set using DispatcherServlet. The DispatcherServlet is responsible for loading web component-specific beans like controllers, view resolvers, and handler mappings while, as I said before, ContextLoaderListener is accountable for loading middle-tier and data-tier beans which forms the back end of Spring applications.
+
+In servlets, Events are basically occurrence of something. Changing the state of an object is known as an event.
+
+We can perform some important tasks at the occurrence of these events. The Servlet API provides a number of listener interfaces we can implement in order to react to these events.
+
+A context listener receives notifications when the web application (ie: the context) is starting up or shutting down.
+
+The ContextLoaderListener is like any other Servlet listener, and it has to be declared in the deployment descriptor to listen to events. It listens for startup and shutdown of the server by implementing ServletContextListener and accordingly creates and destroys Spring-managed beans.
+
+ContextLoaderListener job is to take the Spring configuration files as input and creates the Spring-managed beans as per configuration and make it ready during server startup and destroys them during server shutdown.
+
+
+----------------------------------------------------------------------------------------------
+
+#Proxy Pattern 
+
+-> https://howtodoinjava.com/design-patterns/structural/proxy-design-pattern/
+
+-> Spring Framework uses the Proxy design pattern in the Spring AOP module transparently. In Spring AOP, you create proxies of the object to apply cross cutting concern across the point cut in the Spring application. 
+
+-> https://spring.io/blog/2012/05/23/transactions-caching-and-aop-understanding-proxy-usage-in-spring
+
+----------------------------------------------------------------------------------------------
+
+#Facade design pattern
+
+-> https://www.geeksforgeeks.org/facade-design-pattern-introduction/
+
+----------------------------------------------------------------------------------------------
+
+#Scope in spring 
+
+Reference : https://www.journaldev.com/21039/spring-bean-scopes
+
+-----------------------------------------------------------------------------------------------
+@InitBinder
+
+The problem is, when the controller receives the POST, it doesn't know how to convert the id string to a Department object
+
+Ref: https://stackoverflow.com/questions/19957760/how-to-receive-complex-objects-in-spring-3-2-mvc
+

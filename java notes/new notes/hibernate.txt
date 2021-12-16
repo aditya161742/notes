@@ -1,0 +1,1128 @@
+Hibernate:
+
+
+-> It is an open source, lightweight (ie , relatively simpler or faster than something else), ORM (Object Relational Mapping) tool. Hibernate implements the specifications of JPA (Java Persistence API) for data persistence.
+
+-> Java Persistence API (JPA) is a Java specification that provides certain functionality and standard to ORM tools. The javax.persistence package contains the JPA classes and interfaces.
+
+Advantage:
+
+-> The performance of hibernate framework is fast because cache is internally used in hibernate framework. There are two types of cache in hibernate framework first level cache and second level cache. First level cache is enabled by default.
+
+-> HQL (Hibernate Query Language) is the object-oriented version of SQL. It generates the database independent queries. So you don't need to write database specific queries.
+
+-> Hibernate framework provides the facility to create the tables of the database automatically. So there is no need to create tables in the database manually (ie it maps Java objects to database tables and schema).
+
+
+JDBC vs Hibernate:
+
+	JDBC: It is database connectivity technology 
+
+	Hibernate: It is a framework,
+
+	Lazy Loading:
+
+	JDBC: It does not support lazy loading 
+
+	Hibernate: Hibernate support lazy loading 
+
+	Transaction management:
+
+	JDBC: We need to maintain explicitly database connection and transaction.  
+
+	Hibernate: Hibernate itself manage all transaction 
+
+	Caching:
+
+	JDBC: We need to write code for implementing caching  
+
+	Hibernate: Hibernates provides two types of caching :
+
+	First level Cache 
+
+	Second level cache
+
+	No Extra code is required to use first level cache.
+
+
+	Performance:
+
+	JDBC: Low performance
+
+	Hibernate: High Performance
+
+
+Hibernate Archetucture:
+
+-> https://www.geeksforgeeks.org/hibernate-architecture/
+
+Hibernate Dialects:
+
+-> The dialect specifies the type of database used in hibernate so that hibernate generate appropriate type of SQL statements. For connecting any hibernate application with the database, it is required to provide the configuration of SQL dialect.
+
+
+
+Hibernate Annoations:
+
+-> javax.persistence.Entity annotation is used to mark a class as Entity bean that can be persisted by hibernate, since hibernate provides JPA implementation.
+
+-> javax.persistence.Table annotation is used to define the table mapping and unique constraints for the columns.
+
+-> javax.persistence.Id annotation is used to define the primary key for the table. 
+
+-> javax.persistence.GeneratedValue is used to define that the field will be auto generated and GenerationType.IDENTITY strategy is used so that the generated “id” value is mapped to the bean and can be retrieved in the java program.
+
+-> javax.persistence.Column is used to map the field with table column, we can also specify length, nullable and uniqueness for the bean properties.
+
+
+Generation Strategies:
+
+-> The JPA specification supports 4 different primary key generation strategies
+
+	1) GenerationType.AUTO
+		
+		The GenerationType.AUTO is the default generation type and lets the persistence provider choose the generation strategy.
+
+		@Id
+		@GeneratedValue(strategy = GenerationType.AUTO)
+		private Long id;
+
+		If you use Hibernate as your persistence provider, it selects a generation strategy based on the database specific dialect. For most popular databases, it selects GenerationType.SEQUENCE which I will explain later. 
+
+	2) GenerationType.IDENTITY
+
+		The GenerationType.IDENTITY is the easiest to use but not the best one from a performance point of view. It relies on an auto-incremented database column and lets the database generate a new value with each insert operation. From a database point of view, this is very efficient because the auto-increment columns are highly optimized, and it doesn’t require any additional statements.
+
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		private Long id;
+
+		This approach has a significant drawback if you use Hibernate. Hibernate requires a primary key value for each managed entity and therefore has to perform the insert statement immediately. This prevents it from using different optimization techniques like JDBC batching.
+
+	3) GenerationType.SEQUENCE
+		
+		The GenerationType.SEQUENCE is my preferred way to generate primary key values and uses a database sequence to generate unique values.
+
+		It requires additional select statements to get the next value from a database sequence. But this has no performance impact for most applications.
+
+			@Id
+			@GeneratedValue(strategy = GenerationType.SEQUENCE)
+			private Long id;
+
+		If you don’t provide any additional information, Hibernate will request the next value from its default sequence. You can change that by referencing the name of a @SequenceGenerator in the generator attribute of the @GeneratedValue annotation. The @SequenceGenerator annotation lets you define the name of the generator, the name, and schema of the database sequence and the allocation size of the sequence.
+
+		sequenceName is the name of the sequence in the DB. This is how you specify a sequence that already exists in the DB. If you go this route, you have to specify the allocationSize which needs to be the same value that the DB sequence uses as its "auto increment".
+
+		Oracle supports sequnce but mysql donot support sequence in database.
+
+			@Id
+			@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "book_generator")
+			@SequenceGenerator(name="book_generator", sequenceName = "book_seq", allocationSize=50)
+			private Long id;
+
+
+	4) GenerationType.TABLE
+		
+		The GenerationType.TABLE gets only rarely used nowadays. 
+
+
+Cascade types:
+
+-> 6 cascade types upported by hibernate:
+
+	1) CascadeType.ALL : cascade type all is shorthand for all of the above cascade operations.
+
+		Ex:
+
+			@Entity
+			@Table(name = "Employee")
+			public class EmployeeEntity implements Serializable
+			{
+				....
+
+				@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+			    @JoinColumn(name="EMPLOYEE_ID")
+			    private Set<AccountEntity> accounts;
+
+			   ...
+
+			 }
+
+			@Entity
+			@Table(name = "Account")
+			public class AccountEntity implements Serializable
+			{
+			..
+				@OneToOne (mappedBy="accounts",  fetch = FetchType.LAZY)
+    			private EmployeeEntity employee;
+			..
+			}
+
+			This means , If you save an employee, then all associated accounts will also be saved into database. If you delete an Employee then all accounts associated with that Employee also be deleted. Simple enough.
+
+	2) CascadeType.PERSIST : cascade type presist means that save() or persist() operations cascade to related entities.
+
+			If we only want to cascade only save operations but not delete operation. 
+
+	3) CascadeType.MERGE : cascade type merge means that related entities are merged when the owning entity is merged.
+
+			cascades the entity merge operation.
+
+	4) CascadeType.REFRESH : cascade type refresh does the same thing for the refresh() operation.
+
+			cascades the entity refresh operation.
+
+	5) CascadeType.REMOVE : cascade type remove removes all related entities association with this setting when the owning entity is deleted.
+
+			cascades the entity to remove operation.
+
+	6) CascadeType.DETACH : cascade type detach detaches all related entities if a “manual detach” occurs.
+
+			cascades the entity detach operation.
+
+
+Fetch type:
+
+1) Eagerly:
+
+	To load it together with the rest of the fields (i.e. eagerly)
+
+		Ex:
+
+		@OneToMany(fetch = FetchType.EAGER)
+	    private List<Student> students;
+
+2) Lazy:
+
+	To load it on-demand (i.e. lazily) 
+
+		Ex:
+			@OneToMany(fetch = FetchType.LAZY)
+	    	private List<Student> students;
+
+One To One Mapping:
+
+-> 1st way) Implementing With a Foreign Key in JPA
+
+Example:
+
+@Entity
+@Table(name = "users")
+public class User {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Long id;
+    //... 
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")    //configure the name of the column in the users table that maps to the primary key in the address table
+
+    private Address address;
+
+    // ... getters and setters
+}
+
+
+@Entity
+@Table(name = "address")
+public class Address {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Long id;
+    //...
+
+    @OneToOne(mappedBy = "address")
+    private User user;
+
+    //... getters and setters
+}
+
+We also need to place the @OneToOne annotation here too. That's because this is a bidirectional relationship. The address side of the relationship is called the non-owning side. 
+
+
+-> 2nd way:
+
+Implementing With a Shared Primary Key in JPA
+
+Example:
+
+@Entity
+@Table(name = "users")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Long id;
+
+    //...
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private Address address;
+
+    //... getters and setters
+}
+
+
+@Entity
+@Table(name = "address")
+public class Address {
+
+    @Id
+    @Column(name = "user_id")
+    private Long id;
+
+    //...
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "user_id")
+    private User user;
+   
+    //... getters and setters
+}
+
+The mappedBy attribute is now moved to the User class since the foreign key is now present in the address table. We've also added the @PrimaryKeyJoinColumn annotation, which indicates that the primary key of the User entity is used as the foreign key value for the associated Address entity.
+
+
+-> One to Many:
+
+Example:
+
+Example, we'll implement a cart system where we have a table for each cart and another table for each item. One cart can have many items, so here we have a one-to-many mapping.
+
+The way this works at the database level is we have a cart_id as a primary key in the cart table and also a cart_id as a foreign key in items.
+
+public class Cart {
+
+    //...     
+ 
+    @OneToMany(mappedBy="cart")
+    private Set<Items> items;
+	
+    //...
+}
+
+
+We can also add a reference to Cart in Items using @ManyToOne, making this a bidirectional relationship. Bidirectional means that we are able to access items from carts, and also carts from items.
+
+@Entity
+@Table(name="ITEMS")
+public class Items {
+    
+    //...
+    @ManyToOne
+    @JoinColumn(name="cart_id", nullable=false)   //If referenceColumn is not mentioned then primary key of Cart table is used as foreign key
+    
+    private Cart cart;
+
+    public Items() {}
+    
+    // getters and setters
+}
+
+
+
+-> Many to Many:
+
+	In this scenario, any given employee can be assigned to multiple projects and a project may have multiple employees working for it, leading to a many-to-many association between the two.
+
+	We have an employee table with employee_id as its primary key and a project table with project_id as its primary key. A join table employee_project is required here to connect both sides.
+
+	@Entity
+	@Table(name = "Employee")
+	public class Employee { 
+	    // ...
+	 
+	    @ManyToMany(cascade = { CascadeType.ALL })
+	    @JoinTable(
+	        name = "Employee_Project", 
+	        joinColumns = { @JoinColumn(name = "employee_id") }, 
+	        inverseJoinColumns = { @JoinColumn(name = "project_id") }
+	    )
+	    Set<Project> projects = new HashSet<>();
+	   
+	    // standard constructor/getters/setters
+	}
+
+
+	@Entity
+	@Table(name = "Project")
+	public class Project {    
+	    // ...  
+	 
+	    @ManyToMany(mappedBy = "projects")
+	    private Set<Employee> employees = new HashSet<>();
+	    
+	    // standard constructors/getters/setters   
+	}
+
+
+This association has two sides i.e. the owning side and the inverse side. In our example, the owning side is Employee so the join table is specified on the owning side by using the @JoinTable annotation in Employee class. The @JoinTable is used to define the join/link table. In this case, it is Employee_Project.
+
+The @JoinColumn annotation is used to specify the join/linking column with the main table. Here, the join column is employee_id and project_id is the inverse join column since Project is on the inverse side of the relationship.
+
+In the Project class, the mappedBy attribute is used in the @ManyToMany annotation to indicate that the employees collection is mapped by the projects collection of the owner side.
+
+
+
+HQL:
+
+-> It is independent SQL vendor implemented. If write this in mySql and change underline database to Oracle it will work fine.
+
+public class HQLExamples {
+
+	@SuppressWarnings("unchecked")
+	public static void main(String[] args) {
+		
+		//Prep work
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = sessionFactory.getCurrentSession();
+		
+		//HQL example - Get All Employees
+		Transaction tx = session.beginTransaction();
+		Query query = session.createQuery("from Employee");
+		List<Employee> empList = query.list();
+		for(Employee emp : empList){
+			System.out.println("List of Employees::"+emp.getId()+","+emp.getAddress().getCity());
+		}
+		
+		//HQL example - Get Employee with id
+		query = session.createQuery("from Employee where id= :id");
+		query.setLong("id", 3);
+		Employee emp = (Employee) query.uniqueResult();
+		System.out.println("Employee Name="+emp.getName()+", City="+emp.getAddress().getCity());
+		
+		//HQL pagination example
+		query = session.createQuery("from Employee");
+		query.setFirstResult(0); //starts with 0
+		query.setFetchSize(2);
+		empList = query.list();
+		for(Employee emp4 : empList){
+			System.out.println("Paginated Employees::"+emp4.getId()+","+emp4.getAddress().getCity());
+		}
+		
+		//HQL Update Employee
+		query = session.createQuery("update Employee set name= :name where id= :id");
+		query.setParameter("name", "Pankaj Kumar");
+		query.setLong("id", 1);
+		int result = query.executeUpdate();
+		System.out.println("Employee Update Status="+result);
+
+		//HQL Delete Employee, we need to take care of foreign key constraints too
+		query = session.createQuery("delete from Address where id= :id");
+		query.setLong("id", 4);
+		result = query.executeUpdate();
+		System.out.println("Address Delete Status="+result);
+		
+		query = session.createQuery("delete from Employee where id= :id");
+		query.setLong("id", 4);
+		result = query.executeUpdate();
+		System.out.println("Employee Delete Status="+result);
+		
+		//HQL Aggregate function examples
+		query = session.createQuery("select sum(salary) from Employee");
+		double sumSalary = (Double) query.uniqueResult();
+		System.out.println("Sum of all Salaries= "+sumSalary);
+		
+		//HQL join examples
+		query = session.createQuery("select e.name, a.city from Employee e "
+				+ "INNER JOIN e.address a");
+		List<Object[]> list = query.list();
+		for(Object[] arr : list){
+			System.out.println(Arrays.toString(arr));
+		}
+		
+		//HQL group by and like example
+		query = session.createQuery("select e.name, sum(e.salary), count(e)"
+				+ " from Employee e where e.name like '%i%' group by e.name");
+		List<Object[]> groupList = query.list();
+		for(Object[] arr : groupList){
+			System.out.println(Arrays.toString(arr));
+		}
+		
+		//HQL order by example
+		query = session.createQuery("from Employee e order by e.id desc");
+		empList = query.list();
+		for(Employee emp3 : empList){
+			System.out.println("ID Desc Order Employee::"+emp3.getId()+","+emp3.getAddress().getCity());
+		}
+		
+		//rolling back to save the test data
+		tx.rollback();
+		
+		//closing hibernate resources
+		sessionFactory.close();
+	}
+
+}
+
+Native SQL Query:
+
+-> Used only for select query.
+
+-> Get all empoyee list. 
+
+SQLQuery query = session.createSQLQuery("select emp_id, emp_name, emp_salary from Employee");
+List<Object[]> rows = query.list();
+
+-> Join query.
+
+//Join example with addEntity and addJoin
+SQLQuery query = session.createSQLQuery("select {e.*}, {a.*} from Employee e join Address a ON e.emp_id=a.emp_id")
+		.addEntity("e",Employee.class)
+		.addJoin("a","e.address");
+List<Object[]> rows = query.list();
+
+
+-> Named SQL Query:
+
+@Entity
+@Table(name = "ADDRESS")
+@NamedQueries({ @NamedQuery(name = "@HQL_GET_ALL_ADDRESS", 
+			query = "from Address") })
+@NamedNativeQueries({ @NamedNativeQuery(name = "@SQL_GET_ALL_ADDRESS", 
+			query = "select emp_id, address_line1, city, zipcode from Address") })
+public class Address {
+
+	@Id
+	@Column(name = "emp_id", unique = true, nullable = false)
+	@GeneratedValue(generator = "gen")
+	@GenericGenerator(name = "gen", strategy = "foreign", parameters = { @Parameter(name = "property", value = "employee") })
+	private long id;
+
+	@Column(name = "address_line1")
+	private String addressLine1;
+
+	@Column(name = "zipcode")
+	private String zipcode;
+
+	@Column(name = "city")
+	private String city;
+
+	@OneToOne
+	@PrimaryKeyJoinColumn
+	private Employee employee;
+
+}
+
+// Prep work
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = sessionFactory.getCurrentSession();
+		Transaction tx = session.beginTransaction();
+
+		//HQL Named Query Example
+		Query query = session.getNamedQuery("HQL_GET_ALL_EMPLOYEE");
+		List<Employee> empList = query.list();
+		for (Employee emp : empList) {
+			System.out.println("List of Employees::" + emp.getId() + ","
+					+ emp.getAddress().getCity());
+		}
+
+		query = session.getNamedQuery("HQL_GET_EMPLOYEE_BY_ID");
+		query.setInteger("id", 2);
+		Employee emp = (Employee) query.uniqueResult();
+		System.out.println("Employee Name=" + emp.getName() + ", City="
+				+ emp.getAddress().getCity());
+
+
+Hibernate Criteria:
+
+->  Hibernate Criteria query is only used to fetch the results from the database using object oriented approach.
+
+Exanple:
+
+SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = sessionFactory.getCurrentSession();
+		Transaction tx = session.beginTransaction();
+
+		//Get All Employees
+		Criteria criteria = session.createCriteria(Employee.class);
+		List<Employee> empList = criteria.list();
+
+
+		//Get by ID
+		criteria = session.createCriteria(Employee.class)
+					.add(Restrictions.eq("id", new Long(3)));
+		Employee emp = (Employee) criteria.uniqueResult();
+
+		//Pagination Example
+		empList = session.createCriteria(Employee.class)
+					.addOrder(Order.desc("id"))
+					.setFirstResult(0)
+					.setMaxResults(2)
+					.list();
+
+
+
+Caching:
+
+-> Hibernate Cache can be very useful in gaining fast application performance if used correctly. The idea behind cache is to reduce the number of database queries, hence reducing the throughput time of the application.
+
+1) First Level Cache: Hibernate first level cache is associated with the Session object. Hibernate first level cache is enabled by default and there is no way to disable it.
+Any object cached in a session will not be visible to other sessions and when the session is closed, all the cached objects will also be lost.
+
+
+Example:
+
+public class HibernateCacheExample {
+
+	public static void main(String[] args) throws InterruptedException {
+		
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = sessionFactory.getCurrentSession();
+		Transaction tx = session.beginTransaction();
+		
+		//Get employee with id=1
+		Employee emp = (Employee) session.load(Employee.class, new Long(1));
+		printData(emp,1);
+		
+		//waiting for sometime to change the data in backend
+		Thread.sleep(10000);
+		
+		//Fetch same data again, check logs that no query fired
+		Employee emp1 = (Employee) session.load(Employee.class, new Long(1));
+		printData(emp1,2);
+		
+		//Create new session
+		Session newSession = sessionFactory.openSession();
+		//Get employee with id=1, notice the logs for query
+		Employee emp2 = (Employee) newSession.load(Employee.class, new Long(1));
+		printData(emp2,3);
+		
+		//START: evict example to remove specific object from hibernate first level cache
+		//Get employee with id=2, first time hence query in logs
+		Employee emp3 = (Employee) session.load(Employee.class, new Long(2));
+		printData(emp3,4);
+		
+		//evict the employee object with id=1
+		session.evict(emp);
+		System.out.println("Session Contains Employee with id=1?"+session.contains(emp));
+
+		//since object is removed from first level cache, you will see query in logs
+		Employee emp4 = (Employee) session.load(Employee.class, new Long(1));
+		printData(emp4,5);
+		
+		//this object is still present, so you won't see query in logs
+		Employee emp5 = (Employee) session.load(Employee.class, new Long(2));
+		printData(emp5,6);
+		//END: evict example
+		
+		//START: clear example to remove everything from first level cache
+		session.clear();
+		Employee emp6 = (Employee) session.load(Employee.class, new Long(1));
+		printData(emp6,7);
+		Employee emp7 = (Employee) session.load(Employee.class, new Long(2));
+		printData(emp7,8);
+		
+		System.out.println("Session Contains Employee with id=2?"+session.contains(emp7));
+		
+		tx.commit();
+		sessionFactory.close();
+	}
+
+	private static void printData(Employee emp, int count) {
+		System.out.println(count+":: Name="+emp.getName()+", Zipcode="+emp.getAddress().getZipcode());
+	}
+
+}
+
+
+-> Hibernate First Level cache is enabled by default, there are no configurations needed for this.
+-> Hibernate first level cache is session specific, that’s why when we are getting the same data in same session there is no query fired whereas in other session query is fired to load the data.
+-> Hibernate first level cache can have old values, as you can see above that I have put my program to sleep for 10 seconds and in that time I updated the value (name from Pankaj to PankajK) in database but it didn’t get reflected in the same session. But in other session, we got the updated value.
+-> We can use session evict() method to remove a single object from the hibernate first level cache.
+-> We can use session clear() method to clear the cache i.e delete all the objects from the cache.
+-> We can use session contains() method to check if an object is present in the hibernate cache or not, if the object is found in cache, it returns true or else it returns false.
+-> Since hibernate cache all the objects into session first level cache, while running bulk queries or batch updates it’s necessary to clear the cache at certain intervals to avoid memory issues.
+
+
+2) Second Level Cache: Hibernate Second Level cache is disabled by default but we can enable it through configuration. Currently EHCache and Infinispan provides implementation for Hibernate Second level cache and we can use them. 
+
+-> EHCache is more popular and we will use it for our example project
+
+-> Different strategies for caching an object.
+
+	1) Read Only: This caching strategy should be used for persistent objects that will always read but never updated. It’s good for reading and caching application configuration and other static data that are never updated. This is the simplest strategy with best performance because there is no overload to check if the object is updated in database or not.
+
+	2) Read Write: It’s good for persistent objects that can be updated by the hibernate application. However if the data is updated either through backend or other applications, then there is no way hibernate will know about it and data might be stale. So while using this strategy, make sure you are using Hibernate API for updating the data.
+
+	3) Nonrestricted Read Write: If the application only occasionally needs to update data and strict transaction isolation is not required, a nonstrict-read-write cache might be appropriate.
+
+-> Caching is particularly useful for the following scenarios:
+
+The same data is requested again and again (so-called hot spots), which have to be loaded from the database  with each request. This data can be cached in the main memory of the server application (RAM) or on the client (browser cache). This reduces access times and the number of data transfers since the server does not have to repeatedly request data from the database and send it to the client.
+Long-term or resource-intensive operations are often performed with specific parameters. Depending on the parameters, the result of the operation can be stored temporarily so that the server can send the result to the client without executing the operation.
+
+-> Spring Boot it is very easy to add caching to an application. All you need to do is activate caching support via Annotation @EnableCaching. As we are used to from Spring Boot, the entire caching infrastructure is configured for us.
+
+Springs Caching Service is an abstraction and not an implementation. Therefore it is necessary to use a cache provider or cache implementation for caching. Spring supports a wide range of cache providers like Ehcache 3.
+
+A change of the cache provider has no effect on the existing code, as the developer only gets in touch with the abstract concepts.
+
+If no cache provider is added, Spring Boot configures a very simple provider that caches in main memory using maps. This is sufficient for testing, but for applications in production, you should choose one of the above cache providers.
+
+
+Ehcache can be configured in such a way that the caching layer can consist of more than one memory area. When using more than one memory area, the areas are arranged as hierarchical tiers. The lowest tier is called the Authority Tier and the other tiers are called the Near Cache.
+
+The most frequently used data is stored in the fastest caching tier (top layer). The authority tier basically contains all cache entries.
+
+The memory areas supported by Ehcache include:
+
+On-Heap Store: Uses the Java heap memory to store cache entries and shares the memory with the application. The cache is also scanned by the garbage collection. This memory is very fast, but also very limited.
+Off-Heap Store: Uses the RAM to store cache entries. This memory is not subject to garbage collection. Still quite fast memory, but slower than the on-heap memory, because the cache entries have to be moved to the on-heap memory before they can be used.
+Disk Store: Uses the hard disk to store cache entries. Much slower than RAM. It is recommended to use a dedicated SSD that is only used for caching.
+
+Example:
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+<dependency>
+    <groupId>javax.cache</groupId>
+    <artifactId>cache-api</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.ehcache</groupId>
+    <artifactId>ehcache</artifactId>
+    <version>3.7.1</version>
+</dependency>
+
+
+
+@Configuration
+@EnableCaching
+public class EhcacheConfig {
+}
+
+
+@Service
+public class CalculationService {
+  private final Logger LOG = LoggerFactory.getLogger(CalculationService.class);
+  public double areaOfCircle(int radius) {
+    LOG.info("calculate the area of a circle with a radius of {}", radius);
+    return Math.PI * Math.pow(radius, 2);
+  }
+}
+
+
+Caching in Spring is basically applied to methods so that especially the calls of very costly operations can be reduced. We now want to add the result of this calculation to a cache depending on the radius passed by parameter, so that the calculation does not have to be repeated every time. To do this, we annotate the method with the @Cachable annotation:
+
+
+@Cacheable(value = "areaOfCircleCache", key = "#radius", condition = "#radius > 5")
+public double areaOfCircle(int radius) {
+  LOG.info("calculate the area of a circle with a radius of {}", radius);
+  return Math.PI * Math.pow(radius, 2);
+}
+
+
+Each time this method is called with a radius greater than 5, the caching behavior is applied. This checks whether the method has already been called once for the specified parameter. If so, the result is returned from the cache and the method is not executed. If no, then the method is executed and the result is returned and stored in the cache.
+
+
+The following parameters, among others, are available for annotation:
+
+Annotation parameter	Description
+
+value / cacheNames	Name of the cache in which the results of the method execution are to be stored.
+
+key	The key for the cache entries as Spring Expression Language (SpEL). If the parameter is not specified, a key is created for all method parameters by default.
+
+keyGenerator	Name of a bean that implements the KeyGenerator interface and thus allows the creation of a user-defined cache key.
+
+condition	Condition as Spring Expression Language (SpEL) that specifies when a result is to be cached.
+unless	Condition as Spring Expression Language (SpEL) that specifies when a result should not be cached.
+
+
+-> Now the configuration of the Ehcache cache has to be done. The configuration is XML-based. We create the XML file ehcache.xml in the resource folder of our application.
+
+
+----------------------------------------------------------------------------
+
+
+get() vs load():
+
+
+-> Hibernate Session provide different methods to fetch data from database. Two of them are – get() and load().
+
+-> load: 
+
+	1) Only use load() method if you are sure that the object exists.
+	2) load() method will throw an exception if the unique id is not found in the database.
+	3) load() just returns a proxy by default and database won't be hit until the proxy is first invoked.
+
+-> get:
+
+	1) If you are not sure that the object exist, then use one of get() methods.
+	2) get() method will return null if the unique id is not found in the database.
+	3) get() will hit the database immediately.
+
+-> Proxy means, hibernate will prepare some fake object with given identifier value in the memory without hitting a database.
+
+-> For Example:
+If we call session.load(Student.class,new Integer(107));
+
+hibernate will create one fake Student object [row] in the memory with id 107, but remaining properties of Student class will not even be initialized.
+
+-> Ex: if you are trying to load /get Empoyee object where empid=20. But assume record is not available in DB.
+
+ Employee employee1 = session.load(Employee.class,20);  //Step-1
+ system.out.println(employee1.getEmployeeId();       //Step-2  --o/p=20
+ system.out.println(employee1.getEmployeeName();       //Step-3 -->O/P:ObjectNotFoundException
+
+
+If you use load in step-1 hibernate wont fire any select query to fetch employee record from DB at this moment.At this pint hibernate gives a dummy object ( Proxy ). This dummy object doesnt contain anything. it is new Employee(20). you can verify this in step-2 it will print 20. but in step-3 we are trying to find employee information. so at this time hibernate fires a sql query to fetch Empoyee objct. If it is not found in DB.throws ObjectNotFoundException.
+
+
+Employee employee2 = session.get(Employee.class,20);  //Step-4
+
+for session.get() hibernate fires a sql query to fetch the data from db. so in our case id=20 not exists in DB. so it will return null.
+
+
+Save vs Persist:
+
+-> The Session interface has several methods that eventually result in saving data to the database: persist, save, update, merge, saveOrUpdate. 
+
+-> For Entities with generated identifier :
+
+save() : It returns an entity's identifier immediately in addition to making the object persistent. So an insert query is fired immediately.
+
+persist() : It returns the persistent object. It does not have any compulsion of returning the identifier immediately so it does not guarantee that insert will be fired immediately. It may fire an insert immediately but it is not guaranteed. In some cases, the query may be fired immediately while in others it may be fired at session flush time.
+
+For Entities with assigned identifier :
+
+save(): It returns an entity's identifier immediately. Since the identifier is already assigned to entity before calling save, so insert is not fired immediately. It is fired at session flush time.
+
+persist() : same as save. It also fire insert at flush time.
+
+
+-> Example:
+
+@Entity
+@Table(name="USER_DETAILS")
+public class UserDetails {
+    @Id
+    @Column(name = "USER_ID")
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private int userId;
+
+    @Column(name = "USER_NAME")
+    private String userName;
+
+    public int getUserId() {
+        return userId;
+    }
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+}
+
+ Session session = sessionFactory.openSession();
+    session.beginTransaction();
+    UserDetails user = new UserDetails();
+    user.setUserName("Gaurav");
+    session.save(user); // Query is fired immediately as this statement is executed.
+    session.getTransaction().commit();
+    session.close();
+
+
+
+    Session session = sessionFactory.openSession();
+    session.beginTransaction();
+    UserDetails user = new UserDetails();
+    user.setUserName("Gaurav");
+    session.persist(user); // Query is not guaranteed to be fired immediately. It may get fired here.
+    session.getTransaction().commit(); // If it not executed in last statement then It is fired here.
+    session.close();
+
+
+-> If we are generating user_id manually and not autogenerated than save() will behave like persist().
+
+-> The persist() method will not execute an insert query if it is called outside of transaction boundaries. While, the save() method returns an identifier so that an insert query is executed immediately to get the identifier, no matter if it are inside or outside of a transaction.
+
+
+
+Save vs Persist vs Update vs Merge vs SaveOrUpdate:
+
+
+-> Any entity instance in your application appears in one of the three main states in relation to the Session persistence context:
+
+transient — this instance is not, and never was, attached to a Session; this instance has no corresponding rows in the database; it's usually just a new object that you have created to save to the database;
+
+persistent — this instance is associated with a unique Session object; upon flushing the Session to the database, this entity is guaranteed to have a corresponding consistent record in the database;
+
+detached — this instance was once attached to a Session (in a persistent state), but now it’s not; an instance enters this state if you evict it from the context, clear or close the Session, or put the instance through serialization/deserialization process.
+
+Example:
+
+@Entity
+public class Person {
+
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String name;
+
+    // ... getters and setters
+
+}
+
+
+Person person = new Person();
+person.setName("John");
+session.persist(person);
+
+The person object has transitioned from transient to persistent state. The object is in the persistence context now, but not yet saved to the database. The generation of INSERT statements will occur only upon commiting the transaction, flushing or closing the session.
+
+
+Person person = new Person();
+person.setName("John");
+session.persist(person);
+
+session.evict(person);
+
+session.persist(person); // PersistenceException!
+
+
+The save method is an “original” Hibernate method that does not conform to the JPA specification.
+
+Its purpose is basically the same as persist, but it has different implementation details. The documentation for this method strictly states that it persists the instance, “first assigning a generated identifier”. The method is guaranteed to return the Serializable value of this identifier.
+
+Person person = new Person();
+person.setName("John");
+Long id = (Long) session.save(person);
+The effect of saving an already persisted instance is the same as with persist. Difference comes when you try to save a detached instance:
+
+Person person = new Person();
+person.setName("John");
+Long id1 = (Long) session.save(person);
+
+session.evict(person);
+Long id2 = (Long) session.save(person);
+The id2 variable will differ from id1. The call of save on a detached instance creates a new persistent instance and assigns it a new identifier, which results in a duplicate record in a database upon committing or flushing.
+
+
+As with persist and save, the update method is an “original” Hibernate method that was present long before the merge method was added.
+
+In the following example we save the object, then evict (detach) it from the context, then change its name and call update. Notice that we don't put the result of the update operation in a separate variable, because the update takes place on the person object itself. Basically we're reattaching the existing entity instance to the persistence context — something the JPA specification does not allow us to do.
+
+Person person = new Person();
+person.setName("John");
+session.save(person);
+session.evict(person);
+
+person.setName("Mary");
+session.update(person);
+
+Trying to call update on a transient instance will result in an exception. The following will not work:
+
+Person person = new Person();
+person.setName("John");
+session.update(person); // PersistenceException!
+
+
+The main intention of the merge method is to update a persistent entity instance with new field values from a detached entity instance.
+
+
+Person person = new Person(); 
+person.setName("John"); 
+session.save(person);
+
+session.evict(person);
+person.setName("Mary");
+
+Person mergedPerson = (Person) session.merge(person);
+
+
+merge Find an attached object with the same id and update it. If doesn't exist insert the new register to the database.
+
+
+SaveOrUpdate This method appears only in the Hibernate API.The main difference of saveOrUpdate method is that it does not throw exception when applied to a transient instance; instead, it makes this transient instance persistent.
+
+Person person = new Person();
+person.setName("John");
+session.saveOrUpdate(person);
+
+
+If you don't have any special requirements, as a rule of thumb, you should stick to the persist and merge methods, because they are standardized and guaranteed to conform to the JPA specification.
+
+
+Session creation:
+
+If we talk about SessionFactory.openSession()
+
+It always creates a new Session object.
+You need to explicitly flush and close session objects.
+In single threaded environment it is slower than getCurrentSession().
+You do not need to configure any property to call this method.
+
+And If we talk about SessionFactory.getCurrentSession()
+
+It creates a new Session if not exists, else uses same session which is in current hibernate context.
+You do not need to flush and close session objects, it will be automatically taken care by Hibernate internally.
+In single threaded environment it is faster than openSession().
+You need to configure additional property. "hibernate.current_session_context_class" to call getCurrentSession() method, otherwise it will throw an exception.
+
+
+
+@Configuration
+public class BeanConfig {
+
+	@Autowired
+	private EntityManagerFactory entityManagerFactory;
+
+	@Bean
+	public SessionFactory getSessionFactory() {
+	    if (entityManagerFactory.unwrap(SessionFactory.class) == null) {
+	        throw new NullPointerException("factory is not a hibernate factory");
+	    }
+	    return entityManagerFactory.unwrap(SessionFactory.class);
+	}
+
+}
+
+
+
+@Component
+public class UserDaoImpl implements UserDao {
+	
+	@Autowired
+	private SessionFactory sessionFactory;
+
+	public List getUserDetails() {
+		Criteria criteria = sessionFactory.openSession().createCriteria(UserDetails.class);
+		return criteria.list();
+	}
+
+}
+
+
+
+How to enable printing sql statments in console ?
+
+Use in applicatins.properties,
+
+spring.jpa.show-sql=true
+
+Hibernate Validation:
+
+public class Employee {
+
+	@Min(value=1)
+	private int id;
+	
+	@NotNull(message="Name cannot be null")
+	@Size(min=5, max=30)
+	private String name;
+	
+	@Email
+	private String email;
+	
+	@CreditCardNumber
+	private String creditCardNumber;
+
+
+}
+
+------------------------------------------------------------------------------------
+
+
+Transaction management:
+
+
+Isolation level:
+
+-> Imagine you have the customer’s bank account where he can withdraw the money. If the customer is not a person, but company, and if he can have multiple users accessing the bank application, without any locks there’s a chance for situation where two or more users depute transfers, that exceed the account balance, but because data is accessed concurrently, they both can make payoff.
+
+-> In above situation we need different islotion level to get the lock.
+
+-> For example, you have 3 concurrent processes A, B and C. A starts a transaction, writes data and commit/rollback (depending on results). B just executes a SELECT statement to read data. C reads and updates data. All these process work on the same table T.
+
+READ UNCOMMITTED - no lock on the table. You can read data in the table while writing on it. This means A writes data (uncommitted) and B can read this uncommitted data and use it (for any purpose). If A executes a rollback, B still has read the data and used it. This is the fastest but most insecure way to work with data since can lead to data holes in not physically related tables (yes, two tables can be logically but not physically related in real-world apps =\). This uncommited reads by other transactions called dirty reads.
+
+READ COMMITTED - lock on committed data. You can read the data that was only committed. This means A writes data and B can't read the data saved by A until A executes a commit. The problem here is that C can update data that was read and used on B and B client won't have the updated data.
+
+REPEATABLE READ - lock on a block of SQL(which is selected by using select query). This means B reads the data under some condition i.e. WHERE aField > 10 AND aField < 20, A inserts data where aField value is between 10 and 20, then B reads the data again and get a different result.
+
+SERIALIZABLE - lock on a full table(on which Select query is fired). This means, B reads the data and no other transaction can modify the data on the table. This is the most secure but slowest way to work with data. Also, since a simple read operation locks the table, this can lead to heavy problems on production: imagine that T table is an Invoice table, user X wants to know the invoices of the day and user Y wants to create a new invoice, so while X executes the read of the invoices, Y can't add a new invoice (and when it's about money, people get really mad, especially the bosses).
+
+
+Propogaton:
+
+syntax: 
+	
+	@Transactional(propagation = Propagation.REQUIRED)
+
+Spring REQUIRED behavior means that the same transaction will be used if there is an already opened transaction in the current bean method execution context.
+
+REQUIRES_NEW behavior means that a new physical transaction will always be created by the container.
+
+The MANDATORY behavior states that an existing opened transaction must already exist. If not an exception will be thrown by the container.
+
+The NESTED behavior makes nested Spring transactions to use the same physical transaction but sets savepoints between nested invocations so inner transactions may also rollback independently of outer transactions.
+
+The NEVER behavior states that an existing opened transaction must not already exist. If a transaction exists an exception will be thrown by the container.
+
+
+The NOT_SUPPORTED behavior will execute outside of the scope of any transaction. If an opened transaction already exists it will be paused.
+
+The SUPPORTS behavior will execute in the scope of a transaction if an opened transaction already exists. If there isn't an already opened transaction the method will execute anyway but in a non-transactional way.
+
+
+Real world example:
+
+Suppose you're in charge of implementing a signup service in which a confirmation e-mail is sent to the user. You come up with two service objects, one for enrolling the user and one for sending e-mails, which the latter is called inside the first one. For example something like this:
+
+/* Sign Up service */
+@Service
+@Transactional(Propagation=REQUIRED)
+class SignUpService{
+ ...
+ void SignUp(User user){
+    ...
+    emailService.sendMail(User);
+ }
+}
+
+/* E-Mail Service */
+@Service
+@Transactional(Propagation=REQUIRES_NEW)
+class EmailService{
+ ...
+ void sendMail(User user){
+  try{
+     ... // Trying to send the e-mail
+  }catch( Exception)
+ }
+}
+
+
+You may have noticed that the second service is of propagation type REQUIRES_NEW and moreover, chances are it throws an exception (SMTP server down , invalid e-mail, or other reasons). You probably don't want the whole process to roll back, like removing the user information from a database or other things; therefore you call the second service in a separate transaction.
+
+
+Back to our example, this time you are concerned about the database security, so you define your DAO classes this way:
+
+/* User DAO */
+@Transactional(Propagation=MANDATORY)
+class UserDAO{
+ // some CRUD methods
+}
+
+Meaning that whenever a DAO object, and hence a potential access to DB, is created, we need to reassure that the call was made from inside one of our services, implying that a live transaction should exist; otherwise, an exception occurs. Therefore the propagation is of type MANDATORY.
+

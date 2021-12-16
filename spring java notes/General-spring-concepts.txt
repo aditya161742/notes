@@ -1,0 +1,10 @@
+
+<!-- Generate PDF in spring framework -->
+
+https://www.technicalkeeda.com/spring-tutorials/generate-pdf-using-spring-framework
+
+
+<!-- Read Write Excel -->
+https://www.baeldung.com/java-microsoft-excel
+
+

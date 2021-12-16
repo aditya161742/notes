@@ -1,0 +1,56 @@
+JAX-WS - is Java API for the XML-Based Web Services - a standard way to develop a Web- Services in SOAP notation (Simple Object Access Protocol).
+
+JAX-RS - Java API for RESTful Web Services. RESTful Web Services - more flexible, can use several different MIME- types. Typically used for XML data exchange or JSON (JavaScript Object Notation) data exchange.
+
+ It is a Jakarta EE API specification that provides support in creating web services according to the Representational State Transfer architectural pattern. JAX-RS uses annotations, introduced in Java SE 5.
+
+Jersey/RestEasy are implementation of JAX-RS. 
+
+The Spring Framework is a full framework that allows you to create Java enterprise applications. The REST capabilities are provided by the Spring MVC module (same module that provides model-view-controller capabilities). It is not a JAX-RS implementation and can be seen as a Spring alternative to the JAX-RS standard.
+
+The Spring ecosystem also provides a wide range of projects for creating enterprise applications, covering persistence, security, integration with social networks, batch processing, etc.
+
+
+@Path("/greetings")
+public class JaxRsController {
+
+    @GET
+    @Path("/{name}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response greeting(@PathParam("name") String name) {
+
+        String greeting = "Hello " + name;
+        return Response.ok(greeting).build();
+    }
+}
+
+The equivalent implementation using the Spring MVC API would be:
+
+@RestController
+@RequestMapping("/greetings")
+public class SpringRestController {
+
+    @RequestMapping(method = RequestMethod.GET,
+                    value = "/{name}", 
+                    produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<?> greeting(@PathVariable String name) {
+
+        String greeting = "Hello " + name;
+        return new ResponseEntity<>(greeting, HttpStatus.OK);
+    }
+}
+
+Spring Boot provides the spring-boot-starter-jersey module that allows you to use the JAX-RS programming model for the REST endpoints instead of Spring MVC. It works quite well with Jersey 2.x.
+
+----------------------------------------
+
+
+Comparing SOAP and REST is not really correct. The first one is basically Protocol (or at least it's trying to be) and REST is just a architecture pattern/style.
+
+Unlike Rest, SOAP supports multiple protocols Http/Https, JMS
+
+When should you use SOAP? SOAP is best for anything that requires formal contracts. To be even more specific, here are two common use cases for SOAP. 
+
+1) Asynchronous operations. An asynchronous operation is very time-specific. It is when various signals trigger new events, rather than an external timer. REST limits itself to HTTP and HTTPS, neither of which are the ideal communication protocols for this purpose as they may delay such an operation. SOAP supports additional communication protocols.
+
+2) Stateful operations: Basically Stateful means that server stores information about the client and uses that information over a series of requests. So performing one request is dependant upon the state of some other request (e.g. previous). Implementing this is possible with http protocols.

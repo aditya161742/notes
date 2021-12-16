@@ -1,0 +1,12 @@
+
+
+
+
+
+
+Spring boot STS intsall and cretae 1st project -> https://www.javacodegeeks.com/2018/07/spring-boot-project-sts.html
+
+Spring-boot-Generate-JWT -----  https://www.devglan.com/spring-security/spring-boot-jwt-auth
+
+Spring-boot-oauth-2.0-google ---- https://www.devglan.com/spring-security/spring-boot-security-google-oauth
+

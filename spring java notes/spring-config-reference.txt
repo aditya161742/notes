@@ -1,0 +1,11 @@
+
+
+https://dzone.com/articles/spring-mvc-and-java-based-configuration-1
+
+
+https://javarevisited.blogspot.com/2017/09/dispatcherservlet-of-spring-mvc-10-points-to-remember.html
+
+https://www.quora.com/What-is-ServletContext
+
+<!-- For automatic add heder footer, side menu-->
+http://websystique.com/springmvc/spring-4-mvc-apache-tiles-3-annotation-based-example/

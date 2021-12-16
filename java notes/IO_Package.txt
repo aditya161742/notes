@@ -1,0 +1,260 @@
+																IO Package
+
+
+
+
+File class:
+
+		
+		Ex:
+
+			import java.io.*;
+
+			class Test{
+
+				public static void main(String[] args)throws exceptions{
+
+					File f = new File('abc.txt');   // Read file abc, with refrence variable f ,if file exists, it won't create any new 									file if not exists
+
+					System.out.println(f.exists()); // returns false, as file doesn't exists
+					f.createNewFile();      // It will create empty file if doesnot exists
+					System.out.println(f.exists()); // returns true, as file exists now
+				}
+
+			}
+
+		Ex:
+
+			import java.io.*;
+
+			class Test{
+
+				public static void main(String[] args)throws exceptions{
+
+					File f = new File('abc');   // Read directory abc, with refrence variable f ,if directory exists, it won't create any new 									file if not exists
+
+					System.out.println(f.exists()); // returns false, as directory doesn't exists
+					f.mkdir();      // It will create empty directory if doesnot exists
+					System.out.println(f.exists()); // returns true, as file exists now
+				}
+
+			}
+
+
+
+File class contructors:
+
+	1) File f = new File(String name);  // creates java object refering to file or directory present in current working directory
+	2) File f = new File(String subdirectory,String name);  //creates java object refering to file present in provided subdirectory
+	3) File f = new File(File f,String name);  
+
+
+Methods:
+
+1) f.isFile();  //To check if file reference represent file or not
+2) f.isDirectory();  //To check if file reference represent directory or not
+3) String[] s = f.list();  //  it list all files and directory in CWD
+4) f.delete();  // Removes file or directory
+5) long l = f.length();  // Returns length of file
+
+
+FileWriter():
+	
+	-> Used to write inside file.
+	-> It creates file, if not exists.
+
+	Contructors:
+	1) FileWriter f = new FileWriter(String name); // this constructors provide overrriding of the file
+	2) FileWriter f = new FileWriter(File f);  // this constructors provide overrriding of the file
+	3) FileWriter f = new FileWriter(String name,boolean append = true); // this constructors append's file
+	4) FileWriter f = new FileWriter(File f, boolean append = true); // this constructors append's file
+
+	Methods:
+
+	1) void write(String text)	//It is used to write the string into FileWriter.
+	2) void write(char c)	//It is used to write the char into FileWriter.
+	3) void write(char[] c)	//It is used to write char array into FileWriter.
+	4) void flush()	//It is used to flushes the data of FileWriter.  To give gurantee that total data including last character also 						written properly to the file.
+	5) void close()	// It is used to close the FileWriter.
+
+	Ex:
+
+			import java.io.*;
+
+			class FileWriterDemo{
+
+				public static void main(String[] args)throws exceptions{
+
+					FileWriter fw = new FileWriter('abc.txt');
+					fw.write(100);  // it will write d, as ASCII for 100 is d
+					fw.write('urga\nthis is next line');
+					fw.write('\n');
+					char[] ch = ['a','b','c'];
+					fw.write(ch);
+					fw.write('\n');
+					fw.flush();
+					fw.close();
+
+				}
+
+			}
+
+Cons: 
+
+In file writer we have provide '\n' (i.e next line) operator manually, which becames very difficult for programmer to write because it varies Operating System to operating system.that is why we need buffered writer (i.e BufferedWriter) to write data. 
+
+
+FileReader():
+
+	Contructors:
+	
+	1) FileReader fr = new FileReader(String filename); // this constructors reads file
+	2) FileReader fr = new FileReader(File f);   // Can also pass file reference
+
+
+	Methods: 
+
+	1) int read();  // Returns unicode value of character, when to read single charracheter, returns -1 if no charachter found
+	2) int read(char[] ch); // Returns number of character copied from file into char array, when to read multiple charracheter
+	3) void close();    
+
+	Ex:
+
+			import java.io.*;
+
+			class FileReaderDemo1{
+
+				public static void main(String[] args)throws exceptions{
+
+					FileReader fr = new FileReader('abc.txt');
+					
+					int i = fr.read(); 
+
+					while(i != -1){
+
+						Systme.out.println((char) i );   // Reuired type casting because it returns unicode value
+						i = fr.read();
+
+					}
+
+					fr.close();
+
+				}
+
+			}
+
+	Ex:
+
+			import java.io.*;
+
+			class FileReaderDemo1{
+
+				public static void main(String[] args)throws exceptions{
+
+					File f = new File('abc.txt');
+					FileReader fr = new FileReader(f);
+					
+					char[] ch = new char((int) f.length());  // Type casting is required because char array allowed maximum length to int size only and length() return long ,therefore we need to type cast it to int.
+
+					fr.read(ch);
+
+					for(char ch1:ch){
+
+						Systme.out.println(ch1);  
+						
+					}
+
+					fr.close();
+
+				}
+
+			}
+
+
+
+Cons: 
+
+In file reader we can read data charachter by charachter but not line by line therefore it is not recommended, that is why we need buffered reader (i.e BufferedReader) to read data line by line. 
+
+
+BufferedWriter:
+
+->(Important) Buffer Writer cannot communicate directly to the file, i.e file name or file object, but can only communicate to any writer object.
+
+	Contructors:
+
+	1) BufferedWriter bw = new BufferedWriter(Writer w);
+	2) BufferedWriter bw = new BufferedWriter(Writer w,int bufferSize);
+
+	Methods:
+	1) All methods of file writer are available
+	2) Writer(Char[] ch);
+	3) writer(String s);
+	4) flush();
+	5) close();
+
+
+BufferedReader:
+
+	Contructors:
+
+	1) 1) BufferedReader bw = new BufferedReader(Reader w);
+	2) BufferedReader bw = new BufferedReader(Reader w,int bufferSize);
+
+	Methods:
+
+	1) read();
+	2) read(char[] ch);
+	3) void close();
+	4) String readLine();  //Reads line by line
+
+
+PrintWriter:
+
+-> We cannot write boolean, float, int type to the file using bufferedWriter or FileWriter, therefore we use PrintWriter.
+
+	Methods:
+
+	void println(boolean x)	It is used to print the boolean value.
+	void println(char[] x)	It is used to print an array of characters.
+	void println(int x)	It is used to print an integer.
+	PrintWriter append(char c)	It is used to append the specified character to the writer.
+	PrintWriter append(CharSequence ch)	It is used to append the specified character sequence to the writer.
+	PrintWriter append(CharSequence ch, int start, int end)	It is used to append a subsequence of specified character to the writer.
+	boolean checkError()	It is used to flushes the stream and check its error state.
+	protected void setError()	It is used to indicate that an error occurs.
+	protected void clearError()	It is used to clear the error state of a stream.
+	PrintWriter format(String format, Object... args)	It is used to write a formatted string to the writer using specified arguments and format string.
+	void print(Object obj)	It is used to print an object.
+	void flush()	It is used to flushes the stream.
+	void close()	It is used to close the stream.
+
+
+-------------------------------------------------------------------------------------------------------------------------
+
+Conclusions:
+
+Whole data is divided into 2 types : 1) Character data(Text files) (2) Binary Data(Video Files, audio files, image files etc)
+
+To read or write character data we should use Reader and Writers. 
+
+But reading and writing binary data we should use Streams concept. (1) InputStream (For read binary files)  (2) OutputStream (For writing into binary files)
+ 
+
+														Object(c)
+
+														/		\
+													/				\
+												/						\
+								Writer(Abstract class)	             Reader(Abstract class)
+								/      |         \                            |           \
+							/          |           \                          |             \
+						/              |             \                        |               \
+					/                  |               \                      |                 \
+				/                      |                \                     |                   \
+		OutputStreamWriter        BufferedWriter     PrintWriter          InputstreamReader       BufferedReader
+			/                                                                |
+		/                                                                    |
+	FileWriter                                                              FileReader
+
+

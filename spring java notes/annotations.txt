@@ -1,0 +1,19 @@
+
+@Controller vs @RestController:
+
+
+	Refrence: https://javarevisited.blogspot.com/2017/08/difference-between-restcontroller-and-controller-annotations-spring-mvc-rest.html
+
+@Component vs @Controller vs @Service vs @Repository
+
+	Reference : https://javarevisited.blogspot.com/2017/11/difference-between-component-service.html
+	
+
+@Configuration
+
+	Reference : https://www.journaldev.com/21033/spring-configuration-annotation
+
+
+---> Important annotation to be put when creating DAO, Services, Controller design patter
+
+	https://stackoverflow.com/questions/34884318/spring-mvc-how-to-connect-controller-with-service-class-and-dao

@@ -1,0 +1,45 @@
+
+JNDI (Java Naming and Directory Interface.) Introduction:
+
+
+
+
+JNDI in layman's terms is basically an Interface for being able to get instances of internal/External resources.
+
+Clients use the naming service to locate objects by name.
+
+A directory service is a customizable information store that functions as a single point from which users can locate resources and services distributed throughout the network. This customizable information store also gives administrators a single point for managing its objects and their attributes.
+
+A Naming service performs lookups of stored information, such as: Host names and addresses. User names. Passwords. Access permissions.
+
+This information is made available so that users can log in to their host, access resources, and be granted permissions. The name service information can be stored locally in various forms of database files, or in a central network-based repository or database.
+
+Without a central naming service, each host would have to maintain its own copy of this information. Naming service information can be stored in files, maps, or database tables. If you centralize all data, administration becomes easier.
+
+Naming services are fundamental to any computing network. Among other features, naming services provide functionality that does the following.
+
+1) Associates (binds) names with objects
+2) Resolves names to objects
+3) Removes bindings
+
+JNDI is an API specified in Java technology that provides naming and directory functionality to applications written in the Java programming language. It is designed especially for the Java platform using Java's object model. Using JNDI, applications based on Java technology can store and retrieve named Java objects of any type. In addition, JNDI provides methods for performing standard directory operations, such as associating attributes with objects and searching for objects using their attributes.
+
+While JNDI plays less of a role in lightweight, containerized Java applications such as Spring Boot, there are other uses. Three Java technologies that still use JNDI are JDBC, EJB, and JMS. All have a wide array of uses across Java enterprise applications.
+
+For example, a separate DevOps team may manage environment variables such as username and password for a sensitive database connection in all environments. A JNDI resource can be created in the web application container, with JNDI used as a layer of consistent abstraction that works in all environments.
+
+This setup allows developers to create and control a local definition for development purposes while connecting to sensitive resources in a production environment through the same JNDI name.
+
+The most common use case is to set up a database connection pool on a Java EE application server. Any application that's deployed on that server can gain access to the connections they need using the JNDI name java:comp/env/FooBarPool without having to know the details about the connection.
+
+This has several advantages:
+
+If you have a deployment sequence where apps move from devl->int->test->prod environments, you can use the same JNDI name in each environment and hide the actual database being used. Applications don't have to change as they migrate between environments.
+You can minimize the number of folks who need to know the credentials for accessing a production database. Only the Java EE app server needs to know if you use JNDI.
+
+------------------------------------------------------------------------------------------------------------------
+
+Reference Link: https://www.javaworld.com/article/2076888/jndi-overview--part-1--an-introduction-to-naming-services.html
+Reference Link: https://www.javaworld.com/article/2076055/jndi-overview--part-3--advanced-jndi.html
+
+

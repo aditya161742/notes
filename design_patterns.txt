@@ -1,0 +1,539 @@
+
+
+Factory pattern:
+
+-> It is one of the best ways of creating an object. In factory pattern, we create object without exposing the creation logic to the client and refer to newly created object using a common interface.
+
+
+Example:
+	
+	There are Customers and they can use mode of contact either mobile or email (used for dual authentication). 
+
+	public class Employee{
+
+		private String name;
+		private String city;
+		private String modeOfContact;
+		private String email;
+		private String phoneNumber;
+		
+		..............
+
+	}
+
+
+	public interface Communication{
+
+		public void process(Employee emp);
+	}
+
+
+	public EmailCommunication implements Communication{
+
+		@Override
+		public void process(Employee emp){
+
+			Systemout.println(emp.getName()+" communicaton via email "+emp.getEmail());
+		}
+
+	}
+
+
+	public MobileCommunication implements Communication{
+
+		@Override
+		public void process(Employee emp){
+
+			Systemout.println(emp.getName()+" communicaton via mobile "+emp.getPhoneNumber());
+		}
+
+	}
+
+
+	public class CommuncationFactory{
+
+			private Communication getProcess(String modeOfCommunication){
+
+						if("Email".equalsIgnoreCase(modeOfCommunication)){
+							return new EmailCommunication();
+						}
+						else if("mobile".equalsIgnoreCase(modeOfCommunication){
+							return new MobileCommuncation();
+						}	
+
+						return null;
+			}
+	}
+
+
+	public static void  main(String[] args){
+
+		List<Employee> empList = new ArrayList<Employee>();
+
+		empList.add(new Employee("Ram","delhi","mobile","ram@ram.com","98468535"));
+		empList.add(new Employee("Vijay","mumbai","email","vijay@vijay.com","898485154"));
+
+		CommunicationFactory factory = new CommunicationFactory(empList);
+
+		Communcation processor;
+
+		for(Employee emp:empList){
+			processor = factory.getProcess(emp.geModeOfContact());
+			processor.process(emp);
+		}
+
+	}
+
+
+Builder patter:
+
+-> It seperate constructotion of complex object from its representation so that same constriction process can create different representation.
+
+Example:
+	
+	Make ClaimsCalculator class immutable, image if there 100 fields some are optional and some are required then becomes diffucult to create objects, in that situation we will go with builder pattern.
+	
+	public class ClaimsCalculator{
+
+		
+		//Rewuired fields
+		private final String claimId;
+		private final String custId;
+		private final String submitDate;
+		private final String amount;
+		
+		//Non required
+		private final String age;
+		private final String address;
+		private final String limits;
+		private final String location;
+		
+		ClaimsCalculator(ClaimBuilder builder){
+			this.claimId = builder.claimId;
+			this.custId = builder.custId;
+			this.submitDate = builder.submitDate;
+			this.amount = builder.amount;
+
+			this.age = builder.age;
+			this.address = builder.address;
+			this.limits = builder.limits;
+			this.location = builder.location;
+			
+
+		}
+
+		//create only getter as this class needs to be immutable
+		.....
+	
+		public static class ClaimBuilder{
+
+				private  String claimId;
+				private  String custId;
+				private  String submitDate;
+				private  String amount;
+				
+				private  String age;
+				private  String address;
+				private  String limits;
+				private  String location;
+
+				//required fields constructor
+				public ClaimBuilder(String claimId,String custId,String submitDate, String amount){
+
+					this.claimId = claimId;
+					this.custId = custId;
+					this.submitDate = submitDate;
+					this.amount = amount;
+				}
+
+				public String age(String age){
+					this.age = age;
+
+					return this;
+				}
+
+				public String address(String address){
+					this.address = address;
+
+					return this;
+				}
+
+				public String limits(String limits){
+					this.limits = limits;
+
+					return this;
+				}
+
+				public String location(String location){
+					this.location = location;
+
+					return this;
+				}
+
+				public ClaimsCalculator build(){
+					ClaimsCalculator ct = new ClaimsCalculator(this);
+					return ct;
+				}
+
+		}
+
+
+	}
+
+
+	main(Stringp[] args){
+
+		ClaimsCalculator cc = new ClaimsCalculator.ClaimsBuilder("CLA-123","Sunny123","01/01/2021","500")
+							.address("Some street")
+							.age("25")
+							.build();  // We can call required and optional as optional only if needed.
+
+
+
+	}
+
+
+
+Prototype pattern:
+
+
+-> It is also creational object.It is used when we need to create multiple objects of same values. We can simply clone it.
+
+-> We need to implement Clonable interface.
+
+	Ex:
+
+		class Vehicle implements Clonable{
+
+				private List<String> vehicleList;
+
+				public Vehicle(List<String> list){
+					this.vehicleList = list;
+				}
+
+				public void insertData(){
+					vehicleList.add("Honda");
+					vehicleList.add("Audi");
+					vehicleList.add("Matuti");
+					vehicleList.add("Renault");
+				}
+
+				public Lis<String> geVehicleList(){
+					return this.vehicleList;
+
+				}
+
+				@Override
+				public Object clonne() throws CloneNotSupportedException{
+
+					List<String> tempList = new ArrayList<String>();
+
+					for(String s:this.getVehicleList()){
+						templList.add(s);
+					}
+
+					return new Vehicle(tempList);
+
+				}
+
+		}
+
+
+		main(){
+			Vehicle a = new Vehicle();
+			a.insertData();
+
+			Vehicle b = (Vehicle)a.clone();
+			
+
+		}
+
+
+Strategy pattern:
+
+-> It is behavioral design pattern. 
+
+Example:
+
+	An organzation have employees and employees have different roles. Now each role have different responsibiliy. 
+
+	public interface Role{
+
+			String descrption;
+			String responsibilities;
+
+	}
+
+	public class Consultant implements Role{
+
+		@override
+		public String description(){
+
+			return Consultant.class.getSimpleName();
+		}
+
+		@Override
+		public String responsibilites(){
+			return "Write code";
+		}
+	}
+
+	public class SeniorConsultant implements Role{
+
+		@override
+		public String description(){
+
+			return SeniorConsultant.class.getSimpleName();
+		}
+
+		@Override
+		public String responsibilites(){
+			return "Review code";
+		}
+	}
+
+	public class LeadConsultant implements Role{
+
+		@override
+		public String description(){
+
+			return LeadConsultant.class.getSimpleName();
+		}
+
+		@Override
+		public String responsibilites(){
+			return "Make tech decisions";
+		}
+	}
+
+	public class Employee{
+		private String name;
+		private Role role;
+
+		Employee(String name, Role role){
+			this.name = name;
+			this.role = role;
+		}
+
+		public void promote(Role newRole){
+			role = newRole;
+		}
+
+		public String grade(){
+			return this.name + "is a "+role.description;
+		}
+
+		public void doWork(){
+			System.out.println(name+ " will "+role.responsibilities);
+		}
+
+	}
+
+	main(){
+
+		Employee ram = new Employee("Ram",new Consultant());
+		Employee rahul = new Employee("Rahul",new SeniorConsultant());
+
+		ram.doWork();
+		rahul.doWork();
+
+		ram.promote(new SeniorConultant());
+		rahul.promote(new LeadConsultant());
+		
+		ram.promote();
+		rahul.promote();
+
+	}
+
+
+Observer pattern:
+
+-> Used when we are intrested in the state of an object and want to get notified whenever there is any change.
+-> The object that watch on the state another object are called Observer and the object that is being watched is called Subject.
+
+-> subject contains a list of observers to notify of any change in it's state, so it should provide methods using which observers can register and unregister themselves.Subjectt also contain a method to notify all the observers of any change and either it can send the update while notifyig the observer or it can provide another method to get the update.
+
+-> Observer should have a method to set the object to watch amd another method that will be used by Subject to notify them of any updates.
+
+Example:
+
+	public interface Subject{
+
+		public void register(Observer observer);
+		public void unregister(Observer observer);
+		public void notifyUpdate(Message message);
+
+	}
+
+
+	public class MessagePublisher implements Subject{
+
+		private Set<Observer> observers = new HashSet<>;
+
+		@override
+		public void register(Observer observer){
+			observers.add(observer);
+		}
+
+		@override
+		public void unregister(Observer observer){
+			observers.add(observer);
+		}
+
+		@override
+		public void nofifyUpdate(Message message){
+			
+			for(Observer observer:observers){
+				observer.updateObserver(message);
+			}
+		}
+
+	}
+
+
+	pbulic interface Observer{
+		public void updateObserver(Message message);
+	}
+
+	public class FirstMessageSubscriber implements Observer{
+
+		@Override
+		public void updateObserver(Message message){
+			System.out.println("Message from first sbscriber: "+message.getMessage());
+		}
+
+	}
+
+	public class SecondMessageSubscriber implements Observer{
+
+		@Override
+		public void updateObserver(Message message){
+			System.out.println("Message from second sbscriber: "+message.getMessage());
+		}
+
+	}
+
+
+	public final class Message{
+
+		private final String message;
+
+		public Message(String message){
+			this.message = message;
+		}
+
+		public String getMessage(){
+			return message;
+		}
+
+	}
+
+
+	main(){
+
+			FirstMessageSubscriber firstMessageSubscriber = new FirstMessageSubscriber();
+			SecondMessageSubscriber secondMessageSubscriber = new SecondMessageSubscriber();
+
+			MessagePublisher messagePublisher = new MessagePublisher();
+
+			messagePublisher.regsiter(firstMessageSubscriber);
+			messagePublisher.regsiter(secondMessageSubscriber);
+
+			messagePublisher.notifyUpdate(new Message("This is the First message"));
+
+			System.out.println("----------------------------------------");
+
+			messagePublisher.notifyUpdate(new Message("This is the Second message"));
+
+			messagePublisher.unregsiter(secondMessageSubscriber);
+
+			messagePublisher.notifyUpdate(new Message("This is the Third message")); // Only first subscriber will receive this message
+	}
+
+
+
+Adaptor pattern:
+
+
+-> It is structural design pattern.
+-> used so that two unrealted interfaces can work together.
+-> The object that joins these unrelated interface called Adaptor.
+
+Example:
+
+	Mobile needs 3 volts to charge but normal socket produces 240 volts. So mobile charger works as a adaptor which converts 240 volts to 3 volt.
+
+
+	public class Volt{
+
+		private int volts;
+
+		public Volt(int volts){
+			this.volts = volts;
+		}
+
+		public int getVolts(){
+			return volts;
+		}
+
+		public String toString(){
+			return "Volt [volts="+volts+"]";
+		}
+
+	}
+
+
+	public interface MobileAdaptor{
+
+			public Volt get3Volt();
+	}
+
+
+	public interface WallSocket{
+		public abstract Volt getVolts();
+	}
+
+
+	public class WallSocketImpl implements WallSocket{
+
+		@Override
+		public Volt getVolts(){
+
+				return new Volt(240);
+		}
+
+	}
+
+
+	public class MobileAdaptorImpl implements MobileAdaptor{
+
+		private WallSocket wallSocket;
+
+		public MobileAdaptorImpl(WallSocket wallSocket){
+			this.wallSocket = wallSocket;
+		}
+
+		@Override
+		public Volt get3Volt(){
+			Volt v240 = wallSocket.getVolts();
+			int v3 = v240.getVolts()/80;
+			return v3;
+		}
+
+	}
+
+
+	main(){
+
+		WallSocket wallSocket = new WallSocket();
+		Volt v240 = wallSocket.getVolts();
+
+		System.out.println(v240);
+
+		MobileAdaptor mobileAdaptor = new MobileAdaptorImpl(wallSocket);
+
+		Volt v3 = mobileAdaptor.get3Volt();
+
+		System.out.println(v3);
+
+	}

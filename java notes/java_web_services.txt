@@ -1,0 +1,407 @@
+Java Web Services:
+
+
+
+Java web services tutorial provides concepts and examples of two main java web services api: JAX-WS and JAX-RS. The java web service application can be accessed by other programming languages such as .Net and PHP.
+
+Java web service application perform communication through WSDL (Web Services Description Language). There are two ways to write java web service application code: SOAP and RESTful.
+
+
+There are two main API's defined by Java for developing web service applications since JavaEE 6.
+
+1) JAX-WS: for SOAP web services. The are two ways to write JAX-WS application code: by RPC style and Document style.
+
+2) JAX-RS: for RESTful web services. There are mainly 2 implementation currently in use for creating JAX-RS application: Jersey and RESTeasy.
+
+**** JAX-WS RPC Style: ******
+
+
+Creating JAX-WS example is a easy task because it requires no extra configuration settings.
+
+JAX-WS API is inbuilt in JDK, so you don't need to load any extra jar file for it. Let's see a simple example of JAX-WS example in RPC style.
+
+-> In document style, SOAP message is sent as a single document.
+-> In Document style, SOAP message loses the operation name.
+-> In Document style, parameters are sent in XML format.
+
+JAX-WS Server Code:
+
+File: HelloWorld.java
+
+package com.javatpoint;  
+import javax.jws.WebMethod;  
+import javax.jws.WebService;  
+import javax.jws.soap.SOAPBinding;  
+import javax.jws.soap.SOAPBinding.Style;  
+//Service Endpoint Interface  
+@WebService  
+@SOAPBinding(style = Style.RPC)  
+public interface HelloWorld{  
+    @WebMethod String getHelloWorldAsString(String name);  
+} 
+
+File: HelloWorldImpl.java
+
+package com.javatpoint;  
+import javax.jws.WebService;  
+//Service Implementation  
+@WebService(endpointInterface = "com.javatpoint.HelloWorld")  
+public class HelloWorldImpl implements HelloWorld{  
+    @Override  
+    public String getHelloWorldAsString(String name) {  
+        return "Hello World JAX-WS " + name;  
+    }  
+}  
+
+File: Publisher.java
+
+package com.javatpoint;  
+import javax.xml.ws.Endpoint;  
+//Endpoint publisher  
+public class HelloWorldPublisher{  
+    public static void main(String[] args) {  
+       Endpoint.publish("http://localhost:7779/ws/hello", new HelloWorldImpl());  
+        }  
+} 
+
+How to view generated WSDL
+After running the publisher code, you can see the generated WSDL file by visiting the URL:
+
+http://localhost:7779/ws/hello?wsdl  
+
+
+JAX-WS Client Code:
+
+File: HelloWorldClient.java
+
+package com.javatpoint;  
+import java.net.URL;  
+import javax.xml.namespace.QName;  
+import javax.xml.ws.Service;  
+public class HelloWorldClient{  
+    public static void main(String[] args) throws Exception {  
+    URL url = new URL("http://localhost:7779/ws/hello?wsdl");  
+   
+        //1st argument service URI, refer to wsdl document above  
+    //2nd argument is service name, refer to wsdl document above  
+        QName qname = new QName("http://javatpoint.com/", "HelloWorldImplService");  
+        Service service = Service.create(url, qname);  
+        HelloWorld hello = service.getPort(HelloWorld.class);  
+        System.out.println(hello.getHelloWorldAsString("javatpoint rpc"));  
+     }  
+ }  
+
+
+***JAX-WS Example Document Style:  ******
+
+Like RPC style, we can create JAX-WS example in document style. To do so, you need to change only one line in service interface.
+
+You need to use Style.DOCUMENT for @SOAPBinding annotation in place of Style.RPC. Let's have a quick look at this:
+
+File: HelloWorld.java
+
+@SOAPBinding(style = Style.DOCUMENT)//It is changed from RPC to DOCUMENT  
+
+->  In document style, SOAP message is sent as a single document.
+-> In Document style, SOAP message loses the operation name.
+-> In Document style, parameters are sent in XML format.
+
+
+*** JAX-RS example Jersey ***
+
+-> We can create JAX-RS example by jersey implementation. To do so, you need to load jersey jar files or use maven framework.
+
+
+JAX-RS Server Code
+
+File: Hello.java
+
+package com.javatpoint.rest;  
+import javax.ws.rs.GET;  
+import javax.ws.rs.Path;  
+import javax.ws.rs.Produces;  
+import javax.ws.rs.core.MediaType;  
+@Path("/hello")  
+public class Hello {  
+  // This method is called if HTML and XML is not requested  
+  @GET  
+  @Produces(MediaType.TEXT_PLAIN)  
+  public String sayPlainTextHello() {  
+    return "Hello Jersey Plain";  
+  }  
+  // This method is called if XML is requested  
+  @GET  
+  @Produces(MediaType.TEXT_XML)  
+  public String sayXMLHello() {  
+    return "<?xml version=\"1.0\"?>" + "<hello> Hello Jersey" + "</hello>";  
+  }  
+  
+  // This method is called if HTML is requested  
+  @GET  
+  @Produces(MediaType.TEXT_HTML)  
+  public String sayHtmlHello() {  
+    return "<html> " + "<title>" + "Hello Jersey" + "</title>"  
+        + "<body><h1>" + "Hello Jersey HTML" + "</h1></body>" + "</html> ";  
+  }  
+}   
+
+File: web.xml
+
+<?xml version="1.0" encoding="UTF-8"?>  
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+xmlns="http://java.sun.com/xml/ns/javaee"   
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee   
+http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"   
+id="WebApp_ID" version="3.0">  
+ <servlet>  
+    <servlet-name>Jersey REST Service</servlet-name>  
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>  
+    <init-param>  
+        <param-name>jersey.config.server.provider.packages</param-name>  
+        <param-value>com.javatpoint.rest</param-value>  
+    </init-param>  
+    <load-on-startup>1</load-on-startup>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>Jersey REST Service</servlet-name>  
+    <url-pattern>/rest/*</url-pattern>  
+  </servlet-mapping>  
+</web-app>   
+
+File: index.html
+<a href="rest/hello">Click Here</a>  
+
+Now run this application on server. Here we are using Tomcat server on port 4444. The project name is restfuljersey.
+
+
+JAX-RS Client Code
+
+File: ClientTest.java
+
+package com.javatpoint.restclient;  
+import java.net.URI;  
+import javax.ws.rs.client.Client;  
+import javax.ws.rs.client.ClientBuilder;  
+import javax.ws.rs.client.WebTarget;  
+import javax.ws.rs.core.MediaType;  
+import javax.ws.rs.core.UriBuilder;  
+import org.glassfish.jersey.client.ClientConfig;  
+public class ClientTest {  
+  public static void main(String[] args) {  
+    ClientConfig config = new ClientConfig();  
+    Client client = ClientBuilder.newClient(config);  
+    WebTarget target = client.target(getBaseURI());  
+    //Now printing the server code of different media type  
+    System.out.println(target.path("rest").path("hello").request().accept(MediaType.TEXT_PLAIN).get(String.class));  
+    System.out.println(target.path("rest").path("hello").request().accept(MediaType.TEXT_XML).get(String.class));  
+    System.out.println(target.path("rest").path("hello").request().accept(MediaType.TEXT_HTML).get(String.class));  
+  }  
+  private static URI getBaseURI() {  
+    //here server is running on 4444 port number and project name is restfuljersey  
+    return UriBuilder.fromUri("http://localhost:4444/restfuljersey").build();  
+  }  
+}   
+
+Output:
+
+Hello Jersey Plain
+<?xml version="1.0"?><hello> Hello Jersey</hello>
+<html> <title>Hello Jersey</title><body><h1>Hello Jersey HTML</h1></body></html> 
+
+****** RESTful JAX-RS Annotations Example *******
+
+The javax.ws.rs package contains JAX-RS annotations.
+
+Annotation	Description
+Path	It identifies the URI path. It can be specified on class or method.
+PathParam	represents the parameter of the URI path.
+GET	specifies method responds to GET request.
+POST	specifies method responds to POST request.
+PUT	specifies method responds to PUT request.
+HEAD	specifies method responds to HEAD request.
+DELETE	specifies method responds to DELETE request.
+OPTIONS	specifies method responds to OPTIONS request.
+FormParam	represents the parameter of the form.
+QueryParam	represents the parameter of the query string of an URL.
+HeaderParam	represents the parameter of the header.
+CookieParam	represents the parameter of the cookie.
+Produces	defines media type for the response such as XML, PLAIN, JSON etc. It defines the media type that the methods of a resource class or MessageBodyWriter can produce.
+Consumes	It defines the media type that the methods of a resource class or MessageBodyReader can produce.
+
+
+JAX-RS @Path, @GET and @PathParam Annotations
+File: HelloService.java
+
+package com.javatpoint.rest;  
+import javax.ws.rs.GET;  
+import javax.ws.rs.Path;  
+import javax.ws.rs.PathParam;  
+import javax.ws.rs.core.Response;  
+@Path("/hello")  
+public class HelloService{  
+    @GET  
+    @Path("/{param}")  
+    public Response getMsg(@PathParam("param") String msg) {  
+        String output = "Jersey say : " + msg;  
+        return Response.status(200).entity(output).build();  
+    }  
+}  
+File: web.xml
+
+<?xml version="1.0" encoding="UTF-8"?>  
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+xmlns="http://java.sun.com/xml/ns/javaee"   
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee   
+http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"   
+id="WebApp_ID" version="3.0">  
+ <servlet>  
+    <servlet-name>Jersey REST Service</servlet-name>  
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>  
+    <init-param>  
+        <param-name>jersey.config.server.provider.packages</param-name>  
+        <param-value>com.javatpoint.rest</param-value>  
+    </init-param>  
+    <load-on-startup>1</load-on-startup>  
+  </servlet>  
+  <servlet-mapping>  
+    <servlet-name>Jersey REST Service</servlet-name>  
+    <url-pattern>/rest/*</url-pattern>  
+  </servlet-mapping>  
+</web-app>   
+File: index.html
+
+<a href="rest/hello/javatpoint">Click Here</a>  
+Now run this application on server, you will see the following output:
+
+Output:
+
+Jersey say : javatpoint
+
+
+JAX-RS Multiple @PathParam Annotation
+File: HelloService.java
+
+package com.javatpoint.rest;  
+import javax.ws.rs.GET;  
+import javax.ws.rs.Path;  
+import javax.ws.rs.PathParam;  
+import javax.ws.rs.core.Response;  
+@Path("/hello")  
+public class HelloService{  
+    @GET  
+    @Path("{year}/{month}/{day}")  
+    public Response getDate(  
+            @PathParam("year") int year,  
+            @PathParam("month") int month,   
+            @PathParam("day") int day) {  
+   
+       String date = year + "/" + month + "/" + day;  
+   
+       return Response.status(200)  
+        .entity("getDate is called, year/month/day : " + date)  
+        .build();  
+    }  
+ }  
+File: web.xml
+
+It is same as above example.
+
+File: index.html
+
+<a href="rest/hello/2014/12/05">Click Here</a>  
+Now run this application on server, you will see the following output:
+
+Output:
+
+getDate is called, year/month/day : 2014/12/5
+
+
+JAX-RS @FormParam and @POST Annotation
+File: HelloService.java
+
+package com.javatpoint.rest;  
+import javax.ws.rs.FormParam;  
+import javax.ws.rs.POST;  
+import javax.ws.rs.Path;  
+import javax.ws.rs.core.Response;  
+@Path("/product")  
+public class ProductService{  
+    @POST  
+    @Path("/add")  
+    public Response addUser(  
+        @FormParam("id") int id,  
+        @FormParam("name") String name,  
+        @FormParam("price") float price) {  
+   
+        return Response.status(200)  
+            .entity(" Product added successfuly!<br> Id: "+id+"<br> Name: " + name+"<br> Price: "+price)  
+            .build();  
+    }  
+}  
+File: web.xml
+
+It is same as above example.
+
+File: index.html
+
+<form action="rest/product/add" method="post">  
+Enter Id:<input type="text" name="id"/><br/><br/>  
+Enter Name:<input type="text" name="name"/><br/><br/>  
+Enter Price:<input type="text" name="price"/><br/><br/>  
+<input type="submit" value="Add Product"/>  
+</form> 
+
+**** RESTful JAX-RS File Download Example *****
+
+We can download text files, image files, pdf files, excel files in java by JAX-RS API. To do so we need to write few lines of code only. Here, we are using jersey implementation for developing JAX-RS file download examples.
+
+You need to specify different content type to download different files. The @Produces annotation is used to specify the type of file content.
+
+@Produces("text/plain"): for downloading text file.
+@Produces("image/png"): for downloading png image file.
+@Produces("application/pdf"): for downloading PDF file.
+@Produces("application/vnd.ms-excel"): for downloading excel file.
+@Produces("application/msword"): for downloading ms word file.
+
+
+JAX-RS PDF File Download
+File: FileDownloadService.java
+
+package com.javatpoint.rest;  
+import java.io.File;  
+import javax.ws.rs.GET;  
+import javax.ws.rs.Path;  
+import javax.ws.rs.Produces;  
+import javax.ws.rs.core.Response;  
+import javax.ws.rs.core.Response.ResponseBuilder;  
+@Path("/files")  
+public class FileDownloadService {  
+    private static final String FILE_PATH = "c:\\mypdf.pdf";  
+    @GET  
+    @Path("/pdf")  
+    @Produces("application/pdf")  
+    public Response getFile() {  
+        File file = new File(FILE_PATH);  
+        ResponseBuilder response = Response.ok((Object) file);  
+        response.header("Content-Disposition","attachment; filename=\"javatpoint_pdf.pdf\"");  
+        return response.build();  
+    }  
+ }  
+File: web.xml
+
+Same as above example.
+
+File: index.html
+
+<a href="rest/files/pdf">Download PDF File</a>
+
+
+*********************************************************************
+
+Practical use of SOAP:
+
+https://dzone.com/articles/when-use-soap-over-rest
+
+https://www.service-architecture.com/articles/web-services/soap.html
+
+https://nordicapis.com/common-cases-when-using-soap-makes-sense/

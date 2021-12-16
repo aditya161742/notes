@@ -1,0 +1,680 @@
+Introduction:
+
+
+1) Multi-tasking:
+	
+-> Executing several tasks simultanuously is a concept of multi tasking.
+-> There are 2 types of multi-tasking:
+	
+	i) Process based multitasking:
+		-> Executing several tasks simultanuously where each task is a seperate independent program(Process) is called process based multitasking.
+		Ex:
+		While typing a java program in the editor we can listen audio songs from the same system, at the same time we can download a file from net. All these tasks will be executed simultaneously and independent of each other.Hence it is process based multi tasking.
+
+		Process based multitasking is best suitable at OS level.
+
+	ii) Thread based multitasking:
+		-> Executing several tasks simultanuously where each task is a seperate independent part of same program(Process) is called thread based multitasking and each independent part called thread.
+
+		Thread based multitasking is best suitable at programatic level.
+
+	Weather it is process based or thread based the main objective of multi-tasking is to reduce response time of the system and to improve performance.
+
+	The main important application areas of multi threading are: 
+
+	1)To develop multi media graphics.
+	2) To develop animations 
+	3) To develope video games.
+	4) To develop web server and application servers.
+
+
+	When compared with old languages developing multi threaded applications in java is very easy because java provides inbuild support for multi threading with rich API(Thread,Runnable,ThreadGroup.....).
+
+-----------------------------------------------------------------------------------------------------------------------
+
+Defining a Thread:
+
+-> We can define a thread in the following 2 ways: 
+	i) By extending thread class:
+
+
+		Note :- code inside run() method called job of thread.
+			-> myThread class is called defining a thread.
+
+		EX:
+
+			class myThread extends Thread{
+				
+				//Override run method which is available in Thread class
+
+				public void run(){
+					
+					for(int i = 0;i<10;i++){
+
+						sop("Child Thread");
+					
+					}
+
+				}
+			}
+
+
+			class ThreadDemo{
+
+				//Every java program by default contain one thread which is main thread, but internally deamon threads are there.
+
+				public static void main(String[] args){
+
+					MyThread t = new MyThread();                      //This line called thread instantiation.
+					t.start();                                       //This line executed by main thread, starting of a child thread. 													//Here main thread starts child thread. 
+
+					for(int i = 0;i<10;i++){
+
+						sop("Main Thread");
+					
+					}
+
+				}
+
+			}
+
+
+		Case I:  Thread Scheduler
+
+			-> It is the part of JVM , it is responsible to schedule threads, i.e , if multiple threads are waiting to get a chance of execution then in which order threads will be executed is decided by thread scheduler.
+
+			-> We can't expect exact algorithm followed by thread scheduler it is varied froom JVM to JVM. Hence we can't expect thread exection order and exact output.
+
+			-> Hence whenever situation comes to multi threading there is no gurantee for exact output. But we can provide several possible outputs.
+
+		Case II: Difference between t.start() and t.run()
+
+			-> In the case of t.start() a new thread will be created which is responsible for the execution of run() method.
+			But in the case of t.run() a new thread won't be created and run() method will be executed just like a normal method call by main thread.
+
+		Case III: Imporatnce of Thread class start() method
+
+			-> Thread class start() method is responsible to register the Thread with Thread scheduler and all other mandatory activities. Hence without executing start() method there is no chance of starting a new thread in java. Due to this Thread class start() method is considered as heart of muti-threading.
+
+			Ex: start() method in Thread class.
+
+			start(){
+
+				1) Register this thread with thread scheduler.
+				2) Perform all other mandatory activities.
+				3)Invoke run() method.
+
+			}
+
+		Case IV: Overloading of run() method
+
+			-> Overloading of run() is always possible but Thread class start() method can invoke no argument run() method (i.e like run(int i) ). The other overloaded method we have to call explicitly like a normal method call.
+
+
+		Case V: If we are not overrding run() method
+
+			-> If we are not overrding run() method then Thread class run() method will be executed which has empty implementation hence we won't get any output.
+			-> It is highly recommended to override run() method otherwise don't go for multi threading concept.
+
+		Case VI: Overriding of start method
+
+			-> If we override start() method then our start method will be executed just like a normal method call and new thread won't be created.
+			-> It is not recommended to override start() method, otherwise don't go for multi threading concept.
+
+		Case VII: Thread life cycle
+
+			
+		Case VIII: IllegalThreadStatement
+
+			-> After starting a thread if we are trying to restart the same thread,then we will get run time exception saying illegal thread state exception.
+
+
+			EX:
+
+				class ThreadDemo{
+
+					//Every java program by default contain one thread which is main thread, but internally deamon threads are there.
+
+					public static void main(String[] args){
+
+						MyThread t = new MyThread();                 //This line called thread instantiation.
+						t.start();                                  //This line executed by main thread, starting of a child thread. 											//Here main thread starts child thread. 
+
+						for(int i = 0;i<10;i++){
+
+							sop("Main Thread");
+						
+						}
+
+						t.start();                           // Error : IllegalThreadStatement
+
+					}
+
+				} 
+
+	ii) By implementing Runnable interface:
+
+		
+		-> We can define a thread by implmenting Runnable interface.
+
+			class myRunnable implements Runnable{
+
+			}
+
+		-> It is present in Java.lang. and it contains only one method run() method.
+
+			Ex:
+
+				class myRunnable implements Runnable{
+
+					public void run(){
+						
+						for(int i = 0;i<10;i++){
+								sop("child thread");
+						}
+					}
+
+				}
+
+				class MyRunnableDemo{
+
+						public static void main(String[] args){
+
+							myRuunbale r = new myRunnable();
+
+							Thread t = new Thread(r);            // Here r is called target runnable
+
+							t.start();   
+
+							for(int i = 0;i<10;i++){
+								sop("main thread");
+							}
+
+
+
+							r.start();          // Cannot find symbol, method start(), location: Class myRunnable
+
+						}
+
+				}
+
+			-> We will get mixed output and we can't tell exact output.
+
+
+		Case Study:
+
+					myRunnable r = new myRunnable();
+					Thread t1 = new Thread();
+					Thread t2 = new Thread(r);
+
+
+			Case I: t1.start()
+
+				-> New thread will be created , which is responsible for execution of thread class run() method, which has empty implementation.
+
+			Case II: t1.run()
+
+				-> No new thread will be created and thread class run method will be executed just like a normal method call.
+
+			Case III: t2.start()
+
+				-> A new thread will be created which is responsible for the execution of myRunnable class run() method.
+
+			Case IV: t2.run()
+
+				-> A new thread won't be created and myRunnable run() method will be executed just like a normal method call.
+
+			Case V: r.start()
+
+				-> We will can compile time error, myrunnable class doesn't have start capability.
+
+			Case VI: r.run()
+
+				-> No new thread will be created and myRunnable run() method will be executed like normal method call.
+
+
+	-> Which approach is best to define a thread ?
+
+		Amoung two ways of defining a thread implements runnable approach is recommended. 
+		In the first approach our class always extends Thread class, there is no chance of extending any other class. Hence we are missing inheritence benefit.
+
+		But in the second approach while implmenting runnable interface we can extend any other class, hence we won't miss any inheritence benefit. 
+
+		Because of above reason it is recommended to use Runnable interface approach, then extending thread class. 
+
+
+
+Thread class constructors:
+
+	1) Thread t = new Thread();
+	2) Thread t = new Thread(Runnable r);
+	3) Thread t = new Thread(String name);
+	4) Thread t = new Thread(Runnable r,String name);
+	5) Thread t = new Thread(ThreadGroup g, String name); //Grouping threads together
+	6) Thread t = new Thread(ThreadGroup g, Runnable r);
+	7)Thread t = new Thread(ThreadGroup g, Runnable r, String name);
+	8) Thread t = new Thread(ThreadGroup g, Runnable r, String name, Long stackSize); // For every thread JVM creates stack for 																						thread, we can define stack size 
+
+Getting and Setting name of a Thread:
+
+Every thread in java has some name it may be default name generated by JVM or customized name provided by programmer.
+
+1) getName();   // get name of a thread 
+2) setName(String name);	// set name of a thread
+
+Ex:
+
+class {
+
+public static void main(String[] args)
+{
+
+Thread t = new Thread();
+
+sop(t.getName());  // main
+
+myThread t1 = new myThread();
+
+sop(t1.getName()); // Thread-0     , default name generated by JVM 
+
+sop(Thread.currentThread().setName("Aditya"));   // Now new name for main method is "Aditya"
+
+}
+
+}
+
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+
+
+Thread Priorities:
+
+-> Every thread in java has some priority it may be default priority genrated by JVM or customized priority provided by programmer, the valid range of thread priorities is 1 to 10, where 1 is mini priority and 10 is max priority.
+
+-> Thread class defines the following constants to represent some standard priorities. 
+	
+	Thread.LOW_PRIORITY // Value is 0
+	Thread.MIN_PRIORITY // Value is 1
+	Thread.NORM_PRIORITY // Value is 5
+	Thread.MAX_PRIORITY  // Value is 10
+
+-> Thread scheduler will use priorities while allocating processor.
+-> The thread which is having hightest priority will get chance first.
+-> If 2 threads having same priority then we can't expect exact execution order it depends on thread scheduler.
+
+-> Thread class defines the following methods to get and set priority of a thread.
+	public final int getPriority()
+	public final void setPriority(int p)   // Allowed values range 1-10, if out of range we get IllegalArgumentException
+
+
+Default Priority:
+
+-> The default priority only for main thread is 5 but for all remaining threads default priority will be inherited from parent to child ,i.e whatever priority parent thread has the same priority will be there for the child thread. Therefore if thread is running inside main() thread default priority is 5.
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+-> We can prvent a thread execution by using the following methods:
+	
+	1) yield() method:
+
+
+
+	2) join() method:
+
+	3) sleep() method:
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+synchronization:
+
+
+-> synchronized is the modifier applicable only for methods and blocks, but not for classes and variables. If multiple threads are trying to operate simultenously on the same java object then there may be a chance of data inconsistency problem. To overcome this problem we should go for synchronized keyword. 
+
+-> If a method or block decalred as synchronized, then at a time only one thread is allowed to execute that method or block on the given object so that data inconsitency problem will be resolved.
+
+-> The main advantage of synchronized keyword is we resolve data inconsistency problems, but the main disadvantage of synchronized keyword is it increases waiting time of threads and creates performance problems hence if there is no specific requirement then it is not recommended to use syncgronized keyword.
+
+-> Internally synchronizartion concept is implemented by using lock. Every object in java has a unique lock. Whenever we are using synchronized keyword then only lock concept will come into the feature. 
+
+-> If thread wants to execute sychronized method on the given object first it has to get lock of that object. Once thread got the lock then it is allowed to execute any synchronized method on that object. Once method execution completes automatically thread releases lock.
+
+-> Acquiring and releasing lock internally takes care by JVM and programmer not rsponsible for this activity.
+
+-> While a thread executing synchronized method on the given object the remaining threads are not allowed to execute any synchronized method simultenously on the same object but remaining threads are allowed to execute non-synchronized methods simultenoulsy. 
+
+-> lock concept is implmeneted based on object but not based on method.
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+ExcecutorService:
+
+-> Present in java.util.concurrent.
+
+-> First an ExecutorService is created using the Executors newFixedThreadPool() factory method. This creates a thread pool with 10 threads executing tasks.
+
+-> Second, an anonymous implementation of the Runnable interface is passed to the execute() method. This causes the Runnable to be executed by one of the threads in the ExecutorService.
+
+-> Creating threads is expensive task, therefore when we need to create lets say 1000 threads then we can use ExecutorService which will increase performance. 
+
+Ex:
+
+ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+executorService.execute(new Runnable() {
+    public void run() {
+        System.out.println("Asynchronous task");
+    }
+});
+
+executorService.shutdown();          //This will not instantly shutsdown threadpool, but initiates the shutdown process, and will 										//shutdown once submitted tasks are completed by threadpool
+
+-> To terminate the threads inside the ExecutorService you call its shutdown() method. The ExecutorService will not shut down immediately, but it will no longer accept new tasks, and once all threads have finished current tasks, the ExecutorService shuts down. All tasks submitted to the ExecutorService before shutdown() is called, are executed.
+
+-> If you want to shut down the ExecutorService immediately, you can call the shutdownNow() method.
+
+executorService.shutdownNow();
+
+-> The ExecutorService awaitTermination() method will block the thread calling it until either the ExecutorService has shutdown completely, or until a given time out occurs. The awaitTermination() method is typically called after calling shutdown() or shutdownNow(). Here is an example of calling ExecutorService awaitTermination():
+
+executorService.shutdown();
+
+executorService.awaitTermination();
+
+--------------------------------------------------------------------------------------------------------------
+
+BlockingQueue:
+
+
+-> Present in java.util.concurrent.
+
+-> Multiple threads can be inserting and taking elements concurrently from a Java BlockingQueue, without any concurrency issues arising.
+
+-> A BlockingQueue is typically used to have one thread produce objects, which another thread consumes.
+
+-> The producing thread will keep producing new objects and insert them into the BlockingQueue, until the queue reaches some upper bound on what it can contain. It's limit, in other words. If the blocking queue reaches its upper limit, the producing thread is blocked while trying to insert the new object. It remains blocked until a consuming thread takes an object out of the queue.
+
+The consuming thread keeps taking objects out of the BlockingQueue to processes them. If the consuming thread tries to take an object out of an empty queue, the consuming thread is blocked until a producing thread puts an object into the queue.
+
+-> It is not possible to insert null into a BlockingQueue. If you try to insert null, the BlockingQueue will throw a NullPointerException.
+
+-> Since BlockingQueue is an interface, you need to use one of its implementations to use it. The java.util.concurrent package has the following implementations of the BlockingQueue interface:
+
+1) ArrayBlockingQueue : ArrayBlockingQueue is a bounded, blocking queue that stores the elements internally in an array. That it is bounded means that it cannot store unlimited amounts of elements. There is an upper bound on the number of elements it can store at the same time. You set the upper bound at instantiation time, and after that it cannot be changed.
+
+2) DelayQueue: The DelayQueue blocks the elements internally until a certain delay has expired.
+
+3) LinkedBlockingQueue: The LinkedBlockingQueue keeps the elements internally in a linked structure (linked nodes). This linked structure can optionally have an upper bound if desired. If no upper bound is specified, Integer.MAX_VALUE is used as the upper bound.
+
+4) PriorityBlockingQueue: The PriorityBlockingQueue is an unbounded concurrent queue. It uses the same ordering rules as the java.util.PriorityQueue class. You cannot insert null into this queue.
+
+5) SynchronousQueue: The SynchronousQueue is a queue that can only contain a single element internally. A thread inseting an element into the queue is blocked until another thread takes that element from the queue.
+
+
+-> Following are some important methods you should know.
+
+Adding Elements:
+1) add() – returns true if insertion was successful, otherwise throws an IllegalStateException
+2) put() – inserts the specified element into a queue, waiting for a free slot if necessary
+3) offer() – returns true if insertion was successful, otherwise false
+4) offer(E e, long timeout, TimeUnit unit) – tries to insert element into a queue and waits for an available slot within a specified timeout
+
+Retrieving Elements:
+
+1) take() – waits for a head element of a queue and removes it. If the queue is empty, it blocks and waits for an element to become available
+2) poll(long timeout, TimeUnit unit) – retrieves and removes the head of the queue, waiting up to the specified wait time if necessary for an element to become available. Returns null after a timeout
+
+These methods are the most important building blocks from BlockingQueue interface when building producer-consumer programs.
+
+Ex:
+
+public class BlockingQueueExample {
+
+    public static void main(String[] args) throws Exception {
+
+        BlockingQueue queue = new ArrayBlockingQueue(1024);
+
+        Producer producer = new Producer(queue);
+        Consumer consumer = new Consumer(queue);
+
+        new Thread(producer).start();
+        new Thread(consumer).start();
+
+        Thread.sleep(4000);
+    }
+}
+
+public class Producer implements Runnable{
+
+    protected BlockingQueue queue = null;
+
+    public Producer(BlockingQueue queue) {
+        this.queue = queue;
+    }
+
+    public void run() {
+        try {
+            queue.put("1");
+            Thread.sleep(1000);
+            queue.put("2");
+            Thread.sleep(1000);
+            queue.put("3");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public class Consumer implements Runnable{
+
+    protected BlockingQueue queue = null;
+
+    public Consumer(BlockingQueue queue) {
+        this.queue = queue;
+    }
+
+    public void run() {
+        try {
+            System.out.println(queue.take());
+            System.out.println(queue.take());
+            System.out.println(queue.take());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
+-> We can distinguish two types of BlockingQueue:
+
+1) unbounded queue – can grow almost indefinitely:
+
+-> Creating unbounded queues is simple:
+
+	BlockingQueue<String> blockingQueue = new LinkedBlockingDeque<>();
+
+-> The most important thing when designing a producer-consumer program using unbounded BlockingQueue is that consumers should be able to consume messages as quickly as producers are adding messages to the queue. Otherwise, the memory could fill up and we would get an OutOfMemory exception.
+
+2) bounded queue – with maximal capacity defined
+
+
+-> BlockingQueue<String> blockingQueue = new LinkedBlockingDeque<>(10);
+
+
+
+----------------------------------------------------------------------------------------------------------
+
+BlockingDeque:
+
+-> A deque is short for "Double Ended Queue". Thus, a deque is a queue which you can insert and take elements from, from both ends.
+
+
+---------------------------------------------------------------------------------------------------------
+
+Exchanger:
+
+-> Exchanger() is a class.
+-> Exchanger is same as SynchronousQueue (i.e direct handoff of object from producer to consumer) but with handoff in both direction (i.e also cosumer to producer thread)
+
+ex:
+
+Exchanger exchanger = new Exchanger();
+
+ExchangerRunnable exchangerRunnable1 =
+        new ExchangerRunnable(exchanger, "A");
+
+ExchangerRunnable exchangerRunnable2 =
+        new ExchangerRunnable(exchanger, "B");
+
+new Thread(exchangerRunnable1).start();
+new Thread(exchangerRunnable2).start();
+
+
+public class ExchangerRunnable implements Runnable{
+
+    Exchanger exchanger = null;
+    Object    object    = null;
+
+    public ExchangerRunnable(Exchanger exchanger, Object object) {
+        this.exchanger = exchanger;
+        this.object = object;
+    }
+
+    public void run() {
+        try {
+            Object previous = this.object;
+
+            this.object = this.exchanger.exchange(this.object);
+
+            System.out.println(
+                    Thread.currentThread().getName() +
+                    " exchanged " + previous + " for " + this.object
+            );
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+Output:
+
+Thread-0 exchanged A for B
+Thread-1 exchanged B for A
+
+----------------------------------------------------------------------------------------------------------
+
+Semaphore:
+
+As semaphore typically has two uses:
+
+1) To guard a critical section against entry by more than N threads at a time.
+2) To send signals between two threads.
+
+Guarding Critical Sections:
+
+If you use a semaphore to guard a critical section, the thread trying to enter the critical section will typically first try to acquire a permit, enter the critical section, and then release the permit again after. Like this:
+
+Semaphore semaphore = new Semaphore(1);
+
+//critical section
+semaphore.acquire();
+
+...
+
+semaphore.release();
+
+
+Sending Signals Between Threads:
+
+If you use a semaphore to send signals between threads, then you would typically have one thread call the acquire() method, and the other thread to call the release() method.
+
+If no permits are available, the acquire() call will block until a permit is released by another thread. Similarly, a release() calls is blocked if no more permits can be released into this semaphore.
+
+Thus it is possible to coordinate threads. For instance, if acquire was called after Thread 1 had inserted an object in a shared list, and Thread 2 had called release() just before taking an object from that list, you had essentially created a blocking queue. The number of permits available in the semaphore would correspond to the maximum number of elements the blocking queue could hold.
+
+-----------------------------------------------------------------------------------------------------------
+
+Future and Calable interface:
+
+Java Callable interface use Generic to define the return type of Object. Executors class provide useful methods to execute Java Callable in a thread pool. Since callable tasks run in parallel, we have to wait for the returned Object.
+
+Java Future
+Java Callable tasks return java.util.concurrent.Future object. Using Java Future object, we can find out the status of the Callable task and get the returned Object. It provides get() method that can wait for the Callable to finish and then return the result.
+
+Java Future provides cancel() method to cancel the associated Callable task. There is an overloaded version of get() method where we can specify the time to wait for the result, it’s useful to avoid current thread getting blocked for longer time. There are isDone() and isCancelled() methods to find out the current status of associated Callable task.
+
+Here is a simple example of Java Callable task that returns the name of thread executing the task after one second. We are using Executor framework to execute 100 tasks in parallel and use Java Future to get the result of the submitted tasks.
+
+
+package com.journaldev.threads;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+public class MyCallable implements Callable<String> {
+
+    @Override
+    public String call() throws Exception {
+        Thread.sleep(1000);
+        //return the thread name executing this callable task
+        return Thread.currentThread().getName();
+    }
+    
+    public static void main(String args[]){
+        //Get ExecutorService from Executors utility class, thread pool size is 10
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        //create a list to hold the Future object associated with Callable
+        List<Future<String>> list = new ArrayList<Future<String>>();
+        //Create MyCallable instance
+        Callable<String> callable = new MyCallable();
+        for(int i=0; i< 100; i++){
+            //submit Callable tasks to be executed by thread pool
+            Future<String> future = executor.submit(callable);
+            //add Future to the list, we can get return value using Future
+            list.add(future);
+        }
+        for(Future<String> fut : list){
+            try {
+                //print the return value of Future, notice the output delay in console
+                // because Future.get() waits for task to get completed
+                System.out.println(new Date()+ "::"+fut.get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        //shut down the executor service now
+        executor.shutdown();
+    }
+
+}
+Once we execute the above program, you will notice the delay in output because java Future get() method waits for the java callable task to complete. Also notice that there are only 10 threads executing these tasks.
+
+Here is snippet of the output of above program.
+
+
+Mon Dec 31 20:40:15 PST 2012::pool-1-thread-1
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-2
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-3
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-4
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-5
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-6
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-7
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-8
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-9
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-10
+Mon Dec 31 20:40:16 PST 2012::pool-1-thread-2
+...
+
+Tip: What if we want to override some of the methods of Java Future interface, for example overriding get() method to timeout after some default time rather than waiting indefinitely, in this case Java FutureTask class comes handy that is the base implementation of Future interface. Check out Java FutureTask Example to learn more about this class.
+

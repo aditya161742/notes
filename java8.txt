@@ -1,0 +1,1024 @@
+
+Java 8 new features:
+
+-> Java 8 came in 2014.
+-> Java 8 provides concise code, i.e we need to write less code for doing things. In Languages we write 10 lines of code, same thing in java in earlier version we have to write 100 lines of code. But java overcome this in java 8 and provide ability to write concise code.
+-> Java 8 provides conside code writing ability by enabling functional programming.
+-> For writing functional programming they introduced: 
+
+1) lambda expressions 
+2) Functional interfaces 
+3) Default methods and sttic methods 
+4) Predefined functional interfaces like Function,Predicate,Consumer, Supplier etc
+5) Double colon operator (::)
+6) Streams
+7) Date/Time API
+8) Optional class
+9) Nashron javascript engine
+
+	Exmple 1: Write a function which take int value and return square, in functional programming.
+
+		import java.util.function.*;
+
+		Class Test{
+
+			public static void main(String args[]){
+
+				Function<Integer,Integer> f=i->i*i;
+				Sytem.out.println("Square of 40 is:"+f.apply(40));
+				Sytem.out.println("Square of 50 is:"+f.apply(50));
+			}
+
+		}
+
+
+	Exmple 2: Write a function which take int value and check if it is even or not, in functional programming.
+
+		import java.util.function.*;
+
+		Class Test{
+
+			public static void main(String args[]){
+
+				Predicate<Integer> p=i->i%2==0;
+				Sytem.out.println("Is 4 even :"+p.test(4));
+			}
+
+		}
+
+
+1) Lambda expression:
+
+
+-> It is an anonymous function,i.e any function without name, without return type, without modifiers.
+
+	Example 1: 
+
+		()->{System.out.println("Hello");}
+
+		()->System.out.println("Hello");      // We can remove curly braces if writting single line in body
+
+	Example 2:
+
+		(int a,int b) -> System.out.println(a+b);
+
+	Example 3:
+		(int a)->{ return a*a);
+			OR
+		(int a)->a*a;              //We can remove return keyword if writting single line of code
+			OR 
+		(a)->a*a;                  //Sometimes compiler can know automatically parameter type, so we can remove parameter type
+			OR
+		a->a*a;                   //If we give single parameter we can remove parenthesis
+
+	Example 4:
+
+		(s)->s.length();       /returns length of string
+
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Functional Interface:
+
+-> Interface which contains single abstract method. If we want to invoke lamba expression, it is compulsory to have functional interface.
+
+	Example: 
+
+		Interface Interf{
+			public void m1();
+
+			default void m2(){
+
+			}
+
+			public static void m3(){
+
+			}
+		}
+
+	//This is valid functiona interace,as there is single abstract method and we can have any number of defaul, static methods we want.
+
+-> Comparable, Runnable, Callable etc are functional interface.
+
+-> In java 8 , we can also explicitly define functional interface. By using @FunctionalInterface annotation. It is good practice to decalre functional interface. So that if we are decalring more than 1 abstract method compiler can verify it. Wheather we declare or not interface with this annotation if interface contains only one abstract method than that interface is considered as functional interface.
+
+
+-> Functional interface with respect to inheritence.
+
+	Example 1: 
+		@FunctionalInterface
+		Interface A{
+		public void m1();
+		}
+
+		@FunctionalInterface
+		Interface B extends A{
+		
+		}
+
+		//This is valid because by default parent method is available
+
+	Example 2: 
+		@FunctionalInterface
+		Interface A{
+		 public void m1();
+		}
+
+		@FunctionalInterface
+		Interface B extends A{
+		 public void m1();
+		}
+
+		//This is valid because we are overriding m1() in interface B and therefore for B only one method is available.
+
+	Example 3: 
+		@FunctionalInterface
+		Interface A{
+		 public void m1();
+		}
+
+		@FunctionalInterface
+		Interface B extends A{
+		 public void m2();
+		}
+
+		//This is invalid because we are using new method m2() in interface B and therefore  B have two abstract methods .
+
+
+	Example 4: 
+		@FunctionalInterface
+		Interface A{
+		 public void m1();
+		}
+
+		Interface B extends A{
+		 public void m2();
+		}
+
+		//This is valid because B is not a functional interface therefore it can have multiple abstract methods.
+
+
+-> Lamba expression with functional interfaces.
+	
+	Example: Normal way of using functional interface, without lambda functions
+
+			Interface Interf{
+				public void m1();
+			}
+
+			class Demo implemets Interf{
+
+				public void m1(){
+					System.out.println("Hello Demo");
+				}
+			}
+
+			public Test{
+				public static void main(String args[]){
+					Interf i = new Demo();
+					i.m1();                       // Hello Demo
+				}
+			}
+
+
+	Example:  Using functional interface, with lambda functions
+
+			Interface Interf{
+				public void m1();
+			}
+
+			public Test{
+				public static void main(String args[]){
+					
+					Interf i = ()->System.out.println("Hello Form Lambda expression");
+
+					i.m1();                       // Hello Form Lambda expression
+				}
+			}
+
+		//Therefore we can use lambda expressions for functioanl interfaces, we donot need implemenattion class for functional interface.
+
+
+-> Lambda expressions are only used with functional interface.
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+Lambda expressions multithreading and collections:
+
+-> Exmple: Runnable interface using lambda expressions
+
+		class Test{
+			public static void main(String args[]){
+
+				Runnable r = ()->{
+					for(int w = 0;w<10;w++){
+						System.out.println("Child Thread");
+					}
+				};
+
+				Thread t = new Thread(r);
+				t.start();
+
+				for(int w = 0;w<10;w++){
+					System.out.println("Main Thread");
+				}
+			}
+		}
+
+-> Exmaple : Colections with lambda expressions
+
+		class Test{
+			
+			public static void main(String args[]){
+
+				ArrayList<Integer> al = new ArrayList<>();
+
+				al.add(35);
+				al.(12);
+				al.(25);
+
+				System.out.println(al);
+
+				Comparator<Integer> c = (al1<al2) -> (al1<al2) ? -1 ? (al1>al2) > 1 : 0; 
+				Collections.sort(al,c);
+				
+				System.out.println(al);
+			}
+
+		}
+
+
+-------------------------------------------------------------------------------------------------
+
+Anonymous inner class vs lambda expressions:
+
+
+-> Class with no modifier, class name, return type called anonymous inner class.
+
+			Example: Thread t = new Thread(){
+				......
+			};
+
+			//We are writing a class that extends Thread class.
+
+
+			Example: Runnable r = new Runnable(){
+				.....
+			};
+
+			//We are writing a class that implements Runnable class.
+
+
+-> If anonymous inner class implements and interface that contains single abstract method then only we can replace that anonymous ineer class with lambda expression but not when interface has more than one abstract class.
+
+
+-----------------------------------------------------------------------------------------------------
+
+
+Default method or Defender method or Virtual extension method:
+
+
+-> Until 1.7 version Every mthod present inside interface is always : public and abstract, weather we declare or not.
+-> Every variable inside interface is public static final.
+-> In 1.8 version default and static methods are also allowed.
+-> In 1.9 version private methods are also allowed.
+
+-> For example if 100 classes implements same interface and at some point if we want to add another method to the interface, then we have to manually goto every class and implement new method in classes. 
+
+-> So frm 1.8 we can add defaul method in interface which already have implmentation inside interface, so it not compulsory for implemenattion classes to implement it.
+
+	Example:
+
+		interface I{
+			void m1();
+			void m2();
+			default void m3(){
+				System.out.println("Default method");
+			}
+		}
+
+		class C1 implements I{
+			void m1(){
+				System.out.println("M1");
+			}
+
+			void m2(){
+				System.out.println("M2");
+			}
+		}
+
+
+Case 1: Why we cannot declare Object class methods as default methods in interface.
+
+		Example:
+
+		interface I{
+
+			default void hashCode(){
+				System.out.println("Default method");
+			}
+		}
+
+		class Test implements I{
+			
+		}
+
+		//Here Test class already implements Object class and default hashCode() method is already available to Test class from Object class. Therefore we cannot declare it as default method inside interface.
+
+
+
+-> What happens If multiple interfaces contains default methods with same name ?
+
+	Example:
+
+			interface Left{
+
+				default void m1(){
+					System.out.println("Left interface");
+				}
+
+			}
+
+
+			interface Right{
+
+				default void m1(){
+					System.out.println("Right interface");
+				}
+
+			}
+
+
+			Class Test implements Left,Right      //this is invalid because both interfaces contains same method m1(), To solve this 											//problem by overriding m1 method inside Test class 
+			{
+				public void m1(){
+					//System.out.println("our own m1 method");   
+					Left.super.m1();                 //This will call left m1() method
+					Right.super.m1();                 //This will call right m1() method
+				}
+			}
+
+
+//Therefore as from above example it possible to have multiple inheritence for interfaces but not for classes.
+
+-> static methods are called without creating objects of the classes. And we know that we never create object inside interfaces.
+And classes required objects to be created, therefore classes are heavy weight as compared to interfaces. So we should decalre static method inside interface.
+
+-> static method no where related to objects therefore why to go for classes. This is analysed by java people and therefore they allowed static method inside interface, because interface is light weight. 
+
+
+	Example:
+
+		Interface interf{
+			public static void m1(){
+				System.out.println("Inetrface static method");
+			}
+		}
+
+
+		class Test implements interf{
+			public static void main(String args[]){
+
+				//Calling static method correct way
+				Interf.m1();
+
+				//Calling static method wrong way (this won't work)
+				m1();
+
+				//Calling static method wrong way (this won't work)
+				Test t = new Test();
+				t.m1();
+
+				//Calling static method wrong way (this won't work)
+				Test.m1();
+
+			}
+		}
+
+// Note static interface methods are not available to implementation classes. There the only way to call interface static method is using interface, like in above example.
+
+
+	
+		Example 2:
+
+		Interface interf{
+			public static void m1(){
+				System.out.println("Inetrface static method");
+			}
+		}
+
+
+		class Test{
+			public static void main(String args[]){
+
+				//Calling static method correct way
+				Interf.m1();
+
+				//Calling static method wrong way (this won't work)
+				m1();
+
+				//Calling static method wrong way (this won't work)
+				Test t = new Test();
+				t.m1();
+
+				//Calling static method wrong way (this won't work)
+				Test.m1();
+
+			}
+		}
+
+
+// In above example we haven't implemented interf to Test class. Even then if we call interface static method it is valid.
+	
+	
+	Example 3:
+
+		Interface interf{
+			public static void main(String args[]){
+				System.out.println("Inetrface main method");
+			}
+		}
+
+//We can even declare main method inside interface from java 1.8.
+
+-------------------------------------------------------------------------------------------
+
+Predefined Functional Interfaces:
+
+
+-> Example: Predicate, Function, Consumer, Supplier.
+-> Example: Two argument predefined functional interfaces : BiPredicate, BiFunction, BiConsumer  etc
+-> Example: Primitive functional interfaces: IntPredicate, IntFunctiona, IntConsumer etc
+
+
+Predicate: 
+
+-> used for Conditional checks.
+-> Contains one abstarct method , i.e public abstract boolean test(T t);
+-> internal implementation of Predicate.	
+
+	Class Predicate<T>{
+		public abstract boolean test(T t);
+	}
+	
+-> Usage example.	
+
+Example: Check if number is even or not.
+
+		Class Test{
+			public void main(String arg[]){
+				Predicate<Integer> p1 = i->i%2==0;
+				System.out.prinln(p1.test(10)); // Test If 10 is even or not
+
+				Predicate<Integer> p1 = e->e.getSalary() > 5000 && e.getSalary() < 10000;   // Check multiple conditions
+				System.out.prinln(p1.test(e));
+
+			}
+		}
+
+
+Example: Predicate to check weather the number is even or not and another predicate to check weather the number is grater than 10 or not.
+
+			Class Test{
+			public void main(String arg[]){
+				Predicate<Integer> p1 = i->i%2==0;
+				System.out.prinln(p1.test(10)); // Test If 10 is even or not
+
+				Predicate<Integer> p2 = i > 10; 
+
+				p1.and(p2).test(34);        //Combines two predicate and true if both are true
+
+				p1.or(p2).test(34);        //Check two predicate and true if anyone is true
+
+				p1.negate();  // True if opposite condition is true 
+
+				System.out.prinln(p1.test(e));
+
+			}
+		}
+
+
+--------------------------------------------------
+
+Function:
+
+-> Used when we have to perform sme operation and produce result.
+
+	interface Function<T,R>{
+		public R apply(T t);      //R is return type
+	}
+
+
+->	Example: Find squre of a number
+
+		Class Test{
+			public static void main(String args[]){
+
+				Function<Integer,Integer> f = i->i*i;
+
+				System.out.prinln(f.apply(2));
+
+				// f1.andThen(f2).apply(i);  // For combining multiple Functions, f1 followed by f2
+				// f1.compose(f2).apply(i);  // For combining multiple Functions f2 followed by f1
+			}
+		}
+
+
+
+Consumer:
+
+
+-> It takes input value and can perform operations but never return anything, i.e it only consumer the value.
+
+	interface Consumer<T>{
+		public void accept(T t);
+	}
+
+-> Example:
+		
+		Class Test{
+
+			public static void main(String args[]){
+
+				Consumer<String> c = s->System.out.println(s);
+				System.out.prinln(c.accept("Aditya"));   //Prints Aditya
+
+				Consumer<Student> st = s->{System.out.prinln(s.name);} // Prints student name
+
+				//c.andThen(st); // For consumer chaining
+			}
+
+		}
+
+
+Supplier:
+
+
+-> It never takes input , it returns something.
+
+	interface Supplier<R>{
+		public R get();
+	}
+
+-> Example:
+		
+		Class Test{
+
+			public static void main(String args[]){
+
+				Supplier<Date> s = new Date();
+				System.out.prinln(s.get());    // Return Date
+
+				//GET random OTP of 6 digit
+				Supplier<String> s = ()->{
+					String otp = "";
+
+					for(int i =0;i<6;i++){
+						otp = otp + (int)Math.random()*10;    // Some random number will be generated
+					}
+
+					return otp;
+
+				};
+
+				System.out.prinln(s.get());
+			}
+
+		}
+
+
+BiPredicate:
+
+-> Used for two input argument for condition check. 
+
+-> Example:
+
+		Class Test{
+
+			public static void main(String args[]){
+				BiPredicate<Integer,Integer> p=  (a,b)-> (a+b)%2==0;
+
+				System.out.prinln(p.test(10,20));         //True
+			}
+		}
+
+Same for BiConsumer
+
+BiFunction:
+
+		Class Test{
+
+			public static void main(String args[]){
+
+				BiFunction<Integer,String,Employee> f = (eno,ename) -> new Employee(eno,ename);
+
+				System.out.println(f.apply(100,"Arun"));
+
+
+			}
+		}
+
+
+Note: There is no BiSupplier.
+
+IntPredicate:
+
+-> Used to take int type as input not Integer type.
+-> DoublePredicate, LongPredicate etc are other examples.
+
+-> IntFunction, DoubleFunction etc for Functions are available.
+
+
+
+----------------------------------------------------------------------------------------------------
+
+
+Stream API:
+
+-> Stream API used to process collection of objects.
+-> A stream is a sequence of objects that supports various methods which can be pipelined to produce the desired result.
+-> Stream don't change the orginal data structure , they only provide the result as per the pipelined methods.
+-> It takes input from Collections, Arryas or I/O channels.
+
+
+-> Example:
+
+			Class Test{
+
+				public static void main(String args[]){
+
+					List<Integer> values = Arrays.asList(1,2,3,4,5,6);
+
+					//First way of printing all values 
+					for(int r = 0;r<6;r++){
+						System.out.println(values.get(r));
+					}
+
+					//Second way of printing all values 
+					Iterator<Integer> i - values.iterator();
+
+					while(i.hasNext()){
+						System.out.println(i.next());
+					}
+
+
+					//Third way of printing all values
+					for(int i : values){
+						System.out.println(i);
+					}
+
+					//All above ways are External Iterations
+
+					//Fourth way of printing all values, called internal iteration
+					//In java 1.8 they have done lot of modifications in Collections API's also.
+					//Java 1.8 introduced forEach method for collection
+					//forEach takes Consumer interface as parameter and Consumer interface is Functional interface,therefore we have to //provide lambda expression.
+					//forEach method is default method defined in Iterable interface. List extends Collections and Collections extend //Iterable
+
+					values.forEach(i->System.out.println(i));
+					//OR
+					values.forEach(System.out::println);  // This is called "Call by method" or "method reference"
+					
+				}
+
+			}
+
+
+-> Streams Usage:
+
+  Example: Multiply each numer 2 and show result
+
+			Class Test{
+
+				public static void main(String args[]){
+
+					List<Integer> values = Arrays.asList(1,2,3,4,5,6);
+
+					//Example 1
+
+					System.out.println(values.streams().map(i->i*2).reduce(0,(e,c)->c+e));
+					//Internal working of Above line explanation:
+					// Function<Interger,Integer> f = f=i->i*2;
+					// BinaryOperator<Interger> b = (e,c)->e+c;  // Present in function package in 1.8,takes 2 parameter and returns 1 //value. BinaryOperator interface contains only one method i.e apply.
+					//1. Stream s = values.stream();    //Convert values into bytes of stream
+					//2. Stream s1 = s.map(f);         //f is Function interface
+					//3. int result = s1.reduce(0,b);                    //0 is intial value and second parameter is BinaryOperator
+					
+
+					//Example 2
+					System.out.println(values.streams().filter(i->i%5==0))reduce(0,(e,c)->e+c); //filters values which are divisible by 5
+					//filter needs object of Predicate
+
+				}
+			}
+
+
+-> Optional interface :
+	
+	-> Java introduced a new class Optional in jdk8. It is a public final class and used to deal with NullPointerException in Java application. You must import java.util package to use this class. It provides methods which are used to check the presence of value for particular variable.
+
+	Example:
+
+		import java.util.Optional;  
+		public class OptionalExample {  
+		    public static void main(String[] args) {  
+		        String[] str = new String[10];        
+		        str[5] = "JAVA OPTIONAL CLASS EXAMPLE";  // Setting value for 5th index  
+		        // It returns an empty instance of Optional class   
+		        Optional<String> empty = Optional.empty();  
+		        System.out.println(empty);                      // Optional.empty
+		        // It returns a non-empty Optional  
+		        Optional<String> value = Optional.of(str[5]);  //If user str[4] then it will throw nullpointerexception, to overcome this use Optional.ofNullable(str[4])
+				
+		        // If value is present, it returns an Optional otherwise returns an empty Optional  
+		        System.out.println("Filtered value: "+value.filter((s)->s.equals("Abc")));       // Filtered value: Optional.empty
+		        System.out.println("Filtered value: "+value.filter((s)->s.equals("JAVA OPTIONAL CLASS EXAMPLE")));   // Filtered value: Optional[JAVA OPTIONAL CLASS EXAMPLE]
+		        // It returns value of an Optional. if value is not present, it throws an NoSuchElementException    
+		        System.out.println("Getting value: "+value.get());    // Getting value: JAVA OPTIONAL CLASS EXAMPLE
+		        // It returns hashCode of the value  
+		        System.out.println("Getting hashCode: "+value.hashCode());  //Getting hashCode: -619947648
+		        // It returns true if value is present, otherwise false  
+		        System.out.println("Is value present: "+value.isPresent());  // Is value present: true
+				System.out.println("Is value present: "+empty.isPresent()); // Is value present: false
+				
+		        // It returns non-empty Optional if value is present, otherwise returns an empty Optional  
+		        System.out.println("Nullable Optional: "+Optional.ofNullable(str[4])); // Nullable Optional: Optional.empty 
+				System.out.println("Non Nullable Optional: "+Optional.ofNullable(str[5])); // Non Nullable Optional: Optional[JAVA OPTIONAL CLASS EXAMPLE]				
+		        
+				// It returns value if available, otherwise returns specified value,  
+		        System.out.println("orElse: "+value.orElse("Value is not present"));  // orElse: JAVA OPTIONAL CLASS EXAMPLE
+		        System.out.println("orElse: "+empty.orElse("Value is not present"));  // orElse: Value is not present
+		        value.ifPresent(System.out::println);   // JAVA OPTIONAL CLASS EXAMPLE
+				empty.ifPresent(System.out::println); // Nothing will be printed
+		    }  
+		}
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Double colon operator:
+
+Refernce: https://mkyong.com/java8/java-8-method-references-double-colon-operator/
+
+--------------------------------------------------------------------------------------------------------------------------
+
+Streams:
+
+Reference: https://www.tutorialspoint.com/java8/java8_streams.htm
+
+1) map() examples:
+
+import java.util.stream.Collectors;  // Colecctors is path
+
+Example 1:
+
+		System.out.println("The stream after applying "
+                           + "the function is : "); 
+  
+        // Creating a list of Integers 
+        List<Integer> list = Arrays.asList(3, 6, 9, 12, 15); 
+  
+        // Using Stream map(Function mapper) and 
+        // displaying the corresponding new stream 
+        list.stream().map(number -> number * 3).forEach(System.out::println); 
+
+
+Example 2: 
+
+		 System.out.println("The stream after applying "
+                           + "the function is : "); 
+  
+        // Creating a list of Integers 
+        List<String> list = Arrays.asList("geeks", "gfg", "g", 
+                                          "e", "e", "k", "s"); 
+  
+        // Using Stream map(Function mapper) to 
+        // convert the Strings in stream to 
+        // UpperCase form 
+        List<String> answer = list.stream().map(String::toUpperCase). 
+        collect(Collectors.toList()); 
+  
+        // displaying the new stream of UpperCase Strings 
+        System.out.println(answer); 
+		
+Example 3:
+
+		System.out.println("The stream after applying "
+                           + "the function is : "); 
+  
+        // Creating a list of Strings 
+        List<String> list = Arrays.asList("Geeks", "FOR", "GEEKSQUIZ", 
+                                          "Computer", "Science", "gfg"); 
+  
+        // Using Stream map(Function mapper) and 
+        // displaying the length of each String 
+        list.stream().map(str -> str.length()).forEach(System.out::println); 
+		
+Example 4:
+
+		List<Integer> numbers = Arrays.asList(3, 2, 2, 3, 7, 3, 5);
+
+		//get list of unique squares
+		List<Integer> squaresList = numbers.stream().map( i -> i*i).distinct().collect(Collectors.toList());
+
+
+Exmplae 5: Additional brackets to map function
+		
+		List<String> words = Arrays.asList("Oracle", "Java", "Magazine");
+		List<String> wordLengths = words.stream().map((x) -> {
+			return x.toUpperCase();
+		}).collect(Collectors.toList());
+		
+reduce() method:
+
+-> Many times, we need to perform operations where a stream reduces to single resultant value, for example, maximum, minimum, sum, product, etc. Reducing is the repeated process of combining all elements.
+reduce operation applies a binary operator to each element in the stream where the first argument to the operator is the return value of the previous application and second argument is the current stream element.
+
+Example: 1:  Returns longest string in the List, i.e GeeksforGeeks
+
+	// creating a list of Strings 
+        List<String> words = Arrays.asList("GFG", "Geeks", "for", 
+                                           "GeeksQuiz", "GeeksforGeeks"); 
+  
+        // The lambda expression passed to 
+        // reduce() method takes two Strings 
+        // and returns the longer String. 
+        // The result of the reduce() method is 
+        // an Optional because the list on which 
+        // reduce() is called may be empty. 
+        Optional<String> longestString = words.stream() 
+                                   .reduce((word1, word2) 
+                             -> word1.length() > word2.length() 
+                                           ? word1 : word2); 
+  
+        // Displaying the longest String 
+        longestString.ifPresent(System.out::println); 
+		
+Example 2:  Implementation of reduce method to get the combined String 
+
+		// String array 
+        String[] array = { "Geeks", "for", "Geeks" }; 
+  
+        // The result of the reduce() method is 
+        // an Optional because the list on which 
+        // reduce() is called may be empty. 
+        Optional<String> String_combine = Arrays.stream(array) 
+                                           .reduce((str1, str2) 
+                                           -> str1 + "-" + str2); 
+  
+        // Displaying the combined String 
+        if (String_combine.isPresent()) { 
+            System.out.println(String_combine.get()); 
+        } 
+		
+		
+Example 3: Get sum of all elements
+
+		 // Creating list of integers 
+        List<Integer> array = Arrays.asList(-2, 0, 4, 6, 8); 
+  
+        // Finding sum of all elements 
+        int sum = array.stream().reduce(0, 
+                (element1, element2) -> element1 + element2); 
+  
+        // Displaying sum of all elements 
+        System.out.println("The sum of all elements is " + sum);
+		
+		
+Example 4:
+
+		// To get the product of all elements 
+        // in given range excluding the 
+        // rightmost element 
+        int product = IntStream.range(2, 8) 
+                     .reduce((num1, num2) -> num1 * num2) 
+                     .orElse(-1); 
+  
+        // Displaying the product 
+        System.out.println("The product is : " + product); 
+		
+-----------------------------------------------------------------------------------------------------------		
+		
+Date/Time API in java 8:
+
+Reference: https://www.tutorialspoint.com/java8/java8_datetime_api.htm
+
+Date/Time in hibernate model:
+
+reference: https://thorben-janssen.com/hibernate-jpa-date-and-time/
+
+Example 1: LocalDateTime <-> Timestamp
+	
+	
+	package com.mkyong;
+
+	import java.sql.Timestamp;
+	import java.time.LocalDateTime;
+
+	public class TimeExample {
+
+		public static void main(String[] args) {
+
+			//  LocalDateTime to Timestamp
+			LocalDateTime now = LocalDateTime.now();
+			Timestamp timestamp = Timestamp.valueOf(now);
+
+			System.out.println(now);            // 2019-06-14T15:50:36.068076300
+			System.out.println(timestamp);      // 2019-06-14 15:50:36.0680763
+
+			//  Timestamp to LocalDateTime
+			LocalDateTime localDateTime = timestamp.toLocalDateTime();
+
+			System.out.println(localDateTime);  // 2019-06-14T15:50:36.068076300
+
+		}
+	}
+
+
+Example 2: LocalDate <-> Timestamp
+
+	package com.mkyong.jdbc;
+
+	import java.sql.Timestamp;
+	import java.time.LocalDate;
+
+	public class TimeExample2 {
+
+		public static void main(String[] args) {
+
+			//  LocalDate to Timestamp
+			LocalDate now = LocalDate.now();
+			Timestamp timestamp = Timestamp.valueOf(now.atStartOfDay());
+
+			System.out.println(now);        // 2019-06-14
+			System.out.println(timestamp);  // 2019-06-14 00:00:00.0
+
+			//  Timestamp to LocalDate
+			LocalDate localDate = timestamp.toLocalDateTime().toLocalDate();
+			System.out.println(localDate);  // 2019-06-14
+
+		}
+	}
+
+
+Example 3: Compare dates in java 8 and date formats
+
+	package com.mkyong.date;
+
+	import java.time.LocalDate;
+	import java.time.format.DateTimeFormatter;
+
+	public class TestDate4 {
+
+		public static void main(String[] args) {
+
+			DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate date1 = LocalDate.of(2009, 12, 31);
+			LocalDate date2 = LocalDate.of(2010, 01, 31);
+
+			System.out.println("date1 : " + sdf.format(date1));
+			System.out.println("date2 : " + sdf.format(date2));
+
+			System.out.println("Is...");
+			if (date1.isAfter(date2)) {
+				System.out.println("Date1 is after Date2");
+			}
+
+			if (date1.isBefore(date2)) {
+				System.out.println("Date1 is before Date2");
+			}
+
+			if (date1.isEqual(date2)) {
+				System.out.println("Date1 is equal Date2");
+			}
+
+			System.out.println("CompareTo...");
+			if (date1.compareTo(date2) > 0) {
+
+				System.out.println("Date1 is after Date2");
+
+			} else if (date1.compareTo(date2) < 0) {
+
+				System.out.println("Date1 is before Date2");
+
+			} else if (date1.compareTo(date2) == 0) {
+
+				System.out.println("Date1 is equal to Date2");
+
+			} else {
+
+				System.out.println("How to get here?");
+
+			}
+		}
+
+	}
+	
+	
+-------------------------------------------------------------------------------------------
+	
+Nashron javascript engine:
+
+-> Nashorn is a JavaScript engine. It is used to execute JavaScript code dynamically at JVM (Java Virtual Machine). Java provides a command-line tool jjs which is used to execute JavaScript code. You can execute JavaScript code by using jjs command-line tool and by embedding into Java source code.

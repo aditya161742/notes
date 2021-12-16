@@ -1,0 +1,70 @@
+Best Reference: https://beginnersbook.com/2013/05/servlet-tutorial/
+
+***** APPLICATION, REQUEST, SESSION AND PAGE SCOPES IN SERVLETS AND JSPS:
+
+Similar to scope and lifetime of variables in Java as you have seen in blocks-and-methods-in-java, parameters and attributes in a Java EE web application also have scope and lifetime in the context of the web application. The scope of a parameter/attribute denotes the availability of that parameter/attribute for use. A web application serves multiple requests from clients when it is up and running. These requests can be from same client or different clients. We have seen from the servlet life cycle that a servlet’s service() method is called every time a request comes.
+
+Different scopes are request, session and application. JSP has an additional scope called page scope.
+
+We have not covered topics required for some of the scopes mentioned here; you can come back and look into those scopes for which topics are not covered until now, once those topics are covered.
+
+ 
+
+Application or context scope
+Context scope or application scope starts from the point where a web application is put into service (started) till it is removed from service (shutdown) or the web application is reloaded. Parameters/attributes within the application scope will be available to all requests and sessions. 
+
+Application scope is denoted by javax.servlet.ServletContext interface. 
+
+Application object is available in a JSP page as an implicit object called application. 
+
+In a servlet, you can get application object by calling getServletContext() from within the servlets code directly (the servlet itself implements the ServletConfig interface that contains this method) or by explicitly calling getServletConfig().getServletContext().
+
+The web container provides one ServletContext object per web application per jvm.
+
+ 
+
+Request scope
+Request scope start from the moment an HTTP request hits a servlet in our web container and end when the servlet is done with delivering the HTTP response.
+
+With respect to the servlet life cycle, the request scope begins on entry to a servlet’s service() method and ends on the exit from that method. 
+
+A ‘request’ scope parameter/attribute can be accessed from any of servlets or jsps that are part of serving one request. For example, you call one servlet/jsp, it then calls another servlet/jsp and so on, and finally the response is sent back to the client. 
+
+Request scope is denoted by javax.servlet.http.HttpServletRequest interface.
+
+Container passes the request object as an argument of type HttpServletRequest to Servlet's service method.
+
+Request object is available in a JSP page as an implicit object called request. You can set value for an attribute in request object from a servlet and get it from a JSP within the same request using the implicit request object.
+
+ 
+
+Session scope
+A session scope starts when a client (e.g. browser window) establishes connection with our web application till the point where the browser window is closed.
+
+Session scope spans across multiple requests from the same client. 
+
+A noteable feature of tabbed browsing is that session is shared between the tabs and hence you can requests from other tabs too during a session without logging in again. For instance, you can load your gmail inbox in another tab without logging in again. This also means browsing an unknown site and a secure site from different tabs from the same browser can expose your secure session ID to malicious applications. So always open a new browser window when you want to do secure transactions, especially financial transactions. 
+
+Session scope is denoted by javax.servlet.http.HttpSession interface. 
+
+Session object is available in a JSP page as an implicit object called session. 
+
+In a servlet, you can get Session object by calling request.getSession().
+
+ 
+
+JSP page scope
+​The page scope restricts the scpoe and lifetime of attributes to the same page where it was created.
+
+Page scope is denoted by javax.servlet.jsp.PageContext abstract class.
+
+It is available in a JSP page as an implicit object called pageScope .
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+

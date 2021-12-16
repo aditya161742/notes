@@ -1,0 +1,80 @@
+Java Memory Management:
+
+
+-> Java memory is divided into 2 parts Heap memory and Stack memory:
+
+Heap Memory:
+
+-> Heap memory is divided into 2 parts: Young genration and Old generation.
+
+-> All the class objects stored first time inside young generation.
+
+	Young generation memory is also divided into 3 parts: Eden, Survivor memory s0 and Survivor memory s1.
+
+	When we create (Student s =  new Student), it is always stored inside Eden memory.  Once Eden memory is full, Minor GC (garbage collector) will be called and it will move some objects from Eden memory to Survivor memory s0 and if s0 is filled up then to Survivor memory s1.
+
+-> When s0 and s1 is also filled then JVM will shift all this objects into old generation memory. Once old geenration memory is also filled up then Major GC is performed to find objects for removal. Major GC takes longer time. It might get timeout error/exceptions.
+
+-> Memory pool: It is part of heap memory. It is used to store immutable objects like String objects. It will be defined at run time by JVM.
+
+-> Permanent generation is another part of memory. This memory will be generated at run time. Applications meta data of the classes, methods will be stored here. like class name, class variable name etc.
+
+	We have another concept in Permanent generation called method area. In method area the complete class structure will be stored in method area (ie all static variable, constant variables ).
+
+-> Run time constant pool: It is part of method area of Permanent generation. This will store all static variable, constant variables.
+
+
+-> Heap memory always stores class objects, it stores all JRE classes. GC (garbage collector) always runs on heap memory only.
+
+
+Stack memory:
+
+-> Used to execute threads.
+-> It contains method specific values (ie local variables).
+-> Object reference are stored in stack memory like : 
+
+		Student s = new Student();
+
+		then s is reference variable and will be stored in stack memory which will be pointing to Object in the heap memory (ie Student, Student object is stored in heap memory).
+
+-> If reference object not found in heap memory than reference will be removed from stack memory.
+
+-> In stack memory is filled based on LIFO based.
+
+	Example:
+
+		public void m1(){
+
+		}
+
+	In stack memory it will create a block and will store m1 called method block. Once m1 is executed successfully this memory will be freed and given memory to another method.
+
+
+-> Heap memory size is bigger than stack memory always.
+
+
+Java 8 memory management changes:
+
+-> Permanent generation memory is removed from java 8, instead we have meta space. It is said that 264 MB is enough space for most the applications. When so many classes are created in application the more utilization of Permanent generation memory happens and we will get "outOfMemory at PerGen" error. That is why Permanent generation is removed.
+
+-> Permanent generation was part of heap memory.
+
+-> Meta space is not part of the heap but it is part of native memory (ie process).
+
+-> Native memory is RAM memory and depends upon OS we can use it.
+
+-> What is the significant of this change ??
+
+-> Now you won't get "outOfMemory at PerGen" error as "outOfMemory at PerGen" error is removed. As meta space is not part of heap and we are using Native memory , so if number of usage is so large that all native memory is utilized then we may bring full server down not just application. Also other application might not be able to utilize memory on server. Therefore it is good to set max size of meta space.
+
+-> It is no longer sufficient to just monitor Heap size. You must also monitor the meta space by going to task manager.
+
+JDK vs JRE:
+
+-> The JRE is the Java Runtime Environment. It is a package of everything necessary to run a compiled Java program, including the Java Virtual Machine (JVM), the Java Class Library, the java command, and other infrastructure. However, it cannot be used to create new programs.
+
+The JDK is the Java Development Kit, the full-featured SDK for Java. It has everything the JRE has, but also the compiler (javac) and tools (like javadoc and jdb). It is capable of creating and compiling programs.
+
+-> Class loaders are responsible for loading Java classes during runtime dynamically to the JVM (Java Virtual Machine). Also, they are part of the JRE (Java Runtime Environment).
+
+-> No need to have JRE when you have JDK. If you open JDK folder and see, you'll have JRE folder inside it which is the same of JRE folder initially you have

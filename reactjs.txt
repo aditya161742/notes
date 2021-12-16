@@ -1,0 +1,366 @@
+-> To get an overview of what React is, you can write React code directly in HTML.
+
+But in order to use React in production, you need NPM and Node.js installed.
+
+<!DOCTYPE html>
+<html>
+  <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  <body>
+  
+    <div id="mydiv"></div>
+
+    <script type="text/babel">
+      class Hello extends React.Component {
+        render() {
+          return <h1>Hello World!</h1>
+        }
+      }
+
+      ReactDOM.render(<Hello />, document.getElementById('mydiv'))
+    </script>
+  </body>
+</html>
+
+Install:
+
+The create-react-app is an officially supported way to create React applications. Install by below command.
+
+ 1) npm install -g create-react-app
+
+-2) Command to create new react project: npx create-react-app myfirstreact
+
+3) cd myfirstreact
+
+4) npm start
+
+5) A new browser window will pop up with your newly created React App! If not, open your browser and type localhost:3000 in the address bar.
+
+-> Instead of manipulating the browser's DOM directly, React creates a virtual DOM in memory, where it does all the necessary manipulating, before making the changes in the browser DOM.
+
+-> React finds out what changes have been made, and changes only what needs to be changed.
+
+-> Goto "myfirstreact/src" and open app.js. Try changing the HTML content and save the file.
+
+-> Notice that the changes are visible immediately after you save the file, you do not have to reload the browser!
+
+-> In Nodejs, to use a variable or a function in another file, you have to export them. And we have two type export.
+
+Use export const
+// Export a variable
+export const App = () => { ... }
+
+// Import App in another file
+import { App } from '...'
+Use export default
+// Export default
+const App = () => { ... }
+export default App
+
+// Import App in another file
+import App from '...'
+
+Check in app.js in myfirstreact
+
+-> More Notes:  https://www.w3schools.com/react/react_es6.asp
+
+-> Adding bootstrap dependencies -->
+
+    npm install bootstrap@latest //To install latest bootstrap
+
+   import 'bootstrap/dist/css/bootstrap.min.css';
+
+-> If we want to use react theme like in current scenerio we are using coreui as free theme. 
+
+So npm install @coreui/react  --> it will download dependencies in our project
+Then npm install @coreui/coreui  --> it will donwload dependent CSS in our project
+
+-> For reference purpose of coreui , download theme from here: https://coreui.io/react/?affChecked=1#compare and run npm install to setup on local machine.
+
+-> The ReactDOM.render() function takes two arguments, HTML code and an HTML element.
+
+The purpose of the function is to display the specified HTML code inside the specified HTML element.
+
+Example
+Display a paragraph inside the "root" element:
+
+ReactDOM.render(<p>Hello</p>, document.getElementById('root'));
+The result is displayed in the <div id="root"> element:
+
+<body>
+
+  <div id="root"></div>
+
+</body>
+
+-> The HTML code in this tutorial uses JSX which allows you to write HTML tags inside the JavaScript code:
+
+Example:
+
+const myelement = (
+  <table>
+    <tr>
+      <th>Name</th>
+    </tr>
+    <tr>
+      <td>John</td>
+    </tr>
+    <tr>
+      <td>Elsa</td>
+    </tr>
+  </table>
+);
+
+ReactDOM.render(myelement, document.getElementById('root'));
+
+-> JSX stands for JavaScript XML.
+
+JSX allows us to write HTML in React.
+
+JSX makes it easier to write and add HTML in React.
+
+JSX allows us to write HTML elements in JavaScript and place them in the DOM without any createElement()  and/or appendChild() methods.
+
+JSX converts HTML tags into react elements.
+
+You are not required to use JSX, but JSX makes it easier to write React applications.
+
+JSX will throw an error if the HTML is not properly closed.
+
+Try changing in "src/index.js".
+
+Example (With JSX):
+
+const myelement = <h1>I Love JSX!</h1>;
+
+ReactDOM.render(myelement, document.getElementById('root'));
+
+Example (Without JSX):
+
+const myelement = React.createElement('h1', {}, 'I do not use JSX!');
+
+ReactDOM.render(myelement, document.getElementById('root'));
+
+Example: (Execute the expression 5 + 5):
+
+const myelement = <h1>React is {5 + 5} times better with JSX</h1>;
+
+
+-> Components are like functions that return HTML elements.
+
+Components are independent and reusable bits of code. They serve the same purpose as JavaScript functions, but work in isolation and return HTML via a render() function.
+
+Components come in two types, Class components and Function components
+
+When creating a React component, the component's name must start with an upper case letter.
+
+The component has to include the extends React.Component statement, this statement creates an inheritance to React.Component, and gives your component access to React.Component's functions.
+
+The component also requires a render() method, this method returns HTML.
+
+Example
+Create a Class component called Car
+
+class Car extends React.Component {
+  render() {
+    return <h2>Hi, I am a Car!</h2>;
+  }
+}
+
+Now your React application has a component called Car, which returns a <h2> element.
+
+To use this component in your application, use similar syntax as normal HTML: <Car />
+
+Example
+Display the Car component in the "root" element:
+
+ReactDOM.render(<Car />, document.getElementById('root'));
+
+-> https://www.w3schools.com/react/react_components.asp
+
+-> https://www.w3schools.com/react/react_state.asp
+
+-> https://www.w3schools.com/react/react_lifecycle.asp
+
+-> https://www.w3schools.com/react/react_events.asp
+
+-> https://www.w3schools.com/react/react_forms.asp
+
+-> Hooks: https://www.valentinog.com/blog/hooks/#in-the-beginning-there-was-thissetstate
+
+-> Fragements:
+
+When using render it is required that all elements should be wrapped in single element otherwise react will thro error. For example,
+
+class MyComponent extends React.Component {
+
+ render () {
+   return (
+     <div>
+       <div className="fragment1">Fragment 1</div>
+       <div className="fragment2">Fragment 2</div>
+     <div>
+   ) 
+ }
+}
+
+In above example even if don't need <div> tag we have to add it,which will be visible in UI. This can be removed if we are using fragments. Example:
+
+import React, { Fragment } from 'react'
+
+class MyComponent extends React.Component {
+
+ render () {
+   return (
+     <Fragment>
+       <div className="fragment1">Fragment 1</div>
+       <div className="fragment2">Fragment 2</div>
+     <Fragment>
+   ) 
+ }
+}
+
+-> Different types of routers in react: https://learnwithparam.com/blog/different-types-of-router-in-react-router/
+
+-> HashRouter:
+
+HashRouter uses a hash symbol in the URL, which has the effect of all subsequent URL path content being ignored in the server request (ie you send "www.mywebsite.com/#/person/john" the server gets "www.mywebsite.com". As a result the server will return the pre # URL response, and then the post # path will be handled by parsed by your client side react application.
+
+Example:
+
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+
+class App extends Component{
+  render() {
+    return (
+      <HashRouter>
+          <React.Suspense fallback={loading}>
+            <Switch>
+              <Route exact path="/register" name="Register Page" render={props => <Register {...props}/>} />
+            </Switch>
+          </React.Suspense>
+      </HashRouter>
+    );
+  }
+}
+
+-> Switch:
+
+The <Switch /> component will only render the first route that matches/includes the path. Once it finds the first route that matches the path, it will not look for any other matches. Not only that, it allows for nested routes to work properly, which is something that <Router /> will not be able to handle. ie BrowserRouter, HashRouter etc
+
+Example:
+
+Above example
+
+-> React.Suspense:
+
+React Suspense allows you to suspend components rendering until a condition is met. While waiting, a fallback component is rendered.
+
+Example above.
+
+-> Route render property vs component property:
+
+We use Route with render props as,
+
+<Route path = "/about" component={About} />
+OR,
+
+<Route path = "/about" render= { (props) => <About {...props} } />
+
+See above example.
+
+The second one is different from the first one in the sense that in the second case, the About component has access to the props coming through the Route.
+
+Say, for instance, there is a Profile component,
+
+<Route path="/admin/profile"
+       render={ props => (
+              <Profile tabs= {"valuePassed"} {...props}  />  
+        )}
+ />
+
+
+Now in Profile component, we can access all the props,
+
+this.props.tabs give "valuePasses" in class-based component while props.tabs is used for functional component.
+
+Also The path parameters can be accessed through the props given to the render function.
+
+You generally use the render prop when you need some data from the component that contains your routes, since the component prop gives no real way of passing in additional props to the component.
+
+-> Define global constants:
+
+Creating a .env file at the root of your project with prefixed REACT_APP_ variables inside does quite nicely. You can reference within your JS and JSX process.env.REACT_APP_SOME_VAR as you need AND it's immutable by design.
+
+When you bootstrap your application using Create React App or Next.js, your application will automatically load a .env file that you’ve written.
+
+To call on the environment variable, use the process.env.{ your variable name } syntax:
+
+Example: REACT_APP_USER_MANAGEMENT_SERVICE=http://localhost:8888
+and use like {process.env.REACT_APP_USER_MANAGEMENT_SERVICE}
+
+Example: Define base url of deffirent services as constants.
+
+-> To use spring web services use , @CrossOrigin(origins = "http://localhost:3000") on rest controller. This allows cross origin request from this IP and port. Otherwise react will throw error of CORS.
+
+We use axios for http requests.
+Axios uses default url as, "http://localhost/3000". To change it we Create a component, axios.js:
+
+import axios from 'axios';
+const instance = axios.create({baseURL: 'https://localhost:8888'});
+
+or
+
+const instance = axios.create({baseURL: process.env.REACT_APP_BE_URL});   //Define constant in .env
+
+export default instance
+
+Then import this file everywhere we need axios like import axios from 'axios/axios.js.
+axios just uses endpoint URL for communication 
+
+axios.get('/getUsers').then(response => {
+       console.log(response);
+     }).catch(error => {});
+
+
+or 
+
+Ex: post data in the format of json.
+
+var header  = {
+   'Content-Type':'application/json'
+}
+
+axios.post('api/registerUser', {username:'test'})
+          .then(response => console.log(response));
+
+Ex: Post formData with axios:
+
+           var bodyFormData = new FormData();
+
+            bodyFormData.append("title","some title");
+            
+            axios({
+              method: "post",
+              url: "api/registerUser",
+              data: bodyFormData,
+              headers: { "Content-Type": "multipart/form-data" },
+            })
+              .then(function (response) {
+                //handle success
+                console.log(response);
+              })
+              .catch(function (response) {
+                //handle error
+                console.log(response);
+              });
+
+-> Refs in react js 
+
+Equivalent to selectors in jquery. 
+UseRef vs forwardedRef vs createRef
+
+-> Where o keep JWT token after authentication ?? 
+
+https://dev.to/nilanth/how-to-secure-jwt-in-a-single-page-application-cko

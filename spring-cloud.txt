@@ -1,0 +1,387 @@
+Spring cloud java Techie channel:
+
+
+
+Eureka:
+
+-> Eureka Server is an application that holds the information about all client-service applications. Every Micro service will register into the Eureka server and Eureka server knows all the client applications running on each port and IP address. Eureka Server is also known as Discovery Server.
+
+
+Create Eureka server:
+
+-> Start new spring boot project select these dependecies  devtools, web and eureka server.  Call this project amozon-server.
+
+-> Then below '@SpringBootApplication' in main class annotate '@EnableEurekaServer' to make this application as server where we can register our microservices.
+
+
+-> Create YML config file inside resources folder. To tell this is not a client but eureka server Or else we can mention this configuration inside application.properties file as well.
+
+	Example: application.yml
+
+		eureka:
+			client:
+				register-with-eureka: false
+				fetch-registry:false
+		server:
+				port: 8761                                // Note we can mention any port here, but by default it will take 8761
+		spring:
+				application:
+						name: AMAZON-SERVER
+
+
+
+Create First Microservice and register it with eureka server:
+
+-> Start new spring boot project select these dependecies  devtools, web and eureka discovery.  Call this project payment-service.
+
+-> Then below '@SpringBootApplication' in main class annotate '@EnableEurekaClient' to make this application as client which we can register to eureka server.
+
+-> Create any get request in controller to test this service.
+		
+		@RestController
+		@GetMapping("/payment-provider")
+		class PaymentController{
+			
+			@GetMapping("/paynow/{price}")
+			public String payNow(@PathVariable int price){
+				Sytem.out.println("Paid "+price+" successfully.");
+			}
+		}
+
+-> Register this payment service in eureka server. To register it we need to write yml file.
+
+		Example: application.yml
+
+		eureka:
+			client:
+				register-with-eureka: true
+				fetch-regitry:true                          //Eureka clients fetches the registry information from the server and caches it locally. After that, the clients use that information to find other services.
+				serviceUrl:
+					defaultZone: http://localhost:8761/eureka/         // This is eureka server URL
+			instance:
+				hostname: localhost
+		server:
+				port: 8888                             
+		spring:
+				application:
+						name: PAYMENT-SERVICE          //With this name it will register in eureka server
+
+
+
+-> Now if we check our eureka server at http://localhost:8761/ we can see that new service with name PAYMENT-SERVICE (as mentioned in yml file) has been registered there.
+
+
+Create Second Microservice (From where we call payment-service):
+
+-> Start new spring boot project select these dependecies  devtools, web and eureka discovery.  Call this project amazon-shopping.
+
+-> Then below '@SpringBootApplication' in main class annotate '@EnableEurekaClient' to make this application as client which we can register to eureka server.
+
+-> Write controller in which we will invoke payment-service using the REST call. Name controller as 'ShoppingController'. Note to invoke payment-service from amazon-shopping we need RestTemplate. Therefore create a bean for RestTemplate inside '@SpringBootApplication' along with main method.
+
+	@SpringBootApplication
+	@EnableEurekaClient
+	class AmazonShoppingApplication{
+
+		@LoadBalanced        // Learn more: https://www.studytonight.com/post/load-balancing-spring-boot-microservices-using-netflixs-ribbon
+ 		@Bean
+		public RestTemplate getTemplate(){
+			return new RestTemplate();
+		}
+
+		public static void main(String[] args){
+			SpringApplication.run(AmazonShoppingApplication,args);
+		}
+	}
+	
+	@RestController
+	class ShoppingController{
+		
+		@Autowire
+		private RestTemplate template;
+
+		@GetMapping("/amazon-payment/{price}")
+		public String invokePaymentService(@PathVariable int price){
+			//String url = "http://localhost:8888/payment-provider/paynow/"+price;   // This is traditional approach, without using eureka
+
+			String url = "http://PAYMENT-SERVICE/payment-provider/paynow/"+price; // This is Eureka approach, we have mentioned 																				PAYMENT-SERVICE, by this name we registered payemnt-service 																	in Eureka Server
+
+			return template.getForObject(url,String.class);   // String.class becase it will return plain string
+		}
+	}
+
+
+-> Register this amazon shopping in eureka server. To register it we need to write yml file.
+
+		Example: application.yml
+
+		eureka:
+			client:
+				register-with-eureka: true
+				fetch-regitry:true
+				serviceUrl:
+					defaultZone: http://localhost:8761/eureka/         // This is eureka server URL
+			instance:
+				hostname: localhost
+		server:
+				port: 9999                             
+		spring:
+				application:
+						name: AMAZON-SHOPPING          //With this name it will register in eureka server
+
+
+
+-> Now if we check our eureka server at http://localhost:8761/ we can see that new service with name AMAZON-SHOPPING (as mentioned in yml file) has been registered there.
+
+
+
+What if Eureka System is down:
+
+-> If you're looking for solutions using the Netflix OSS suite, use Hystrix . Or you could add a custom circuit breaker, based on retry. You should let the eureka client continue to send heartbeat so that the whole system would be resume after the eureka server is back.
+
+-> Hystrix retry reference: https://dzone.com/articles/spring-retry-way-to-handle-failures
+
+-> https://medium.com/swlh/hystrix-fault-tolerance-and-circuit-breaker-for-spring-boot-38c744647acb
+
+-------------------------------------------------------------------------------------------------------------------------
+
+Spring cloud config:
+
+-> Problem
+SpringBoot provides lot of flexibility in externalizing configuration properties via properties or YAML files. We can also configure properties for each environment (dev, qa, prod etc) separately using profile specific configuration files such as application.properties, application-dev.properties, application-prod.properties etc. But once the application is started we can not update the properties at runtime. If we change the properties we need to restart the application to use the updated configuration properties.
+
+Also, in the context of large number of MicroService based applications, we want the ability to configure and manage the configuration properties of all MicroServices from a centralized place.
+
+
+-> Solution
+We can use Spring Cloud Config Server (http://cloud.spring.io/spring-cloud-static/Dalston.SR2/#_spring_cloud_config) to centralize all the applications configuration and use Spring Cloud Config Client module from the applications to consume configuration properties from Config Server. We can also update the configuration properties at runtime without requiring to restart the application.
+
+-> Spring Cloud Config Server is nothing but a SpringBoot application with a configured configuration properties source. The configuration source can be a git repository, svn repository or Consul service
+
+
+-> Learn more https://www.sivalabs.in/2017/08/spring-cloud-tutorials-introduction-to-spring-cloud-config-server/
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+Feign Client example:
+
+-> Feign client is declarative approch used for inter communication between microservices.
+-> We can use feign with replacement with resttemplate.
+
+-> https://nirajsonawane.github.io/2019/03/21/Simplifying-Microservices-Communication-Using-Spring-Cloud-OpenFeign/
+-> https://dzone.com/articles/microservices-communication-feign-as-rest-client.
+-> https://examples.javacodegeeks.com/enterprise-java/spring/spring-cloud-feign-client-example/
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+Distributed log tracing in microservices using spring sleuth and zipkin:
+
+-> Using this logs we can also trace which microservice is slowest amoung multiple microservices called from single application. This is used for debugging by first knowing which microservices are slow.
+
+-> Spring cloud sleuth will generate unique trace ID and span ID which genrating logs.
+
+-> We can trace all the transaction in zipkin server.
+
+-> Create new project name payment-service include package web, sleuth and zipkin.
+
+-> Create new endpoint "/getDiscount".
+
+	Example:
+	import ord.slf4j.Logger;
+
+	@SpringBootApplication
+	@RestController
+	class PaymentServiceApplication{
+		private static final Logger log = LoggerFactory.getLogger(PaymentServiceApplication.class);        //Create logger
+		
+		@GetMapping("/getDiscount")
+		String getDiscount(){
+		log.info("Discount service called.......");
+			return "10% discount";
+		}
+
+		pulic static void main(String[] args){
+			SpringApplication.run(PaymentServiceApplication.class);
+		}
+
+	}
+
+
+-> Create config file to push logging details to the zipkin server.
+
+	@Configuration
+	class CloudConfig{
+		
+		@Bean
+		public RestTemplate template(){
+			return new RestTemplate();
+		}
+
+		@Bean
+		public ALwaysSimpler defaultSimpler(){
+			return new AlwaysSimpler();
+		}
+
+	}
+
+
+Run application and we can see logs on console.
+
+-> Untill now we checking logs on console now create zipkin-server. 
+
+-> Create new project zipkin-server add dependencies web, zipkin-autoconfiguare-ui , zipkin-server
+
+-> spring.port = 9411 in applications.properties.
+
+-> use @EnableZipkinServer along with @SpringBootApplication
+
+-> Hit payment-service '/getDiscount' endpoint, then check logs on http:localhost:9411/zipkin/ 
+
+-> Select service name from dropdown and click find traces.
+
+-------------------------------------------------------------------------
+
+What is API Gateway ? And how we can use API gateway for multiple microservices using Spring Cloud Gateway ??
+
+-> API gateway Server handles all the requests and performs the dynamic routing of microservice applications.
+
+->Netflix Zuul was previously most used but it doesnot supported reactive programming etc so removed by spring and spring developed its own API gateway called Spring Cloud Gateway.
+
+-> Numerous Netflix-related modules that were previously in maintenance mode have been removed in Spring Cloud 2020. This includes Ribbon and Zuul which you are using. The Spring Cloud team recommend replacing Ribbon with Spring Cloud Loadbalancer and Zuul with Spring Cloud Gateway.
+
+-> Add Hystrix, Actuator, Spring Cloud Gateway , Eureka Client, spring Web and Devtool for building API gateway.
+
+Working Example:
+
+@SpringBootApplication
+@EnableEurekaClient
+@EnableHystrix
+public class CentralizedApiGatewayApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(CentralizedApiGatewayApplication.class, args);
+	}
+
+	@Bean
+	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+		return builder.routes()
+			.route(r -> r.path("/api/**")
+				.uri("http://localhost:8888/"))
+			.build();
+	}
+}
+
+application.properties
+
+#It tells that register this application is Eureka client
+eureka.client.register-with-eureka=false
+#fetches the registry information from the server and caches it locally
+eureka.client.fetchRegistry=true
+#URL for eureka server
+eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka/
+#Application at this port
+server.port=8889
+
+#Name of application
+spring.application.name=Centralized-API-Gateway
+
+
+Then access like http://localhost:8889/api/registerUser, which will be redirected to http://localhost:8888/api/registerUser
+
+We need to allow CORS in api gateway otherwise we it will give CORS policy error when accessed from react js or any other port.
+
+Add this in configurations file in spring:
+
+@Bean
+    public CorsWebFilter corsWebFilter() {
+
+        final CorsConfiguration corsConfig = new CorsConfiguration();
+        corsConfig.setAllowedOrigins(Collections.singletonList("*"));
+        corsConfig.setMaxAge(3600L);
+        corsConfig.setAllowedMethods(Arrays.asList("GET", "POST"));
+        corsConfig.addAllowedHeader("*");
+
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig);
+
+        return new CorsWebFilter(source);
+    } 
+
+properties.yml
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+            - GET
+            - POST
+
+-----------------------------------------------------------------------------
+
+Centralize configuration using spring cloud consul:
+
+-> Leanr online video.
+
+
+----------------------------------------------------------------------------
+
+Single Sign-On with Spring Boot & Okta | OAuth 2.0:
+
+-> Learn online video
+
+----------------------------------------------------------------------------
+
+
+Spring Cloud Function | @functional | Example :
+
+-> Serverless computing is a method of providing backend services on an as-used basis. Servers are still used, but a company that gets backend services from a serverless vendor is charged based on usage, not a fixed amount of bandwidth or number of servers.
+
+-> Serverless functions are event-driven, meaning the code is invoked only when triggered by a request. The provider charges only for compute time used by that execution, rather than a flat monthly fee for maintaining a physical or virtual server.
+
+More Reference: https://www.baeldung.com/spring-cloud-function
+
+-> Learn more about Function,Consumer and Supplier classes from java 8.
+
+-> Look online video 
+
+---------------------------------------------------------------------------------
+
+SpringBoot : Spring Cloud Task:
+
+-> Spring Cloud Task allows a user to develop and run short lived microservices using Spring Cloud and run them locally, in the cloud, even on Spring Cloud Data Flow. Just add @EnableTask and run your app as a Spring Boot app (single application context).
+
+----------------------------------------------------------------------------------
+
+Microservice - Spring Cloud Consul | Service Discovery:
+
+Following are the problems with Spring Eureka Server:
+
+1) We need to create additional Eureka server to register our microservices.
+2) Manually we have to register and unregister our microservices.
+
+-> Spring cloud consul overcome this problems of Ereuka server.
+
+-> Learn practical on video.
+
+-----------------------------------------------------------------------------------
+
+Microservice -Circuit breaker | Hystrix | Pivotal Cloud Foundry:
+
+-> Learn video
+
+-> know more about pivotal cloud foundary.
+------------------------------------------------------------------------------------
+
+Spring cloud gateway with Authenticaition and microservices  example: https://roytuts.com/spring-cloud-gateway-security-with-jwt-json-web-token/
+
+-------------------------------------------------------------------------------------
+
+
+
+

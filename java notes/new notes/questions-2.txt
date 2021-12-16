@@ -1,0 +1,677 @@
+Q)  Which transaction manager implementation to be used if your application needs to be deployed on JEE application server?? 
+
+Ans)
+    -> If you want to delegate managed transactions to your Application Server and handle complex transactions across multiple resources you need to use the JtaTransactionManager.  Typically you need an application server’s JTA capability only if your application needs to handle transactions across multiple resources, which is not a requirement for many applications.
+
+
+Q) Which transaction manager you use, why ??
+
+Ans)
+
+    PlatformTransactionManager interface is the key abstraction in the Spring API providing essential methods for controlling transaction operations at run-time: begin, commit and rollback.
+
+    PlatformTransactionManager interface, its implementations
+
+    JtaTransactionManager -----> JTA
+    
+    DataSourceTransactionManager -----> JDBC
+    
+    JpaTransactionManager ------> JPA               (I have used because JPATransactionManager is the only implementation of PlatformTransactionManager interface that understands JPA)
+    
+    HibernateTransactionManager ------> Hibernate
+
+
+Q)  Type of @autowire or ways to perform dependency injection in spring ??
+
+Ans)
+
+    The autowiring functionality has four modes. These are ‘no‘, ‘byName‘, ‘byType‘ and ‘constructor‘.
+
+    1) autowire byName – For this type of autowiring, setter method is used for dependency injection. Also the variable name should be same in the class where we will inject the dependency and in the spring bean configuration file
+
+    2) autowire byType – For this type of autowiring, class type is used. So there should be only one bean configured for this type in the spring bean configuration file.
+
+        Ex: 
+        public class EmployeeService {
+            // used for autowire byName and byType
+            public void setEmployee(Employee emp) {
+                this.employee = emp;
+            }
+        }
+
+    3) autowire by constructor – This is almost similar to autowire byType, the only difference is that constructor is used to inject the dependency.
+
+        Ex:
+
+            public class EmployeeService {
+
+                private Employee employee;
+
+                // constructor is used for autowire by constructor
+                public EmployeeService(Employee emp) {
+                    System.out.println("Autowiring by constructor used");
+                    this.employee = emp;
+                }
+            }
+
+    4) @Autowired annotation – We can use Spring @Autowired annotation for spring bean autowiring. @Autowired annotation can be applied on variables and methods for autowiring byType. We can also use @Autowired annotation on constructor for constructor based spring autowiring.
+
+        Ex:
+
+            public class EmployeeService {
+                // default constructor to avoid BeanInstantiationException for autowire
+                // byName or byType
+                public EmployeeService() {
+                    System.out.println("Default Constructor used");
+                }
+            }
+
+    By default spring bean autowiring is turned off. Spring bean autowire default value is “default” that means no autowiring is to be performed. autowire value “no” also have the same behavior.
+
+    Best way to perform dependency inject is autowire by constructor.  We can also use lombok here for constructor based autowiring (ie @RequiredArgsConstructor).
+
+    Why constructor dependency is best ??
+
+    We create an object by calling a constructor. If the constructor expects all required dependencies as parameters, then we can be 100% sure that the class will never be instantiated without its dependencies injected.
+
+    The IoC container makes sure that all the arguments provided in the constructor are available before passing them into the constructor. This helps in preventing the infamous NullPointerException.
+
+    Constructor injection is extremely useful since we do not have to write separate business logic everywhere to check if all the required dependencies are loaded, thus simplifying code complexity.
+
+    Ex:
+
+        @Controller
+        public class ConstructorController {
+            
+            private final MyService myService;               // Note  make it final and private
+
+            public ConstructorController(MyService myService) {
+                this.myService = myService;
+            }
+            public String saySomething(){
+                return myService.getHello();
+            }
+        }
+        
+
+
+Q) what is HATEOS ??
+
+Ans) 
+
+https://www.e4developer.com/2018/02/16/hateoas-simple-explanation/
+
+Q)  Integer i1 =  new Integer(1);
+
+int i2 = 1;
+
+What will be i1.equals(i2);
+And i1 == i2 ??
+
+Q)  two static methods one in parent class and one in child class is there ?? 
+
+Parent p = new Child();
+p. print();
+which method will be called ?? 
+
+Q)  Exception thrown in Parent class but not in Child class,  then does exception handled by parent or not?? 
+
+Ans)
+        An overriding method (the method of child class) can throw any unchecked exceptions, regardless of whether the overridden method (method of base class) throws exceptions or not. However the overriding method should not throw checked exceptions that are new or broader than the ones declared by the overridden method. The overriding method can throw those checked exceptions, which have less scope than the exception(s) declared in the overridden method.
+
+        Example 1: If base class doesn’t throw any exception but child class throws an unchecked exception.
+
+        In this example class Room is overriding the method color(). The overridden method is not throwing any exception however the overriding method is throwing an unchecked exception (NullPointerException). Upon compilation code ran successfully.
+
+        class Building {  
+           void color()
+           {
+               System.out.println("Blue");
+           }  
+        }
+        class Room extends Building{
+           //It throws an unchecked exception
+           void color() throws NullPointerException
+           {
+               System.out.println("White");       // White
+           }  
+           public static void main(String args[]){  
+               Building obj = new Room();  
+               obj.color(); 
+           } 
+        }
+
+        Example 2: If base class doesn’t throw any exception but child class throws an checked exception
+
+        class Building {  
+           void color()
+           {
+              System.out.println("Blue");
+           }  
+        }
+        class Room extends Building{
+           void color() throws IOException
+           {
+              System.out.println("White");
+           }  
+           public static void main(String args[]){  
+              Building obj = new Room();  
+              try{
+                 obj.color();
+              }catch(Exception e){
+                 System.out.println(e);
+               }
+           } 
+        }
+
+        Output:
+
+            Exception in thread "main" java.lang.Error: Unresolved compilation problem: 
+    Exception IOException is not compatible with throws clause in Building.color()
+
+    The above code is having a compilation error: Because the overriding method (child class method) cannot throw a checked exception if the overridden method(method of base class) is not throwing an exception.
+
+    Example 3: When base class and child class both throws a checked exception
+
+        class Building {  
+           void color() throws IOException
+           {
+               System.out.println("Blue");
+           }  
+        }
+        class Room extends Building{
+            void color() throws IOException
+            {
+                System.out.println("White");       //White
+            }  
+            public static void main(String args[]){  
+                Building obj = new Room();  
+                try{
+               obj.color();
+            }catch(Exception e){
+               System.out.println(e);
+             }
+            } 
+        }
+
+        The code ran fine because color() method of child class is NOT throwing a checked exception with scope broader than the exception declared by color() method of base class.
+
+        Example 4: When child class method is throwing border checked exception compared to the same method of base class
+
+        class Building {  
+            void color() throws IOException
+            {
+                  System.out.println("Blue");
+            }  
+        }
+        class Room extends Building{
+              void color() throws Exception
+              {
+                  System.out.println("White");
+              }  
+              public static void main(String args[]){  
+                   Building obj = new Room();  
+                   try{
+                   obj.color();
+                   }catch(Exception e){
+                       System.out.println(e);
+                   }
+              } 
+        }
+
+        Output:
+
+            Compilation error because the color() method of child class is throwing Exception which has a broader scope than the exception thrown by method color() of parent class.
+
+
+Q)  @initbinder,  @PostConstruct,  @PreDestroy
+
+Ans) initbinder --> https://dzone.com/articles/spring-initbinder-for-handling-large-list-of-java
+    
+    @PostContructor, @PreDestroy: https://www.baeldung.com/spring-postconstruct-predestroy
+
+Q)  @Qualifier
+
+Ans)  The @Qualifier annotation can be used on any class annotated with @Component or on methods annotated with @Bean. This annotation can also be applied on constructor arguments or method parameters.
+
+Ex:-
+
+public interface Vehicle {
+     public void start();
+     public void stop();
+}
+There are two beans, Car and Bike implements Vehicle interface
+
+@Component(value="car")
+public class Car implements Vehicle {
+
+     @Override
+     public void start() {
+           System.out.println("Car started");
+     }
+
+     @Override
+     public void stop() {
+           System.out.println("Car stopped");
+     }
+ }
+
+@Component(value="bike")
+public class Bike implements Vehicle {
+
+     @Override
+     public void start() {
+          System.out.println("Bike started");
+     }
+
+     @Override
+     public void stop() {
+          System.out.println("Bike stopped");
+     }
+}
+Injecting Bike bean in VehicleService using @Autowired with @Qualifier annotation. If you didn't use @Qualifier, it will throw NoUniqueBeanDefinitionException.
+
+@Component
+public class VehicleService {
+
+    @Autowired
+    @Qualifier("bike")
+    private Vehicle vehicle;
+
+    public void service() {
+         vehicle.start();
+         vehicle.stop();
+    }
+}
+
+Q)  @modalattribute vs @requestbody
+
+Ans)  https://www.titanwolf.org/Network/q/66e6f9b8-ec6e-4f12-abfd-4cfc24246bc3/y
+
+Q)  how to create filter and interceptor?? 
+
+Ans)
+    
+    Filter: - A filter as the name suggests is a Java class executed by the servlet container for each incoming HTTP request and for each HTTP response. This way is possible to manage HTTP incoming requests before they reach the resource, such as a JSP page, a servlet or a simple static page; in the same way, is possible to manage HTTP outbound response after resource execution.
+
+    Interceptor: - Spring Interceptors are similar to Servlet Filters but they act in Spring Context so are powerful to manage HTTP Request and Response
+
+    A HandlerInterceptor gives you more fine-grained control than a filter because you have access to the actual target "handler" - this means that whatever action you perform can vary depending on what the request is actually doing (whereas the servlet filter is generically applied to all requests - only able to take into account the parameters of each request). The handler interceptor also provides 3 different methods, so that you can apply behavior prior to calling a handler after the handler has completed but prior to view rendering (where you may even bypass view rendering altogether), or after the view itself has been rendered. Also, you can set up different interceptors for different groups of handlers - the interceptors are configured on the handler mapping, and there may be multiple handler mappings.
+
+    Therefore, if you have a need to do something completely generic (e.g. log all requests), then a filter is sufficient - but if the behavior depends on the target handler or you want to do something between the request handling and view rendering, then the HandlerInterceptor provides that flexibility.
+
+    Example filter:
+
+        @Component
+        @Order(1)
+        public class TransactionFilter implements Filter {
+
+            @Override
+            public void doFilter(
+              ServletRequest request, 
+              ServletResponse response, 
+              FilterChain chain) throws IOException, ServletException {
+         
+                HttpServletRequest req = (HttpServletRequest) request;
+                LOG.info(
+                  "Starting a transaction for req : {}", 
+                  req.getRequestURI());
+         
+                chain.doFilter(request, response);
+                LOG.info(
+                  "Committing a transaction for req : {}", 
+                  req.getRequestURI());
+            }
+
+            // other methods 
+        }
+
+
+        //This will Filter With URL Pattern
+        @Bean
+        public FilterRegistrationBean<RequestResponseLoggingFilter> loggingFilter(){
+            FilterRegistrationBean<RequestResponseLoggingFilter> registrationBean 
+              = new FilterRegistrationBean<>();
+                
+            registrationBean.setFilter(new RequestResponseLoggingFilter());
+            registrationBean.addUrlPatterns("/users/*");
+                
+            return registrationBean;    
+        }
+
+
+
+Q)  important spring annotations?? 
+
+Ans)  https://www.journaldev.com/16966/spring-annotations
+
+Q)  hystrix?? 
+
+Ans)  @Service
+public class StudentServiceDelegate {
+ 
+    @Autowired
+    RestTemplate restTemplate;
+     
+    @HystrixCommand(fallbackMethod = "callStudentServiceAndGetData_Fallback")
+    public String callStudentServiceAndGetData(String schoolname) {
+ 
+        System.out.println("Getting School details for " + schoolname);
+ 
+        String response = restTemplate
+                .exchange("http://localhost:8098/getStudentDetailsForSchool/{schoolname}"
+                , HttpMethod.GET
+                , null
+                , new ParameterizedTypeReference<String>() {
+            }, schoolname).getBody();
+ 
+        System.out.println("Response Received as " + response + " -  " + new Date());
+ 
+        return "NORMAL FLOW !!! - School Name -  " + schoolname + " :::  " +
+                    " Student Details " + response + " -  " + new Date();
+    }
+     
+    @SuppressWarnings("unused")
+    private String callStudentServiceAndGetData_Fallback(String schoolname) {
+ 
+        System.out.println("Student Service is down!!! fallback route enabled...");
+ 
+        return "CIRCUIT BREAKER ENABLED!!! No Response From Student Service at this moment. " +
+                    " Service will be back shortly - " + new Date();
+    }
+ 
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+Q)  FeignClient ?? What are its benefits over restTemplate? 
+
+Ans)  https://www.google.com/amp/s/javatechonline.com/how-to-implement-feign-client-in-spring-boot-microservices/amp/
+
+Easy to call and readability as compared to rest template. 
+
+Feign client also provide load balancing automatically as mentioned in example link above. It internally uses Ribbon and spring load balancer. 
+
+Q)  SOLID principles?? 
+
+Ans)  https://www.jrebel.com/blog/solid-principles-in-java
+
+Q) Singleton,  Abstract factory, Factory  , Prototype, Proxy , Builder , Observer patterns. 
+
+Ans) 
+
+Q)  how  to stop bean getting initialized in spring?? 
+
+Ans)
+
+In Spring Boot, you can use the @ConditionalOnProperty annotation to enable or disable a particular bean based on the presence of a property. This is very useful if you want to provide optional features to your microservice.
+
+To do so, add the annotation either at the class or bean level, as follows
+
+@ConditionalOnProperty(value='mybean.enabled')
+@Bean 
+MyOptionalClass optionalBean(){
+}
+
+Any place where you want this bean used, you should specify that is it optionally required:
+
+@Autowired(required=false)
+MyOptionalClass optionalClass
+And that’s it. Your optionalClass bean should resolve to null when you specify mybean.enabled=false in your application.properties or system property file, or if it does not exist.
+
+
+Q)  if we increase thread count will  performance increase?? 
+
+Ans)
+    
+    Not necessarily, it may improve till some point but partitioning a fixed amount of work among too many threads gives each thread too little work that the overhead of starting and terminating threads swamps the useful work.
+    
+
+Q)  Comparator chaining??  Write a code?? 
+
+Ans)
+    
+    For example, given a list of students objects with attributes area, gender and age; the filter needed to firstly sort students by area — values could be north, south, east or west. Subsequently, after this was applied, students then needed to be filtered into groups by gender — male or female. Finally, students needed to be sorted by age. The final product would be a list of male students and female students in each area, sorted by age.
+
+    Here’s a simple way of handling it with Java 8.
+
+    Let’s define our comparators,
+
+    Comparator<Person> sortByArea = Comparator.comparing(Person::getArea);
+    Comparator<Person> sortBySex = Comparator.comparing(Person::getSex);
+    Comparator<Person> sortByAge = Comparator.comparing(Person::getAge);
+
+    If we wanted to sort by area and then sex, we could simply use,
+    
+    List<Person> persons = new ArrayList<>(...);
+    person.stream().sorted(sortByArea.thenComparing(sortBySex));
+
+    This would allow us to achieve our functionality. However, what do we do if we want to apply a third comparator? We can add another sorted method; however, we run into a problem: this solution is in no way extensible. If a new sort criteria is added, the code would have to implement a new .thenComparing() and so on. This isn’t exactly the most pragmatic solution.
+
+    A simple yet optimal solution would be to create a list of comparators and while iterating return a resulting comparison value that when applied allows us to sort the items in a list.
+
+    List<Comparator<Person>> comparators = new ArrayList<>();
+    comparators.add(sortByArea);
+    comparators.add(sortBySex);
+    comparators.add(sortByAge); 
+
+    we can utilise a class that implements the Comparator interface and override the compare method to handle this bit of magic.
+
+    class ChainComparator implements Comparator<Person> {
+       private List<Comparator<Person>> comparatorList;
+       @Override
+       int compare(Person p1, Person p2) {
+           int result;
+           for(Comparator<Person> comparator : comparatorList) {
+             if ((result = comparator.compare(p1, p2)) != 0) {
+                 return result;
+             }
+           }
+           return 0;
+       }
+    }
+
+    Then we can apply multiple sort criterion.
+    
+    list.sort(new ChainComparator(comparatorList));
+
+    Side Note
+    
+    The Apache Commons Library has a ComparatorUtils class that provides this functionality with a simple call to
+    
+    ComparatorUtils.chainedComparator(comparatorsList);
+
+
+Q) Batch processing using spring batch ?? Or how to insert 1 million row csv data into database ??
+ 
+Ans)
+
+    https://dzone.com/articles/batch-processing-large-data-sets-with-spring-boot
+
+Q)  program to find non duplicate numbers  iterating only once ?? Input = [1,1,2,3,3,4,4,8,8]
+
+Ans)
+
+    Ex 1:
+
+        Integer[] input = new Integer[] { 1, 2, 5, 4, 6, 8, 9, 2, 1, 4, 5, 8, 9 }; 
+        
+        List<Integer> UniqueNumbers
+                = Arrays.stream(input)
+              .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+              .entrySet()
+              .stream()
+              .filter(e -> e.getValue() == 1)
+              .map(Map.Entry::getKey)
+              .collect(Collectors.toList());
+
+        System.out.print(UniqueNumbers);
+
+        Output:
+            [6]
+
+
+Q)  String s = aacccdd
+
+Output = a:2 ,c:3, d:2
+
+Q)  best way to read 1 million records from excel and insert in db?? 
+
+Q) SOLID principle??  And there usage in your project?? 
+
+Q)  StringJoiner in java 8 ?? Program 
+Input : "Hello how are you"
+Output: [Hello-how-are-you]
+
+Ans)  First way) 
+
+String input = "Hello how are you";
+
+String inputArray[] = input.split("");
+
+StringJoiner joiner = new StringJoiner("-","[","]");
+
+for(String inputArr:inputArray){
+joiner. add(inputArr);
+}
+
+System.out.println(joiner.toString);
+
+Second way) 
+
+List<String> inputList = Arrays.asList("hello", "how","are","you");
+
+String output = inputList.stream().collect(Collectors.joining("-"));
+
+System.out.println(output);
+
+Q)  what is method reference in java 8 ??
+
+Ans) 
+
+Classname::methodname;
+
+Q)  What is optional class ?? Why and how to use it?? 
+
+Q)  Swagger annotations?? 
+
+Ans)  https://www.javainuse.com/spring/boot_swagger_annotations
+
+
+Q)  kafka vs activeMQ?? 
+
+Ans)  Kafka is a distributed streaming platform with very good horizontal scaling capability. It allows applications to process and re-process streamed data on disk. Due to it's high throughput it's commonly used for real-time data streaming.
+
+ActiveMQ
+
+ActiveMQ is a general-purpose message broker that supports several messaging protocols such as AMQP, STOMP, MQTT. 
+
+Q) spring boot topic  example 
+
+Ans)  https://codenotfound.com/spring-jms-topic-example.html
+
+
+Q)  Redelivery policy activeMQ ??
+
+Ans)  @Component
+@EnableJms
+public class ActiveMQConfig {
+
+    @Value("${spring.activemq.broker-url}")
+    private String brokerUrl;
+
+    @Value("${spring.activemq.user}")
+    private String brokerUsername;
+
+    @Value("${spring.activemq.password}")
+    private String brokerPassword;
+
+    @Bean
+    public ActiveMQConnectionFactory connectionFactory() {
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+        connectionFactory.setBrokerURL(brokerUrl);
+        connectionFactory.setPassword(brokerUsername);
+        connectionFactory.setUserName(brokerPassword);
+        connectionFactory.setTrustAllPackages(true);
+
+        //Config Redelivery Policy in Redelivery Policy Map
+        ActiveMQQueue queue10s = new ActiveMQQueue(Queues.QUEUE_REDELIVERY_EVERY_10_SECONDS);
+        RedeliveryPolicy qp10Seconds = new RedeliveryPolicy();
+        qp10Seconds.setInitialRedeliveryDelay(10000);
+        qp10Seconds.setUseCollisionAvoidance(true);
+        qp10Seconds.setRedeliveryDelay(10000);
+        qp10Seconds.setUseExponentialBackOff(false);
+        qp10Seconds.setMaximumRedeliveries(3);
+        qp10Seconds.setDestination(queue10s);
+
+RedeliveryPolicyMap rdMap = connectionFactory.getRedeliveryPolicyMap();
+        rdMap.put(queue10s, qp10Seconds);
+        rdMap.put(queueEveryMinute, qpEveryMinute);
+        rdMap.put(queue10sAck, qp10SecondsTransactional);
+        rdMap.put(queue10sTransactional, qp10SecondsTransactional);
+
+        connectionFactory.setRedeliveryPolicyMap(rdMap);
+
+ return connectionFactory;
+
+Q) your Microservice architecture?? 
+
+Ans)  Each microservice can have there own UI but it is not good as not all applications need it like mobile app's donot need it. 
+
+So we have two front controlling component.  One is API gateway ( for mobile app or react js front end)  and another is web application UI (it has header, navigation to other microservice and has security features).
+
+Used JWT token for authentication as returned by API gateway. 
+
+Feignclient uses @RequestHeader annotation as parameter to send Authorization header along with request to microservice.
+
+Authorization token is sent from Web Front end in header.
+
+We provide @RequestHeader only to those method whose endpoints are secured .
+
+Example:
+
+@FeignClient("user-management-service")
+public interface UserManagementServiceAPI {
+
+	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	AuthTokenDTO authenticateUser(@RequestBody AuthenticationDTO authenticationDTO);
+
+	@RequestMapping(method = RequestMethod.POST, value = "/roles")
+	RoleDTO createRole(@RequestHeader("Authorization") String authorizationToken, @RequestBody RoleDTO roleDTO);
+
+Q)  JWT token vs Session?? 
+
+Ans)  Sessions restrict us to do horizontal scaling ,but with JWT we can do that. 
+
+Q)  Scopes real world examples?? 
+
+Ans) 
+Singleton :
+Real world example: connection to a database
+
+Prototype :
+
+Real world example: declare configured form elements (a textbox configured to validate names, e-mail addresses for example) and get "living" instances of them for every form being created
+
+Request :
+
+Real world example: information that should only be valid on one page like the result of a search or the confirmation of an order. The bean will be valid until the page is reloaded.
+
+Session : 
+
+Real world example: to hold authentication information getting invalidated when the session is closed (by timeout or logout). You can store other user information that you don't want to reload with every request here as well.
+
+Singleton:
+Most commonly used in different logical layers of the application(service,component(bussiness logic),data access), where state of an object is not a concern.
+
+prototype : will be used to create a new object each time when required
+
+Most commonly used for creation of entity/view objects, where state of an object is important
+
+ If you want to make sure your bean is thread-safe, you should go for the @RequestScope. As the name suggests, Spring binds such bean to a particular web request. Request beans aren’t shared between multiple threads, hence you don’t have to care about concurrency.
+
+Q)  upload bulk data 1 million csv rows to db?? 
+
+Q)  Completablefuture?? 

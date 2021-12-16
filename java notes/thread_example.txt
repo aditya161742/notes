@@ -1,0 +1,325 @@
+Example of sleep() method:---
+
+class myThread implements Runnable{
+    
+    public void run(){
+       // wait();
+      
+       try 
+        {
+            Thread.sleep(10000);
+        } 
+        catch(InterruptedException e)
+        {
+             // this part is executed when an exception (in this example InterruptedException) occurs
+        
+            System.out.println(e);
+        }
+        
+        for(int u = 0;u<10;u++){
+            
+            System.out.println("Thread 1 = "+u);
+            
+        }
+    }
+    
+}
+
+class myThread2 implements Runnable{
+    
+    public void run(){
+        
+        for(int u = 10;u<20;u++){
+            
+            System.out.println("Thread 2  = "+u);
+            
+        }
+        //notify();
+        
+    }
+    
+}
+
+public class Main
+{
+	public static void main(String[] args) {
+		
+		Runnable r1 = new myThread();
+		Thread t1 = new Thread(r1);
+		t1.start();
+		
+		
+		Runnable r2 = new myThread2();
+		Thread t2 = new Thread(r2);
+		t2.start();
+	}
+}
+
+
+---> Simply sleeps thread for 10 seconds and continues to excute other threads.
+
+
+----------------------------------------------------------------------------------------------------
+
+
+Example of wait() and notify() method: ----
+	
+	Here thread-1 waits until thread-2 notifies that it has finished, here note that object reference for wait() and notify() method should be same.
+
+	notify() method notifies single thread , if there are many threads then scheduler will decide at random which thread to be notify. We should use notifyAll() if we want to notify all threads.
+
+
+class myThread implements Runnable{
+    
+    
+    public  void run(){
+        
+         try{
+              synchronized(this){
+                  this.wait();
+              }
+          }
+          catch(InterruptedException e){
+              
+          }
+        
+        for(int u = 0;u<100;u++){
+            
+            System.out.println("Thread 1 = "+u);
+            
+            
+        }
+    }
+    
+}
+
+class myThread2 implements Runnable{
+    
+    myThread m1;
+    
+    myThread2(myThread t1){
+        m1 = t1;
+    }
+    
+    public  void run(){
+        
+        for(int u = 10;u<200;u++){
+            
+            System.out.println("Thread 2  = "+u);
+            
+        }
+        
+        synchronized(m1){
+           m1.notify();
+        }
+        
+    }
+    
+}
+
+public class Main
+{
+	public static void main(String[] args) {
+		
+		myThread r1 = new myThread();
+		Thread t1 = new Thread(r1);
+		t1.start();
+		
+		Runnable r2 = new myThread2(r1);
+		Thread t2 = new Thread(r2);
+		t2.start();
+		
+	
+          
+	}
+}
+
+
+--------------------------------------------------------------------------------
+
+Example of join() method:
+
+	It is used to run threads in order. In this example thread 1 will run only after thread 2 has finished execution.
+
+
+	class myThread implements Runnable{
+    
+    
+    public  void run(){
+        
+        for(int u = 0;u<100;u++){
+            
+            System.out.println("Thread 1 = "+u);
+            
+            
+        }
+    }
+    
+}
+
+class myThread2 implements Runnable{
+   
+    
+    public  void run(){
+        
+        for(int u = 10;u<200;u++){
+            
+            System.out.println("Thread 2  = "+u);
+            
+        }
+        
+        
+        
+    }
+    
+}
+
+
+
+public class Main
+{
+	public static void main(String[] args) {
+		
+		myThread r1 = new myThread();
+		Thread t1 = new Thread(r1);
+	
+		  
+		Runnable r2 = new myThread2();
+		Thread t2 = new Thread(r2);
+		t2.start();
+		 try {
+          t2.join();
+          } catch (InterruptedException ie) {
+              ie.printStackTrace();
+          }
+        
+        t1.start();
+		
+		
+	
+          
+	}
+}
+
+
+-------------------------------------------------------------------------------------
+
+Example of yield() method:
+
+	Theoretically, to ‘yield’ means to let go, to give up, to surrender. A yielding thread tells the virtual machine that it’s willing to let other threads be scheduled in its place. This indicates that it’s not doing something too critical. 
+
+class myThread implements Runnable{
+    
+    
+    public  void run(){
+        
+        for(int u = 0;u<100;u++){
+            
+            System.out.println("Thread 1 = "+u);
+            Thread.yield();
+            
+        }
+    }
+    
+}
+
+class myThread2 implements Runnable{
+   
+    
+    public  void run(){
+        
+        for(int u = 10;u<200;u++){
+            
+            System.out.println("Thread 2  = "+u);
+            Thread.yield();
+        }
+        
+    }
+    
+}
+
+
+
+public class Main
+{
+	public static void main(String[] args) {
+		
+		myThread r1 = new myThread();
+		Thread t1 = new Thread(r1);
+	    t1.start();
+	    
+		Runnable r2 = new myThread2();
+		Thread t2 = new Thread(r2);
+		t2.start();
+	    
+		  
+	}
+}
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+Q) Program to test why synchronization is needed ??
+
+
+
+public class ticketCounter {
+    
+    int availableTickets = 8;
+    
+    // Note: If synchronized keyword is not used then all tickets will be booked 
+    public synchronized void bookTicket(String pname,int bookSeats) {
+        
+        if(availableTickets >= bookSeats && availableTickets > 0) {
+            System.out.println("Hi "+pname+" You have booked "+bookSeats+" successfully.");
+            availableTickets = availableTickets - bookSeats;
+        }
+        else {
+            System.out.println("Seats not available");
+        }
+        
+    }
+}
+
+
+public class TicketBooking implements Runnable {
+    
+    
+    private ticketCounter tcounter;
+    private String pname;
+    private int noOfSeats;
+    
+    TicketBooking(ticketCounter tcounter, String pname, int noOfSeats){
+        this.tcounter = tcounter;
+        this.pname = pname;
+        this.noOfSeats = noOfSeats;
+    }
+    
+    public void run() {
+        
+        tcounter.bookTicket(pname,noOfSeats);
+    }
+    
+}
+
+
+public class ticketWindow{
+
+    public static void main(String[] args){
+
+        ticketCounter tcounter = new ticketCounter(); 
+        TicketBooking tb1 = new TicketBooking(tcounter,"John", 5);  // multiple threads are trying to operate simultenously on the  
+                                                                    //same java object then there may be a chance of data 
+                                                                    //inconsistency problem
+     TicketBooking tb2 = new TicketBooking(tcounter,"Matt",4);   
+        
+        Thread t1 = new Thread(tb1);
+        Thread t2 = new Thread(tb2);
+        
+        t1.start();
+        t2.start();
+    }
+
+}
+
+

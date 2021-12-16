@@ -1,0 +1,502 @@
+Introduction:
+
+-> JMS API is the specification for creating J2EE standards.
+
+-> ActiveMQ is message broker and implementation of the JMS.
+
+-> In application.properties we can define,
+
+	activemq.broker.url=tcp://localhost:61616
+
+Queues:
+
+1) Point to Point:
+
+Messages are sent to a queue and each messsage has exactly one sender and one receiver. Message is guranteed to be delivered to only one server.
+
+
+step 1)
+
+	Create JSMConfiguration class. This is responsible to create the listener container responsible for a particular endpoint.
+
+	@Configuartion
+	@EnableJms
+	class JSMConfiguration{
+
+		@Value("${activemq.broker.url}")
+		private String brokerUrl;
+
+		@Bean
+		public JsmListnerContainerFactory<?> myFactory(ConnectionFactory connectionFactory, DefaultJmsListenerContainerFactoryConfigurer configurer){
+				
+				DefaultJmsListenerContainerFactoryConfigurer factory = new DefaultJmsListenerContainerFactoryConfigurer();
+				configurer.configure(factory,connectionFactory);
+
+				return factory;
+		}
+
+
+		@Bean
+		public ActiveMQConnectionFactory activeMQConnectionFactory() {
+			ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
+			activeMQConnectionFactory.setBrokerURL(brokerUrl);
+			return activeMQConnectionFactory;
+		}
+
+		@Bean
+		public JmsTemplate jmsTemplate() {
+			return new JmsTemplate(activeMQConnectionFactory());
+		}
+
+	}
+
+
+step 2) create class Product (Object which needs to be sent). Note it should implement Serializable interface because it needs to be shared over the network.
+
+
+	public class Product implements Serializable{
+		private int prodcutId;
+		private String name;
+		private int quantity;
+	}
+
+Step 3) Define reciver class, whenever new message is available in on configured queue (ie message_queue), annotated method (ie reciveMessage) will be invoked.
+
+	@Component
+	public class MessageReceiver{
+
+		private static final String MESSAGE_QUEUE = "message_queue";
+
+		@JmsListener(destinaton = MESSAGE_QUEUE)
+		public void reciveMessage(Product product){
+			System.out.println("Received "+product);
+		}
+
+	}
+
+
+Step 4)
+
+
+@RestController
+@RequestMapping("/produce")
+public class Producer {
+	
+	private static final String MESSAGE_QUEUE = "message_queue";
+
+	@Autowired
+	private JmsTemplate jmsTemplate;
+
+	@PostMapping("/message")
+	public Student sendMessage(@RequestBody Product product) {
+
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			String productAsJson = mapper.writeValueAsString(product);
+
+			jmsTemplate.convertAndSend(MESSAGE_QUEUE, productAsJson);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return product;
+	}
+}
+
+
+
+
+2) Publish / Subscribe:
+
+	Pub/sub messaging has the following characteristics:
+
+	i) Each message can have multiple consumers.
+	
+	ii) Publishers and subscribers have a timing dependency. A client that subscribes to a topic can consume only messages published after the client has created a subscription, and the subscriber must continue to be active in order for it to consume messages.
+
+	The JMS API relaxes this timing dependency mentioned in the second bullet to some extent by allowing subscribers to create durable subscriptions, which receive messages sent while the subscribers are not active. 
+
+	Let’s illustrate the above characteristics by creating a message producer that sends a message containing a first and last name to a topic. In turn, a message consumer will read the message and transform it into a greeting.
+
+Nondurable Subscription:
+
+	public class Publisher {
+
+		  private static final Logger LOGGER =
+		      LoggerFactory.getLogger(Publisher.class);
+
+		  private String clientId;
+		  private Connection connection;
+		  private Session session;
+		  private MessageProducer messageProducer;
+
+		  public void create(String clientId, String topicName)
+		      throws JMSException {
+		    this.clientId = clientId;
+
+		    // create a Connection Factory
+		    ConnectionFactory connectionFactory =
+		        new ActiveMQConnectionFactory(
+		            ActiveMQConnection.DEFAULT_BROKER_URL);
+
+		    // create a Connection
+		    connection = connectionFactory.createConnection();
+		    connection.setClientID(clientId);
+
+		    // create a Session
+		    session =
+		        connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+		    // create the Topic to which messages will be sent
+		    Topic topic = session.createTopic(topicName);
+
+		    // create a MessageProducer for sending messages
+		    messageProducer = session.createProducer(topic);
+		  }
+
+		  public void closeConnection() throws JMSException {
+		    connection.close();
+		  }
+
+		  public void sendName(String firstName, String lastName)
+		      throws JMSException {
+		    String text = firstName + " " + lastName;
+
+		    // create a JMS TextMessage
+		    TextMessage textMessage = session.createTextMessage(text);
+
+		    // send the message to the topic destination
+		    messageProducer.send(textMessage);
+
+		    LOGGER.debug(clientId + ": sent message with text='{}'", text);
+		  }
+		}
+
+
+	public class Subscriber {
+
+	  private static final Logger LOGGER =
+	      LoggerFactory.getLogger(Subscriber.class);
+
+	  private static final String NO_GREETING = "no greeting";
+
+	  private String clientId;
+	  private Connection connection;
+	  private MessageConsumer messageConsumer;
+
+	  public void create(String clientId, String topicName)
+	      throws JMSException {
+	    this.clientId = clientId;
+
+	    // create a Connection Factory
+	    ConnectionFactory connectionFactory =
+	        new ActiveMQConnectionFactory(
+	            ActiveMQConnection.DEFAULT_BROKER_URL);
+
+	    // create a Connection
+	    connection = connectionFactory.createConnection();
+	    connection.setClientID(clientId);
+
+	    // create a Session
+	    Session session =
+	        connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+	    // create the Topic from which messages will be received
+	    Topic topic = session.createTopic(topicName);
+
+	    // create a MessageConsumer for receiving messages
+	    messageConsumer = session.createConsumer(topic);
+
+	    // start the connection in order to receive messages
+	    connection.start();
+	  }
+
+	  public void closeConnection() throws JMSException {
+	    connection.close();
+	  }
+
+	  public String getGreeting(int timeout) throws JMSException {
+
+	    String greeting = NO_GREETING;
+
+	    // read a message from the topic destination
+	    Message message = messageConsumer.receive(timeout);
+
+	    // check if a message was received
+	    if (message != null) {
+	      // cast the message to the correct type
+	      TextMessage textMessage = (TextMessage) message;
+
+	      // retrieve the message content
+	      String text = textMessage.getText();
+	      LOGGER.debug(clientId + ": received message with text='{}'",
+	          text);
+
+	      // create greeting
+	      greeting = "Hello " + text + "!";
+	    } else {
+	      LOGGER.debug(clientId + ": no message received");
+	    }
+
+	    LOGGER.info("greeting={}", greeting);
+	    return greeting;
+	  }
+	}
+
+
+	The below JUnit test class will be used to illustrate the Pub/Sub messaging characteristics mentioned at the beginning of this post. The testGreeting() test case verifies the correct working of the getGreeting() method of the Subscriber class.
+
+	The testMultipleConsumers() test case will verify that the same message can be read by multiple consumers. In order to test this, two Subscriber instances are created on the same 'multipleconsumers.t' topic.
+
+	Finally, the testNonDurableSubscriber() test case will illustrate the timing dependency between publisher and subscriber. First, a message is sent to a topic on which only one subscriber listens. Then a second subscriber is added to the same topic and a second message is sent. The result is that the second subscriber only receives the second message and not the first one whereas the first subscriber has received both messages.
+
+	   private static Publisher publisherPublishSubscribe,
+       publisherMultipleConsumers, publisherNonDurableSubscriber;
+	  
+	  private static Subscriber subscriberPublishSubscribe,
+	      subscriber1MultipleConsumers, subscriber2MultipleConsumers,
+	      subscriber1NonDurableSubscriber,
+	      subscriber2NonDurableSubscriber;
+
+	  @BeforeClass
+	  public static void setUpBeforeClass() throws Exception {
+	    publisherPublishSubscribe = new Publisher();
+	    publisherPublishSubscribe.create("publisher-publishsubscribe",
+	        "publishsubscribe.t");
+
+	    publisherMultipleConsumers = new Publisher();
+	    publisherMultipleConsumers.create("publisher-multipleconsumers",
+	        "multipleconsumers.t");
+
+	    publisherNonDurableSubscriber = new Publisher();
+	    publisherNonDurableSubscriber.create(
+	        "publisher-nondurablesubscriber", "nondurablesubscriber.t");
+
+	    subscriberPublishSubscribe = new Subscriber();
+	    subscriberPublishSubscribe.create("subscriber-publishsubscribe",
+	        "publishsubscribe.t");
+
+	    subscriber1MultipleConsumers = new Subscriber();
+	    subscriber1MultipleConsumers.create(
+	        "subscriber1-multipleconsumers", "multipleconsumers.t");
+
+	    subscriber2MultipleConsumers = new Subscriber();
+	    subscriber2MultipleConsumers.create(
+	        "subscriber2-multipleconsumers", "multipleconsumers.t");
+
+	    subscriber1NonDurableSubscriber = new Subscriber();
+	    subscriber1NonDurableSubscriber.create(
+	        "subscriber1-nondurablesubscriber", "nondurablesubscriber.t");
+
+	    subscriber2NonDurableSubscriber = new Subscriber();
+	    subscriber2NonDurableSubscriber.create(
+	        "subscriber2-nondurablesubscriber", "nondurablesubscriber.t");
+	  }
+
+	  @AfterClass
+	  public static void tearDownAfterClass() throws Exception {
+	    publisherPublishSubscribe.closeConnection();
+	    publisherMultipleConsumers.closeConnection();
+	    publisherNonDurableSubscriber.closeConnection();
+
+	    subscriberPublishSubscribe.closeConnection();
+	    subscriber1MultipleConsumers.closeConnection();
+	    subscriber2MultipleConsumers.closeConnection();
+	    subscriber1NonDurableSubscriber.closeConnection();
+	    subscriber2NonDurableSubscriber.closeConnection();
+	  }
+
+	@Test
+	  public void testGetGreeting() {
+	    try {
+	      publisherPublishSubscribe.sendName("Peregrin", "Took");
+
+	      String greeting1 = subscriberPublishSubscribe.getGreeting(1000);
+	      assertEquals("Hello Peregrin Took!", greeting1);
+
+	      String greeting2 = subscriberPublishSubscribe.getGreeting(1000);
+	      assertEquals("no greeting", greeting2);
+
+	    } catch (JMSException e) {
+	      fail("a JMS Exception occurred");
+	    }
+	  }
+
+
+	 @Test
+	 public void testMultipleConsumers() {
+	    try {
+	      publisherMultipleConsumers.sendName("Gandalf", "the Grey");
+
+	      String greeting1 =
+	          subscriber1MultipleConsumers.getGreeting(1000);
+	      assertEquals("Hello Gandalf the Grey!", greeting1);
+
+	      String greeting2 =
+	          subscriber2MultipleConsumers.getGreeting(1000);
+	      assertEquals("Hello Gandalf the Grey!", greeting2);
+
+	    } catch (JMSException e) {
+	      fail("a JMS Exception occurred");
+	    }
+	  }
+
+	  @Test
+	  public void testNonDurableSubscriber() {
+	    try {
+	      // nondurable subscriptions, will not receive messages sent while
+	      // the subscribers are not active
+	      subscriber2NonDurableSubscriber.closeConnection();
+
+	      publisherNonDurableSubscriber.sendName("Bilbo", "Baggins");
+
+	      // recreate a connection for the nondurable subscription
+	      subscriber2NonDurableSubscriber.create(
+	          "subscriber2-nondurablesubscriber",
+	          "nondurablesubscriber.t");
+
+	      publisherNonDurableSubscriber.sendName("Frodo", "Baggins");
+
+	      String greeting1 =
+	          subscriber1NonDurableSubscriber.getGreeting(1000);
+	      assertEquals("Hello Bilbo Baggins!", greeting1);
+	      String greeting2 =
+	          subscriber1NonDurableSubscriber.getGreeting(1000);
+	      assertEquals("Hello Frodo Baggins!", greeting2);
+
+	      String greeting3 =
+	          subscriber2NonDurableSubscriber.getGreeting(1000);
+	      assertEquals("Hello Frodo Baggins!", greeting3);
+	      String greeting4 =
+	          subscriber2NonDurableSubscriber.getGreeting(1000);
+	      assertEquals("no greeting", greeting4);
+
+	    } catch (JMSException e) {
+	      fail("a JMS Exception occurred");
+	    }
+	  }
+
+
+
+Durable Subscription:
+
+	
+	The JMS specification dictates that the identification of a specific durable subscription is done by a combination of the 'client ID', the 'durable subscription name' and the 'topic name'.
+
+
+	public class DurableSubscriber {
+
+	  private static final Logger LOGGER =
+	      LoggerFactory.getLogger(DurableSubscriber.class);
+
+	  private static final String NO_GREETING = "no greeting";
+
+	  private String clientId;
+	  private Connection connection;
+	  private Session session;
+	  private MessageConsumer messageConsumer;
+
+	  private String subscriptionName;
+
+	  public void create(String clientId, String topicName,
+	      String subscriptionName) throws JMSException {
+	    this.clientId = clientId;
+	    this.subscriptionName = subscriptionName;
+
+	    // create a Connection Factory
+	    ConnectionFactory connectionFactory =
+	        new ActiveMQConnectionFactory(
+	            ActiveMQConnection.DEFAULT_BROKER_URL);
+
+	    // create a Connection
+	    connection = connectionFactory.createConnection();
+	    connection.setClientID(clientId);
+
+	    // create a Session
+	    session =
+	        connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+	    // create the Topic from which messages will be received
+	    Topic topic = session.createTopic(topicName);
+
+	    // create a MessageConsumer for receiving messages
+	    messageConsumer =
+	        session.createDurableSubscriber(topic, subscriptionName);
+
+	    // start the connection in order to receive messages
+	    connection.start();
+	  }
+
+	  public void removeDurableSubscriber() throws JMSException {
+	    messageConsumer.close();
+	    session.unsubscribe(subscriptionName);
+	  }
+
+	  public void closeConnection() throws JMSException {
+	    connection.close();
+	  }
+
+	  public String getGreeting(int timeout) throws JMSException {
+
+	    String greeting = NO_GREETING;
+
+	    // read a message from the topic destination
+	    Message message = messageConsumer.receive(timeout);
+
+	    // check if a message was received
+	    if (message != null) {
+	      // cast the message to the correct type
+	      TextMessage textMessage = (TextMessage) message;
+
+	      // retrieve the message content
+	      String text = textMessage.getText();
+	      LOGGER.debug(clientId + ":  received message with text='{}'",
+	          text);
+
+	      // create greeting
+	      greeting = "Hello " + text + "!";
+	    } else {
+	      LOGGER.debug(clientId + ": no message received");
+	    }
+
+	    LOGGER.info("greeting={}", greeting);
+	    return greeting;
+	  }
+	}
+
+
+	It contains a testDurableSubscriber() test case that will first remove one of the two durable subscribers that are listening on the 'durablesubscriber.t' topic by closing it’s connection to the broker. Then a first message is sent to this topic on which only one subscribers is still actively listening. The second subscriber is recreated using the same client ID and subscription name and a second message is sent. The expected result is that both subscribers receive the two messages.
+
+	@Test
+  public void testDurableSubscriber() {
+    try {
+      // durable subscriptions, receive messages sent while the
+      // subscribers are not active
+      subscriber2DurableSubscriber.closeConnection();
+
+      publisherDurableSubscriber.sendName("Bilbo", "Baggins");
+
+      // recreate a connection for the durable subscription
+      subscriber2DurableSubscriber.create(
+          "subscriber2-durablesubscriber", "durablesubscriber.t",
+          "durablesubscriber2");
+
+      publisherDurableSubscriber.sendName("Frodo", "Baggins");
+
+      String greeting1 =
+          subscriber1DurableSubscriber.getGreeting(1000);
+      assertEquals("Hello Bilbo Baggins!", greeting1);
+      String greeting2 =
+          subscriber2DurableSubscriber.getGreeting(1000);
+      assertEquals("Hello Bilbo Baggins!", greeting2);
+
+      String greeting3 =
+          subscriber1DurableSubscriber.getGreeting(1000);
+      assertEquals("Hello Frodo Baggins!", greeting3);
+      String greeting4 =
+          subscriber2DurableSubscriber.getGreeting(1000);
+      assertEquals("Hello Frodo Baggins!", greeting4);
+
+    } catch (JMSException e) {
+      fail("a JMS Exception occurred");
+    }
+  }
