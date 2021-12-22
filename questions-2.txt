@@ -435,54 +435,58 @@ Ans)
     
     For example, given a list of students objects with attributes area, gender and age; the filter needed to firstly sort students by area — values could be north, south, east or west. Subsequently, after this was applied, students then needed to be filtered into groups by gender — male or female. Finally, students needed to be sorted by age. The final product would be a list of male students and female students in each area, sorted by age.
 
+    New methods added to the Comparator class like the comparing() and thenComparing() methods. 
+
     Here’s a simple way of handling it with Java 8.
 
-    Let’s define our comparators,
+    Ex:
 
-    Comparator<Person> sortByArea = Comparator.comparing(Person::getArea);
-    Comparator<Person> sortBySex = Comparator.comparing(Person::getSex);
-    Comparator<Person> sortByAge = Comparator.comparing(Person::getAge);
+    	   	Person p1 = new Person();
+        p1.setAge(20);
+        p1.setArea(25);
+        p1.setSex(0);
+        
+        Person p2 = new Person();
+        p2.setAge(10);
+        p2.setArea(15);
+        p2.setSex(1);
+        
+        Person p5 = new Person();
+        p5.setAge(10);
+        p5.setArea(15);
+        p5.setSex(0);
+        
+        Person p3 = new Person();
+        p3.setAge(50);
+        p3.setArea(75);
+        p3.setSex(1);
+        
+        Person p4 = new Person();
+        p4.setAge(30);
+        p4.setArea(5);
+        p4.setSex(0);
+        
+    	Comparator<Person> sortByArea = Comparator.comparing((Person p)->p.getArea());  // way of before java 8
+        Comparator<Person> sortBySex = Comparator.comparing(Person::getSex); 
+        Comparator<Person> sortByAge = Comparator.comparing(Person::getAge);
+        
+        List<Person> persons = Arrays.asList(p1,p2,p3,p4,p5);
+        persons.sort(sortByArea.thenComparing(sortByAge).thenComparing(sortBySex));
+        //persons.stream().sorted(sortByArea).collect(Collectors.toList());
+        for(Person person:persons) {
+        	System.out.println("area = "+person.getArea()+ " age: "+person.getAge()+ " sex: "+person.getSex());
+        }
 
-    If we wanted to sort by area and then sex, we could simply use,
-    
-    List<Person> persons = new ArrayList<>(...);
-    person.stream().sorted(sortByArea.thenComparing(sortBySex));
+        Output:
 
-    This would allow us to achieve our functionality. However, what do we do if we want to apply a third comparator? We can add another sorted method; however, we run into a problem: this solution is in no way extensible. If a new sort criteria is added, the code would have to implement a new .thenComparing() and so on. This isn’t exactly the most pragmatic solution.
+        	area = 5 age: 30 sex: 0
+			area = 15 age: 10 sex: 0
+			area = 15 age: 10 sex: 1
+			area = 25 age: 20 sex: 0
+			area = 75 age: 50 sex: 1
 
-    A simple yet optimal solution would be to create a list of comparators and while iterating return a resulting comparison value that when applied allows us to sort the items in a list.
 
-    List<Comparator<Person>> comparators = new ArrayList<>();
-    comparators.add(sortByArea);
-    comparators.add(sortBySex);
-    comparators.add(sortByAge); 
-
-    we can utilise a class that implements the Comparator interface and override the compare method to handle this bit of magic.
-
-    class ChainComparator implements Comparator<Person> {
-       private List<Comparator<Person>> comparatorList;
-       @Override
-       int compare(Person p1, Person p2) {
-           int result;
-           for(Comparator<Person> comparator : comparatorList) {
-             if ((result = comparator.compare(p1, p2)) != 0) {
-                 return result;
-             }
-           }
-           return 0;
-       }
-    }
-
-    Then we can apply multiple sort criterion.
-    
-    list.sort(new ChainComparator(comparatorList));
-
-    Side Note
-    
-    The Apache Commons Library has a ComparatorUtils class that provides this functionality with a simple call to
-    
-    ComparatorUtils.chainedComparator(comparatorsList);
-
+		// When Area value is same then it is sorted by Age and when both Area and Age are same then Sex value is compared.
 
 Q) Batch processing using spring batch ?? Or how to insert 1 million row csv data into database ??
  
