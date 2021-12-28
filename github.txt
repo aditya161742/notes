@@ -1,14 +1,14 @@
--> Learn line by line git commit
--> pull git by commit id
--> git pipelining for deployment 
+
+
 
 Steps to use git in elcipse console:
 
 Right click on the project
 Select Team -> Share
 You will be prompted to select the tool you prefer
-Click Create -> Browseif you already have one
+Click Create -> Browse if you already have one
 Select git and go on
+
 
 Git init
 
@@ -47,3 +47,22 @@ git pull origin develop
 
 
 
+-> Learn line by line git commit
+
+	git add --patch filename
+
+	For each change, you will be asked what to do with it. Type the letter, and press enter.
+
+	y	yes; stage this change
+	n	no; don't stage this change
+	s	split; cut the change in smaller parts
+	e	edit; manually define the part to split
+	?	help for the remaining options
+
+-> pull git by commit id
+	
+	git pull is nothing but git fetch followed by git merge. So what you can do is
+
+	git fetch remote example_branch
+
+	git merge <commit_hash>
