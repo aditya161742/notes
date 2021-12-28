@@ -44,13 +44,23 @@ Spring Boot provides the spring-boot-starter-jersey module that allows you to us
 
 ----------------------------------------
 
+SOAP vs REST
 
-Comparing SOAP and REST is not really correct. The first one is basically Protocol (or at least it's trying to be) and REST is just a architecture pattern/style.
+Rest is based on http protocol (get,put,post,delete) , treating everything as a resource.
+whereas SOAP is transport agnostic
+
+Soap works only with xml , Rest works with json/xml both.
 
 Unlike Rest, SOAP supports multiple protocols Http/Https, JMS
+
+SOAP comtains much more infomration like which encryption is used, 
 
 When should you use SOAP? SOAP is best for anything that requires formal contracts. To be even more specific, here are two common use cases for SOAP. 
 
 1) Asynchronous operations. An asynchronous operation is very time-specific. It is when various signals trigger new events, rather than an external timer. REST limits itself to HTTP and HTTPS, neither of which are the ideal communication protocols for this purpose as they may delay such an operation. SOAP supports additional communication protocols.
 
-2) Stateful operations: Basically Stateful means that server stores information about the client and uses that information over a series of requests. So performing one request is dependant upon the state of some other request (e.g. previous). Implementing this is possible with http protocols.
+2) Stateful operations: Basically Stateful means that server stores information about the client and uses that information over a series of requests. So performing one request is dependant upon the state of some other request (e.g. previous). If you need stateless CRUD (Create, Read, Update, and Delete) operations, then  use REST.
+
+3) Caching situations: if the information can be cached because of the totally stateless operation then use REST otherwise use SOAP , as SOAP stores information on server side and dependent on previous states, therefore cannot be cached.
+
+4) SOAP requires more bandwidth for its usage. Since SOAP Messages contain a lot of information inside of it, the amount of data transfer using SOAP is generally a lot. If we have limited bandwidth then use REST.
