@@ -3106,6 +3106,11 @@ Ans)
 
     https://www.nexsoftsys.com/articles/association-composition-aggregation-inheritance-java.html    
 
+Q) What will be the output of 
+
+	System.out.prntln('a'+"H");
+
+Asn) aH
 
 Q)  Explain about Solid principles and where you applied in projects??
 
