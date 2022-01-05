@@ -269,4 +269,24 @@ Asn)
     
     https://www.baeldung.com/sonar-qube
 
+Q) Advantages Spring JDBC over plain JDBC ??
+
+Ans)
+
+	The Spring JDBC Template has the following advantages compared with standard JDBC.
+
+	The Spring JDBC template allows to clean-up the resources automatically, e.g. release the database connections.
+
+	The Spring JDBC template converts the standard JDBC SQLExceptions into RuntimeExceptions. This allows the programmer to react more flexible to the errors. The Spring JDBC template converts also the vendor specific error messages into better understandable error messages.
+
+Q) Spring JDBCTemplate vs JPA ? 
+
+Ans)
+
+	Use Spring JdbcTemplate if you don't want to access your database schema via a domain model. Using JdbcTemplate you are using a lower level access, with more flexibility, but probably also more boilerplate.
+
+	Use JPA you need to make sure that database schema maps correctly to the domain model.
+
+Q) 
+
 Q) explain your project architecture and stack?? 
