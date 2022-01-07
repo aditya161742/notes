@@ -3194,6 +3194,34 @@ class Palinedrome{
         }
     }
 
+Q) Convert int[] array to List<Integer> ??
+
+Ans) 
+
+    int[] input = new int[]{1,2,3,4};
+    List<Integer> output = Arrays.asList(input);
+    Unfortunately, this won't compile due to type incompatibility. We might expect autoboxing to work with arrays of primitives. However, this instinctive belief isn't true.
+
+    Autoboxing only happens for a single element (for example from int to Integer). There is no automatic conversion from an array of primitive types to an array of their boxed reference types (for example from int[] to Integer[]).
+
+    Solution:
+
+        Since autoboxing works with single primitive elements, a simple solution is to just iterate over the elements of the array and add them to the List one by one:
+
+        int[] input = new int[]{1,2,3,4};
+        List<Integer> output = new ArrayList<Integer>();
+        for (int value : input) {
+            output.add(value);
+        }
+
+        or using 
+
+        Since Java 8, we can use the Stream API. We can provide a one-line solution using a Stream:
+
+        int[] input = new int[]{1,2,3,4};
+        List<Integer> output = Arrays.stream(input).boxed().collect(Collectors.toList());
+
+
 Q)  find longest palindrome in a string??
 
 Q) How many microservices you have in your project ??
