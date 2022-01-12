@@ -17,21 +17,40 @@ The responsibility of each layer is different, but there are a few common aspect
 
 Terminology:
 
+-> Advice: The advice is an action that we take either before or after the method execution. The action is a piece of code that invokes during the program execution. There are five types of advices in the Spring AOP framework: before, after, after-returning, after-throwing, and around advice. Advices are taken for a particular join point. We will discuss these advices further in this section.
+
+-> Concerns: The concern is the behavior we want to have in a particular module of an application.
+
+-> Cross-cutting concerns: The cross-cutting concern is a concern which is applicable throughout the application. This affects the entire application. For example, logging, security and data transfer are the concerns needed in almost every module of an application, thus they are the cross-cutting concerns.
+
 -> Aspect: An aspect is a module that encapsulates advice and pointcuts and provides cross-cutting An application can have any number of aspects. We can implement an aspect using regular class annotated with @Aspect annotation.
 
 -> Pointcut: A pointcut is an expression that selects one or more join points where advice is executed. We can define pointcuts using expressions or patterns. It uses different kinds of expressions that matched with the join points. In Spring Framework, AspectJ pointcut expression language is used.
 
 -> Join point: A join point is a point in the application where we apply an AOP aspect. Or it is a specific execution instance of an advice. In AOP, join point can be a method execution, exception handling, changing object variable value, etc.
 
--> Advice: The advice is an action that we take either before or after the method execution. The action is a piece of code that invokes during the program execution. There are five types of advices in the Spring AOP framework: before, after, after-returning, after-throwing, and around advice. Advices are taken for a particular join point. We will discuss these advices further in this section.
-
 -> Target object: An object on which advices are applied, is called the target object. 
 
--> Weaving:
+-> Weaving: Weaving is generating or editing code by directly modifying existing .class (byte-code) files. This can occur at different points in the application life cycle. Weaving can be done at compile time, at load time, or at runtime. Spring Framework uses this for AOP functionality. 
 
 -> Proxy: It is an object that is created after applying advice to a target object is called proxy.
 
 
+AspectJ vs Spring AOP:
+
+1) Spring AOP aims to provide a simple AOP implementation across Spring IoC to solve the most common problems that programmers face. It is not intended as a complete AOP solution – it can only be applied to beans that are managed by a Spring container.
+
+On the other hand, AspectJ is the original AOP technology which aims to provide complete AOP solution. It is more robust but also significantly more complicated than Spring AOP. It's also worth noting that AspectJ can be applied across all domain objects.
+
+2) As AspectJ uses compile time time weaving, Spring AOP makes use of runtime weaving.
+
+3) Spring AOP is a proxy-based AOP framework. This means that to implement aspects to the target objects, it'll create proxies of that object. AspectJ, on the other hand, doesn't do anything at runtime as the classes are compiled directly with aspects.
+
+4) Spring AOP is based on proxy patterns. Because of this, it needs to subclass the targeted Java class and apply cross-cutting concerns accordingly.
+
+But it comes with a limitation. We cannot apply cross-cutting concerns (or aspects) across classes that are “final” because they cannot be overridden and thus it would result in a runtime exception.
+
+However, AspectJ weaves the cross-cutting concerns directly into the actual code before runtime.
 
 @Before:
 
@@ -209,7 +228,7 @@ public void logExceptions(JoinPoint jp, Exception e) {
 -> By using the @AfterThrowing advice, we make sure the logging happens only when the exception occurs.
 
 
-@afterReturning:
+@AfterReturning:
 
 -> After returning is an advice in Spring AOP that invokes after the execution of join point complete (execute) normally. It does not invoke if an exception is thrown. We can implement after returning advice in an application by using @AfterReturning annotation. 
 
