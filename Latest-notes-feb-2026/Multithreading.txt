@@ -1,0 +1,421 @@
+
+Two ways to create thread:
+
+	1) extending Thread class and overriding run();
+	2) Implementing Runnable method and implment run().
+	
+		new Thread(() -> sout("Runnable")); //runnable is passed in thread object
+
+synchronization keyword:
+
+	-> synchronized is the modifier applicable only for methods and blocks, but not for classes and variables. If multiple threads are trying to operate simultenously on the same java object then there may be a chance of data inconsistency problem. To overcome this problem we should go for synchronized keyword. 
+
+Thread lifecycle:
+
+	-> wait(): Causes the current thread to pause its execution, release the lock (monitor) it holds on the synchronized object, and enter a waiting state
+	-> notify(): Wakes up a single arbitrary thread that is waiting on the object's monitor. The notified thread then attempts to re-acquire the lock once the current (notifying) thread releases it.
+	-> notifyAll(): Wakes up all threads that are waiting on the object's monitor. All awakened threads then contend for the lock, but only one can acquire it at a time.
+	-> Example of yield() method:
+		Theoretically, to ‘yield’ means to let go, to give up, to surrender. A yielding thread tells the virtual machine that it’s willing to let other threads be scheduled in its place. This indicates that it’s not doing something too critical. 
+	-> Example of join() method:
+
+	It is used to run threads in order. In this example thread 1 will run only after thread 2 has finished execution.
+
+
+	class myThread implements Runnable{
+    
+    
+    public  void run(){
+        for(int u = 0;u<100;u++){
+            System.out.println("Thread 1 = "+u);        
+        }
+		}    
+	}
+
+	class myThread2 implements Runnable{
+	   
+		
+		public  void run(){
+			
+			for(int u = 10;u<200;u++){
+				
+				System.out.println("Thread 2  = "+u);
+				
+			}
+		   
+		}    
+	}
+
+
+	public class Main
+	{
+		public static void main(String[] args) {
+			
+			myThread r1 = new myThread();
+			Thread t1 = new Thread(r1);
+		
+			  
+			Runnable r2 = new myThread2();
+			Thread t2 = new Thread(r2);
+			t2.start();
+			 try {
+			  t2.join();
+			  } catch (InterruptedException ie) {
+				  ie.printStackTrace();
+			  }
+			
+			t1.start();
+					 
+		}
+	}
+	
+Q) print numbers 1 to 10 sequentially using 3 threads ??
+
+	class Printer {
+		private int number = 1;      // shared counter
+		private final int MAX = 10;  // maximum number
+		private final int threadCount = 3; // total threads
+
+		// synchronized method to ensure only one thread prints at a time
+		public synchronized void printNumber(int threadId) {
+			while (number <= MAX) {
+				// Check if it's this thread's turn
+				if (number % threadCount != threadId) {
+					try {
+						wait(); // wait until other threads print
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				} else {
+					System.out.println("Thread-" + threadId + ": " + number);
+					number++;       // increment counter
+					notifyAll();    // wake up other threads
+				}
+			}
+		}
+	}
+	
+	public class Main {
+		public static void main(String[] args) {
+			Printer printer = new Printer();
+
+			// Create 3 threads with IDs 0,1,2
+			for (int i = 0; i < 3; i++) {
+				final int threadId = i;
+				new Thread(() -> printer.printNumber(threadId)).start();
+			}
+		}
+	}
+
+
+ExcecutorService:
+
+	-> Present in java.util.concurrent.
+
+	-> First an ExecutorService is created using the Executors newFixedThreadPool() factory method. This creates a thread pool with 10 threads executing tasks.
+
+	-> Second, an anonymous implementation of the Runnable interface is passed to the execute() method. This causes the Runnable to be executed by one of the threads in the ExecutorService.
+
+	-> Creating threads is expensive task, therefore when we need to create lets say 1000 threads then we can use ExecutorService which will increase performance. 
+
+	Ex:
+
+	ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+	executorService.execute(new Runnable() {
+		public void run() {
+			System.out.println("Asynchronous task");
+		}
+	});
+
+	executorService.shutdown();          //This will not instantly shutsdown threadpool, but initiates the shutdown process
+	
+BlockingQueue:
+
+
+	-> Present in java.util.concurrent.
+
+	-> Multiple threads can be inserting and taking elements concurrently from a Java BlockingQueue, without any concurrency issues arising.
+
+	-> A BlockingQueue is typically used to have one thread produce objects, which another thread consumes.
+
+	-> The producing thread will keep producing new objects and insert them into the BlockingQueue, until the queue reaches some upper bound on what it can contain. It's limit, in other words. If the blocking queue reaches its upper limit, the producing thread is blocked while trying to insert the new object. It remains blocked until a consuming thread takes an object out of the queue.
+
+	-> The consuming thread keeps taking objects out of the BlockingQueue to processes them. If the consuming thread tries to take an object out of an empty queue, the consuming thread is blocked until a producing thread puts an object into the queue.
+	
+	Example:
+	
+		public class BlockingQueueExample {
+
+			public static void main(String[] args) throws Exception {
+
+				BlockingQueue queue = new ArrayBlockingQueue(1024);
+
+				Producer producer = new Producer(queue);
+				Consumer consumer = new Consumer(queue);
+
+				new Thread(producer).start();
+				new Thread(consumer).start();
+
+				Thread.sleep(4000);
+			}
+		}
+
+		public class Producer implements Runnable{
+
+			protected BlockingQueue queue = null;
+
+			public Producer(BlockingQueue queue) {
+				this.queue = queue;
+			}
+
+			public void run() {
+				try {
+					queue.put("1");
+					Thread.sleep(1000);
+					queue.put("2");
+					Thread.sleep(1000);
+					queue.put("3");
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		public class Consumer implements Runnable{
+
+			protected BlockingQueue queue = null;
+
+			public Consumer(BlockingQueue queue) {
+				this.queue = queue;
+			}
+
+			public void run() {
+				try {
+					System.out.println(queue.take());
+					System.out.println(queue.take());
+					System.out.println(queue.take());
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+
+Q) Semaphore ? 
+	
+	-> It is shared resource controlling tool. Semaphore doesn’t lock a whole method; it controls access to a resource or a specific section of code
+	
+	import java.util.concurrent.Semaphore;
+
+	class Printer {
+		private final Semaphore semaphore = new Semaphore(3); // 3 printers
+
+		public void printJob(String job) {
+			System.out.println(Thread.currentThread().getName() + " doing non-critical work");
+			
+			try {
+				semaphore.acquire(); // acquire a permit
+				System.out.println(job + " is printing by " + Thread.currentThread().getName());
+				Thread.sleep(1000); // simulate printing
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} finally {
+				semaphore.release(); // release permit
+			}
+			
+			System.out.println(Thread.currentThread().getName() + " finished non-critical work");
+		}
+	}
+
+	public class Main {
+		public static void main(String[] args) {
+			Printer printer = new Printer();
+			for (int i = 1; i <= 10; i++) {
+				final int jobId = i;
+				new Thread(() -> printer.printJob("Job " + jobId)).start();
+			}
+		}
+	}
+
+	✅ Behavior: Only 3 threads can print at the same time. Others wait for a permit.
+	
+
+Q) Callable and Future ?
+
+	What is Callable interface?
+
+		Callable is part of java.util.concurrent
+
+		Similar to Runnable
+
+		BUT it:
+
+			✅ Returns a result
+
+			✅ Can throw checked exceptions
+			
+	Executer service response type is Future.
+	
+	Example:
+	
+		import java.util.concurrent.Callable;
+
+		class MyTask implements Callable<Integer> {
+
+			@Override
+			public Integer call() throws Exception {
+				int sum = 0;
+				for (int i = 1; i <= 5; i++) {
+					sum += i;
+				}
+				return sum;
+			}
+		}
+
+		import java.util.concurrent.*;
+
+		public class Main {
+			public static void main(String[] args) throws Exception {
+
+				ExecutorService executor = Executors.newSingleThreadExecutor();
+
+				Callable<Integer> task = new MyTask();
+
+				Future<Integer> future = executor.submit(task);
+
+				// get() blocks until result is available
+				Integer result = future.get();
+
+				System.out.println("Result = " + result);
+
+				executor.shutdown();
+			}
+		}
+
+CountDownLatch:
+
+	-> CountDownLatch is used to make sure that a task waits for other threads before it starts.
+
+CyclicBarrier:
+
+	-> CyclicBarrier is used to make threads wait for each other. It is used when different threads process a part of computation and when all threads have completed the execution, the result needs to be combined in the parent thread.
+	
+Exchanger:
+
+
+	-> Exchanging objects between threads.
+	
+Q) Program to create Race condition , DeadLock condition and starvation ?
+
+
+Ans)
+
+	Race Condition:
+
+		when more than one thread try to access a shared resource (modify, write) at the same time. It is safe if multiple threads are trying to read a shared resource as long as they are not trying to change it.
+
+		Example:
+
+			class Counter  implements Runnable{
+			  private int c = 0;
+
+			  public void increment() {
+			    try {
+			      Thread.sleep(10);
+			    } catch (InterruptedException e) {
+			      // TODO Auto-generated catch block
+			      e.printStackTrace();
+			    }
+			    c++;
+			  }
+
+			  public void decrement() {    
+			    c--;
+			  }
+
+			  public int getValue() {
+			    return c;
+			  }
+			    
+			  @Override
+			  public void run() {
+			    //incrementing
+			    this.increment();
+			    System.out.println("Value for Thread After increment " 
+			    + Thread.currentThread().getName() + " " + this.getValue());
+			    //decrementing
+			    this.decrement();
+			    System.out.println("Value for Thread at last " 
+			    + Thread.currentThread().getName() + " " + this.getValue());        
+			  }
+			}
+
+			public class RaceConditionDemo{
+			  public static void main(String[] args) {
+			    Counter counter = new Counter();
+			    Thread t1 = new Thread(counter, "Thread-1");
+			    Thread t2 = new Thread(counter, "Thread-2");
+			    Thread t3 = new Thread(counter, "Thread-3");
+			    t1.start();
+			    t2.start();
+			    t3.start();
+			  }    
+			}
+
+		Output:
+
+		Value for Thread After increment Thread-2 3
+		Value for Thread at last Thread-2 2
+		Value for Thread After increment Thread-1 2
+		Value for Thread at last Thread-1 1
+		Value for Thread After increment Thread-3 1
+		Value for Thread at last Thread-3 0
+
+
+	-> To fix the race condition we need to have a way to restrict resource access to only one thread at a time. We have to use synchronized keyword to synchronize the access to the shared resource.
+	
+-> DeadLock condition:
+
+		Example:
+
+			public class DeadLockDemo {
+
+			    /*
+			     * This method request two locks, first String and then Integer
+			     */
+			    public void method1() {
+			        synchronized (String.class) {
+			            System.out.println("Aquired lock on String.class object");
+
+			            synchronized (Integer.class) {
+			                System.out.println("Aquired lock on Integer.class object");
+			            }
+			        }
+			    }
+
+			    /*
+			     * This method also requests same two lock but in exactly
+			     * Opposite order i.e. first Integer and then String. 
+			     * This creates potential deadlock, if one thread holds String lock
+			     * and other holds Integer lock and they wait for each other, forever.
+			     */
+			    public void method2() {
+			        synchronized (Integer.class) {
+			            System.out.println("Aquired lock on Integer.class object");
+
+			            synchronized (String.class) {
+			                System.out.println("Aquired lock on String.class object");
+			            }
+			        }
+			    }
+			}
+
+
+
+		-> To solve the issue we will have to simply re-order the statements where the code is accessing shared resources.
+
+Starvation:
+
+
+	-> Starvation of thread in java is said to occur when a particular thread does not get access to the object or the resource which leads to an increase in waiting and execution time.

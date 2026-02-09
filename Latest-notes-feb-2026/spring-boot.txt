@@ -1,0 +1,93 @@
+Spring boot internall working:
+
+	-> @SpringBootApplication  = @Configuration + @AutoConfiguration + @ComponentScan
+	-> @ComponentScan scans all the packages and creates Beans and also injects them.
+	-> Loads application.yml properties
+	-> Creates ApplicationContext (which have all the beans)
+	-> Loads embeded server like tomcat. So external server not required.
+	
+Difference between @Component and @Bean:
+	
+	@Component → Spring creates the bean automatically via classpath scanning
+		
+		@Component
+		public class EmailService {
+			public void send() {
+				System.out.println("Email sent");
+			}
+		}
+
+	
+	@Bean → You create the bean manually inside a configuration class	
+	
+		@Configuration
+		public class AppConfig {
+
+			@Bean
+			public EmailService emailService() {
+				return new EmailService();
+			}
+		}
+
+Q)  what is Scope reference to spring bean?
+
+	1) Singleton: Only one instance will be created for a single bean definition per Spring IoC container and the same object will be shared for each request made for that bean.
+		By Default @SErvice, @Component, @Repository, @Controller created singleton.
+		
+	2) Prototype Scope: A new bean instance is created every time it is requested from the container. Means it will return new instance whenever spring ask for it.
+	
+		@Component
+		@Scope("prototype")
+		public class Pen {
+		}
+		
+		Basically when two different classes @Inject Pen then two different Pen object will be created.
+	
+	3) Request Scope: One bean instance per HTTP request. 
+	
+Q)  Difference between @RequestParam and @PathVariable??
+	
+	http://localhost:8080/springmvc/hello/101?param1=10&param2=20
+	
+	@RequestMapping("/hello/{id}")    
+	public String getDetails(@PathVariable(value="id") String id,
+			@RequestParam(value="param1", required=true) String param1,
+			@RequestParam(value="param2", required=false) String param2){
+		.......
+		}
+
+Q) @Repository vs @Component vs @Service vs @Controller vs @RestController
+
+	-> All of these are specialized forms of @Component
+	-> @Repository: Converts JDBC / JPA exceptions into Spring’s DataAccessException
+	-> @SErvice : Improves readability & design
+	-> @RestController: handles REST APIs returning JSON
+	
+Q) @Qualifier ?
+
+	@Qualifier: Used to distinguish by name if two or more classes implements same interface. Used with autowiring.
+	
+	
+Q) Profile in spring boot ?
+
+Ans)
+
+    we need to create three  application.properties:
+
+     application-dev.properties 
+     application-test.properties 
+     application-prod.properties 
+
+     Of course, the application.properties will remain as a master properties file, but if we override any key in the profile-specific file, the latter will gain precedence.
+
+     @Configuration
+     class appConfig{
+
+        @Profile("dev")
+        @Bean
+        public String devDBConnectionBean(){
+            return "dev";
+        }
+
+     }
+	 

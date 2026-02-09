@@ -1,0 +1,1014 @@
+
+class level modifiers:
+
+We can specify this information using appropriate modifier.
+
+-> The only applicable modifiers for top level classes are public , default , final, abstract , strictfp
+	But for inner classes the applicable modifiers are public , default , final, abstract , strictfp   +   private, protected, static 
+
+	private class Test{
+
+		public static void main(String[] args){
+			sop("Hello");
+		}
+
+	}
+
+	Errror -----> modifier private not allowed here
+	
+	
+public classes:
+
+-> If a class declared as public then we can access that class from anywhere.
+	Note: classes can be accessed from package without decalring them public but if class is accessed from another package or anywhere then class has to be public. 
+
+	default classes:
+
+	-> If nothing is declared on class called default class. We can access deafult class only within the current package. i.e from outside package we can't access.
+
+	Hence default access is also known as package level access.
+
+
+	final modifier:
+
+	-> It is applicable for classes, methods and variables. 
+
+
+	final method:
+
+	-> If parent class is declared final then child classes are not allowed to override those methods.
+
+	final class:
+
+	-> If class is final then that class cannot extend (i.e inheritence) functionality of that class. i.e , we can't create child class for that class.
+	
+
+Abstract modifier:
+
+	-> Abstract is the modifier applicable for classes and methods but not for variables.
+
+Abstract method:
+
+	-> Even though we don't know about implmentation still we can declare a method with abstract modifier. i.e , for abstract methods only declaration is available but not implementation , hence abstract method decalration should end with semicolon.
+
+	-> Child class is responsible to provide implementation for parent class abstract methods ( This is compulsory). 
+	-> By declaring abstract method in the parent class we can provide guidlince to the child classes such that which method compulsory child has to implement.
+
+			Ex:
+
+			abstract class vehicle{
+				public abstract int getNumberWheel();    // method decalred		
+			}
+
+			class bus extends vehicle{
+				public int getNumberWheel(){
+					return 4;
+				}
+
+			}
+
+			class auto extends vehicle{
+				public int getNumberWheel(){
+					return 3;
+				}
+
+			}
+
+
+	-> Abstract never talks about implementation. If any modifier talks about implementation then it forms illegal combination with abstract modifier. The following are various illegal combination of modifiers for methods w.r.t abstract final, native,synchronized, private ,static, strictfp.
+
+Abstract class:
+
+	-> For any java class if we are not allowed to create an object (because of partial implementation), such type of class we have to decalre with abstarct modifier. i.e for abstract classes instantiation is not possible.
+
+		Ex:
+
+			class abstarct Test{
+
+			}  
+
+			Test t = new Test();                 //  Errror -----> Test is abstarct ; cannot be instantiated  
+
+
+Abstract class vs Abstract method:
+
+	-> If a class contains atleast one abstract method then compulsory we should declare class as abstarct otherwise we will get compile time error. 
+		
+		Reason: If a class contains atleast one abstract method then implmentation is not complete, hence it is not recommneded to create object. To restrict object instantiation compulsory we should declare class as abstract.
+
+	Even though class doesn't contain any abstract method still we can declare class as abstract if we don't want instantiation, i.e abstract class can contain 0 number of abstract methods also.
+	
+final vs abstract:
+
+	-> abstract methods compulsory we should override in child classes to provide implmentation, whereas we can't override final methods.. Hence final abstract combination is illegal combination for methods.
+
+	-> for final classes we can't crate child class whereas for abstract classes we should create child class to provide implementation. Hence final abstract combination is illegal for classes.
+	
+protected members:
+
+	-> the most misunderstood modifier.
+	-> If a member decalred as protected then we can access that member anywhere within the current package but only in child classes of outside package.
+	-> protected = default + kids
+	
+default member:
+
+	-> If member delared as default then we can access that member only within the current package,i.e from outside of the package we can't access, hence default access is also known as package level access.
+	
+final variables:
+
+	-> variables are of 3 types instance variable, static variable and local variable
+
+
+	final instance variables:
+
+	-> If the value of a variable is varied from object to object such type of variables are called instance variables.
+	-> for every object a seperate copy of instance variables will be created.
+
+	-> for instance variables we are not required to perform intialization explicitly, JVM will always provide default values.
+
+						Ex:
+
+							class Test{
+								int x;
+								public static void main(String[] args){
+									Test t = new Test();
+									sop(t.x);    // default value 0
+								}
+							}
+
+	-> If the instance variable decalred as final then compulsory we have to perform initialization explicitly, weather we are using or not and JVM won't provide default values.
+
+						Ex:
+
+							class Test{
+								final int x;
+								public static void main(String[] args){
+									Test t = new Test();
+									sop(t.x);    // compile time error
+								}
+							}
+							
+							
+	-> For static variables it is not required to perform initialization explicitly JVM will always provide default values.
+			
+			Ex:
+				class Test{
+					static int x;
+
+					public static void main(String[] args){
+						sop(x); // 0
+					}
+				}
+	-> If the static variable decalred as final then compulsory we should perform initialization explicitly otherwise we will get compile time error and JVM won't provide any defaul values.
+
+				Ex:
+					class Test{
+						final static int x:
+
+						//Errrorr ------> variable x might not have been initialized
+					}
+					
+	
+	final local variables:
+
+	-> variables decalred inside method/block/constructor called local variables.
+	-> For local variables JVM won't provide any default values, compulsory we should perform initialization explicitly, before using that local variable
+	
+	Static variable:
+	
+	-> static is the modifier applicable for methods and variables but not for classes.
+	-> we can't declare top level class with static modifier but we can declare inner class as static (called static nested class).
+	-> In the case of instance variables for every object a seperate copy will be created but in the case of static variables a single copy will be created a class level and shared by every object of that class.
+
+		Ex:
+			class Test{
+
+				static int x = 10;
+				int y = 20; 
+
+				public static void main(String[] args){
+					Test t1 = new Test();
+					t1.x = 888;
+					t1.y = 999;
+
+					Test t2 = new Test();
+
+					sop(t2.x+ " ------ "+t2.y);     // 888 --------- 20, here no new object is created for static variable but new object 									is cretaed for normal variable 
+				}
+			}
+			
+		
+	-> considered the following declaration 
+
+	1) int x = 10;
+	2) static int x = 10;
+
+	3) public void m1{
+			sop(x);
+		}
+
+	4) public static void m1(){
+			sop(x);
+		}
+
+	within the same class which of the above declaration we can take simultaneously. 1 & 3, 2 & 3,2 & 4
+
+	1 & 4 is not possible, Error ---> non static variable x cannot be referenced from a static context 
+	1 & 2 is not possible, it will give error ---> variable x is already defined.
+	3 & 4 is not possible, Error ----> m1 is already defined in Test
+	
+	
+	Case 1:
+	
+	-> Overloading concept applicable for static methods including main() method, but JVM can always call String[] argument main() method only.
+
+			Ex:
+
+				public static void main(String[] arg){
+					sop(String[];
+				}
+
+				public static void main(int[] arg){
+					sop(int[];
+				}
+
+	Other overloaded method we have to call just like a normal method call.
+
+
+	Case 2:
+
+		-> Inheritence concept applicable for static methods including main() method, hence while executing child class if child doesn't contain main() method then parent class main() method will be executed.
+
+				Ex:
+					class p{
+
+						public static void main(String[] args){
+							sop("Parent main");
+						}
+
+					}
+
+					class c extends p{
+
+					}
+
+
+	Case 3:
+		
+		-> It seems overriding method applicable for static methods, but it is not overriding but method hiding.
+
+				Ex:
+					class p{
+
+						public static void main(String[] args){
+							sop("Parent main");
+						}
+
+					}
+
+					class c extends p{
+						public static void main(String[] args){
+							sop("Child main");
+						}
+					}
+
+
+		-> For static methods overloading and inheritence concepts are applicable but overriding concepts are not applicable but instead of overriding method hiding concept is applicable. 
+		
+		-> Static methods are not overridden, they are hidden. main runs depends only on the class you run, not on inheritance
+		-> In above example if we run C class then output will be "Child main" and if we run P class then output will be "Parent main"
+		
+		
+	Example: 
+	
+		class P {
+			public static void abc() {
+				System.out.println("Parent main");
+			}
+		}
+
+		class C extends P {
+			public static void abc() {
+				System.out.println("Child main");
+			}
+		}
+
+		P p = new C();
+		p.abc();
+
+		Output is: Parent main
+	
+		-> Static methods are resolved at compile time
+		-> They depend on the REFERENCE type, not the object type
+		
+		p is a reference of type P
+
+		So the compiler binds the call to:
+
+		P.abc();
+		
+transient keyword:
+
+	-> transient is the modifier applicable only for variables.
+	-> we can use transient keyword in serialization context.
+	-> serialization means saving to file.
+	-> At the time of serialization if we don't want to save the value of a particular variable to meet security contraint, then we should declare that variable as transient.
+	At the time of serialization JVM ignores original value of transient variables and save default value to the file, hence transient means not to serialize.
+		
+				Ex: 
+					transient int password;  // therefore while saving this in file, JVM will take default value as null
+					
+volatile modifier:
+
+	-> It is applicable only for variable.
+	-> If the value of a variable keep on changing by mupltiple threads then there may be a chance of data inconsistency problem. we can solve this problem by using volatile modifier.
+	-> If a variable decalred as volatile, then for every thread JVM will create seperate local copy.
+	-> Every modification performed by the thread will takes place in local copy so that there is no affect on the remaining threads.
+	-> Not used much, almost depreciated.
+	
+	
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+Comparable(i):
+
+	-> It is present in java.lang package and it contains only one method compareTo(). It is defined in predefined class therefore it is not recommended to change this function. Therefore we should use compareTo() method of comparator to get customized sorting.
+	-> Used by Collections.sort() / Arrays.sort()
+		
+		Example:
+		
+		class Student implements Comparable<Student> {
+			int rollNo;
+			String name;
+			int marks;
+
+			public int compareTo(Student s) {
+				return this.rollNo - s.rollNo; // natural order
+			}
+		}
+
+		-ve compareTo means it will come before
+		0 means they are equal 
+		+ve compareTo means it will come after
+
+
+Comparator:
+
+	-> It is present in java.util package and it defines 2 methods. 
+
+		1) public int Compare(Obj1, obj2);
+
+				,returns -ve if obj1 < obj2
+				,returns +ve if obj1 > obj2
+				, returns 0 if obj1 = obj 2
+
+
+		2) public boolean equals(Object obj)
+	
+	-> Use Comparator when there are multiple ways to sort like reverse etc
+	
+	Example:
+	
+		Comparator<Student> byMarks =
+		(s1, s2) -> s2.marks - s1.marks;
+
+		Comparator<Student> byName =
+			(s1, s2) -> s1.name.compareTo(s2.name);
+
+		Collections.sort(list, byName);
+		
+Difference between == operator and equals() method:
+
+	-> In general == operator meant for refrence comparision (address comparision), whereas equals() method meant for content comparision. Example:
+		
+		Integer I1 = new Integer(10);
+		Integer I2 = new Integer(10);
+		System.out.println(I1 == I2);   //Returns false because they both refer to different pointers.
+		System.out.println(I1.equals(I2));  //Return true as content is same
+		
+		
+---------------------------------------------------------------------------------------------------------
+
+
+Strings class (Most Important):
+
+	Case 1) Explain mutualbility and immutability with example ?
+
+	->String is immutable													-> StringBuffer is mutable
+
+	String s = new String('durga');                                           StringBuffer s = new StringBuffer('durga');
+	s.concat('software');														s.append('software');
+	sop(s); // Prints 'durga'													sop(s); // Prints 'durga software'
+
+
+	Once we creates a string object we can't perform any changes            Once we creates a stringBuffer object we can perform any change
+	in the existing object. If we are trying to perform any change          in existing object this changeable behaviour is nothing but
+	with those changes a new object will be created, this 					mutability of StringBuffer object.
+	non-changable beheaviour is nothing but immutability of string.
+
+
+
+	Case 2)
+
+	Ex:1
+
+	String s = new String('durga');                                             String s = 'durga';
+
+	In this case two objects will be created one in the heap                    In this case only one object will be created in SCP  
+	area and other is in SCP (String constant pool) and                         and s is always pointing to that object.
+	s is always pointing to heap object.
+
+	Object creation in SCP is optional first it will check is there any object already present in SCP with required content , if object already present then existing object will be reused. If obeject not already available then only a new object will be cretaed.
+
+	But this rule is applicable only for SCP not for heap.
+
+	Garbage collector is not allowed to access SCP area hence even though object doesn't contain refrence variable it is not eligible for GC, if it is present in SCP area.
+
+	All SCP objects will be destroyed automatically at the time of JVM shutdown. 
+
+	Ex:2
+
+	String s1 = new String('durga');		//Create new object in heap and new object SCP
+	String s2 = new String('durga');		//Create new object in heap and use existing refrence object in SCP
+	String s3 = 'durga';					//Same refrence object used in SCP
+	String s4 = 'durga';                  //Same refrence object used in SCP
+
+
+	Whenever we are using new operator compulsory a new object will be created in the heap area hence there may be a chance of existing 2 objects with same content in the heap area but not in SCP , i.e duplicate objects are possible in the heap area but not in SCP.
+
+
+
+How to create our own immutable class ?? (Important)   (Part - 6 1:20 hour )
+
+	-> Once we creates an object we can't perform any changes in that object if we are trying to perform any change and if there is a change in the content then with those changes a new object will be created if there is no change in content then existing object will be reused this beheaviour is nothing but immutability 
+
+		String s1 = new String('durga');
+		String s2 = s1.toUpperCase(); // points to different object , as different case
+		String s3 = s1.toLowerCase(); // Points to same object
+		
+	-> Make our own immuatable object by:
+
+		1) declaring class as final 
+		2) No setter methods should be there.
+		3) Make all fields private final
+		4) Initialize all fields via constructor
+		
+
+
+Wrapper classes:
+
+	-> The main objective of wrapper classes are:
+		1) To wrap primitive into object form so that we can handle primitives also just like objects.
+		2) To define several utility methods which are required for the primitives.
+		
+Autoboxing:
+
+	Autoboxing: Converting a primitive value into an object of the corresponding wrapper class is called autoboxing. For example, converting int to Integer class.
+
+	Unboxing: Converting an object of a wrapper type to its corresponding primitive value is called unboxing. For example conversion of Integer to int.
+	
+	autoboxing works when comparing == or equals ?  Example:
+	
+		int i = 2;
+		Integer j = 2;
+
+		i == j  //true, here unboxing will happen because we are comparing i with j.
+		j.equals(i); //true, here autoboxing will happen because we are comparing j with i.
+		
+		
+Contract between .equals() and hashcode() method:
+
+	-> If 2 objects are equal by .equals() then there hashCode must be equal,i.e , 2 equivalent objects should have same hashCode,i.e,
+			
+			If r1.equals(r2) is true, then r1.hashCode() == r2.hashCode() is always true.
+
+	-> Object class .equals() method and hashCode() follows above contract hence whenever we are overriding .equals() compulsory we should override hashCode() method to satisfy above contract, i.e, 2 equivalent objects should have same hashCode.
+
+Shallow copy vs Deep copy:
+
+	Object A ──▶ Address
+	Object B ──▶ Address   (shallow copy → same Address)
+
+	Object A ──▶ Address
+	Object B ──▶ Address'  (deep copy → different Address)
+	
+------------------------------------------------------------------------------------------------------------------------------
+
+
+Exception hierarchy:
+
+	-> Throwable class acts as root for java exception hierarchy.
+	-> Throwable class defines 2 child classes:	
+		1) Exception
+		2) error
+
+	1) Exception:
+
+	-> Most of the times exceptions are caused by our program and these are recoverable.
+			
+			Ex:
+				If our programming requrement is to read data from remote file locating at london at run time if remote file is not available then we will get run time exception saying fileNotFoundException. If fileNotFoundException occurs we can provide local file and continue rest of the program normally.
+
+					try{
+
+							read data from remote file locating at london
+					}
+					catch(fileNotFoundException e){
+
+						use local file and continue rest of the program normally
+					}
+
+
+	2) Error:
+
+	-> Most of the times error are not caused by our program and these are due to lack of system resources.
+	-> Errors are not recoverable. Ex: If outOfMemory error occurs being a programmer we can't do anything and the program will be terminated abnormally.System admin or server admin is responsible to increase heap memory.
+
+
+Checked Exceptions ✅
+
+		Exceptions that the compiler forces you to handle.
+
+		You must either:
+
+			handle using try–catch, or declare using throws
+
+			Examples
+
+			IOException, SQLException, FileNotFoundException, ClassNotFoundException
+			
+
+Unchecked Exceptions ❌
+
+		Exceptions that the compiler does NOT force you to handle.
+
+		They extend RuntimeException. Example: NullPointerException, ArithmeticException, ClassCastException
+		
+		
+final vs finally vs finalize:
+
+	-> final is the modifier applicable for classes, methods and variables.
+	-> It is a block always associated with try/catch to maintain clean up code.
+	-> It is a method always invoked by garbage collector just before destroying an object to perform clean up activities.
+
+Can we write try without catch ?
+
+	-> Yes,
+	
+	try{
+	
+	}finally{
+	}
+
+throw vs throws:
+
+	-> throw	Actually throws an exception in the code at runtime
+	-> throws	Declares that a method can throw exceptions (compile-time info)
+	
+Create custom exception:
+	
+1) 
+	// Unchecked exception
+	public class ResourceNotFoundException extends RuntimeException {
+
+		public ResourceNotFoundException(String message) {
+			super(message);
+		}
+
+		public ResourceNotFoundException(String message, Throwable cause) {
+			super(message, cause);
+		}
+	}
+
+2)
+	@RestController
+	@RequestMapping("/api/users")
+	public class UserController {
+
+		@GetMapping("/{id}")
+		public User getUser(@PathVariable Long id) {
+			return userRepository.findById(id)
+					.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+		}
+	}
+
+3) Handling the exception globally:
+
+	@ControllerAdvice
+	public class GlobalExceptionHandler {
+
+		@ExceptionHandler(ResourceNotFoundException.class)
+		public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
+			return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+		}
+
+		@ExceptionHandler(Exception.class)
+		public ResponseEntity<String> handleGenericException(Exception ex) {
+			return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Java memory managment:
+
+	-> Java memory is divided into 2 parts Heap memory and Stack memory:
+
+Heap Memory:
+
+	-> Heap memory is divided into 2 parts: Young genration and Old generation.
+
+	-> All the class objects stored first time inside young generation.
+
+		Young generation memory is also divided into 3 parts: Eden, Survivor memory s0 and Survivor memory s1.
+
+		When we create (Student s =  new Student), it is always stored inside Eden memory.  Once Eden memory is full, Minor GC (garbage collector) will be called and it will move some objects from Eden memory to Survivor memory s0 and if s0 is filled up then to Survivor memory s1.
+
+	-> When s0 and s1 is also filled then JVM will shift all this objects into old generation memory. Once old geenration memory is also filled up then Major GC is performed to find objects for removal. Major GC takes longer time. It might get timeout error/exceptions.
+
+	-> Memory pool: It is part of heap memory. It is used to store immutable objects like String objects. It will be defined at run time by JVM.
+
+	-> Heap memory always stores class objects, it stores all JRE classes. GC (garbage collector) always runs on heap memory only.
+
+
+Stack memory:
+
+	-> Used to execute threads.
+	-> It contains method specific values (ie local variables).
+	-> Object reference are stored in stack memory like : 
+
+			Student s = new Student();
+
+			then s is reference variable and will be stored in stack memory which will be pointing to Object in the heap memory (ie Student, Student object is stored in heap memory).
+
+	-> If reference object not found in heap memory than reference will be removed from stack memory.
+
+	-> In stack memory is filled based on LIFO based.
+
+		Example:
+
+			public void m1(){
+
+			}
+
+		In stack memory it will create a block and will store m1 called method block. Once m1 is executed successfully this memory will be freed and given memory to another method.
+
+
+	-> Heap memory size is bigger than stack memory always.
+
+Java 8 memory management changes:
+
+	-> Permanent generation memory is removed from java 8, instead we have meta space. It is said that 264 MB is enough space for most the applications. When so many classes are created in application the more utilization of Permanent generation memory happens and we will get "outOfMemory at PerGen" error. That is why Permanent generation is removed.
+
+	-> Permanent generation was part of heap memory.
+
+	-> Meta space is not part of the heap but it is part of native memory (ie process).
+
+	-> Native memory is RAM memory and depends upon OS we can use it.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+
+Java 8:
+
+
+1) Lambda expression:
+
+
+	-> It is an anonymous function,i.e any function without name, without return type, without modifiers.
+	
+	Example:
+		
+		(int a,int b) -> System.out.println(a+b);
+	
+	
+2) Functional Interface:
+
+	-> Interface which contains single abstract method. If we want to invoke lamba expression, it is compulsory to have functional interface.
+	
+	-> Comparable, Runnable, Callable etc are functional interface.
+	
+	Example:  Using functional interface, with lambda functions
+
+			Interface Interf{
+				public void m1();
+			}
+
+			public Test{
+				public static void main(String args[]){
+					
+					Interf i = ()->System.out.println("Hello Form Lambda expression");
+
+					i.m1();                       // Hello Form Lambda expression
+				}
+			}
+
+		//Therefore we can use lambda expressions for functioanl interfaces, we donot need implemenattion class for functional interface.
+		
+	
+	-> Exmple: Runnable interface using lambda expressions
+
+		class Test{
+			public static void main(String args[]){
+
+				Runnable r = ()->{
+					for(int w = 0;w<10;w++){
+						System.out.println("Child Thread");
+					}
+				};
+
+				Thread t = new Thread(r);
+				t.start();
+
+				for(int w = 0;w<10;w++){
+					System.out.println("Main Thread");
+				}
+			}
+		}
+
+	-> Exmaple : Colections with lambda expressions
+
+			class Test{
+				
+				public static void main(String args[]){
+
+					ArrayList<Integer> al = new ArrayList<>();
+
+					al.add(35);
+					al.(12);
+					al.(25);
+
+					System.out.println(al);
+
+					Comparator<Integer> c = (al1<al2) -> (al1<al2) ? -1 ? (al1>al2) > 1 : 0; 
+					Collections.sort(al,c);
+					
+					System.out.println(al);
+				}
+
+			}
+
+Predefined Functional Interfaces:
+
+
+	-> Example: Predicate, Function, Consumer, Supplier.
+	
+	1) Predicate: 
+
+		-> used for Conditional checks.
+		
+		Example: 
+		
+			Example: Check if number is even or not.
+
+			Class Test{
+				public void main(String arg[]){
+					Predicate<Integer> p1 = i->i%2==0;
+					System.out.prinln(p1.test(10)); // Test If 10 is even or not
+
+					Predicate<Integer> p1 = e->e.getSalary() > 5000 && e.getSalary() < 10000;   // Check multiple conditions
+					System.out.prinln(p1.test(e));
+
+				}
+			}
+			
+	2) Function:
+
+		-> Used when we have to perform some operation and produce result.
+		
+		->	Example: Find squre of a number
+
+			Class Test{
+				public static void main(String args[]){
+
+					Function<Integer,Integer> f = i->i*i;
+
+					System.out.prinln(f.apply(2));
+
+					// f1.andThen(f2).apply(i);  // For combining multiple Functions, f1 followed by f2
+					// f1.compose(f2).apply(i);  // For combining multiple Functions f2 followed by f1
+				}
+			}
+
+
+	3) Consumer:
+
+
+		-> It takes input value and can perform operations but never return anything, i.e it only consumer the value.
+		
+			EXample : 
+			
+					Consumer<String> c = s->System.out.println(s);
+					System.out.prinln(c.accept("Aditya"));   //Prints Aditya
+
+
+	4) Supplier:
+
+
+		-> It never takes input , it returns something.
+		
+		Example: 
+			
+			//GET random OTP of 6 digit
+					Supplier<String> s = ()->{
+						String otp = "";
+
+						for(int i =0;i<6;i++){
+							otp = otp + (int)Math.random()*10;    // Some random number will be generated
+						}
+
+						return otp;
+
+					};
+				
+				
+
+reduce() method:
+
+	Optional<Integer> sum = Stream.of(1, 2, 3, 4)
+                              .reduce((a, b) -> a + b); // can also have intial value like reduce(0, (a,b) -> a+b)
+
+
+Optional interface :
+
+	-> It is used to deal with NullPointerException in Java application
+		
+		Example: 
+	
+				String[] str = new String[10];        
+		        str[5] = "JAVA OPTIONAL CLASS EXAMPLE";  // Setting value for 5th index  
+		        // It returns an empty instance of Optional class   
+		        Optional<String> empty = Optional.empty();  
+		        System.out.println(empty);  
+		        // It returns a non-empty Optional  
+		        Optional<String> value = Optional.of(str[5]);  
+				System.out.println("Getting value: "+value.get()); 
+				System.out.println("Is value present: "+value.isPresent()); 
+				System.out.println("Nullable Optional: "+Optional.ofNullable(str[5]));
+				System.out.println("orElse: "+value.orElse("Value is not present")); 
+				
+				
+-----------------------------------------------------------------------------------------------------------------------
+
+
+Object oriented programming (OOP):
+
+
+Data Hiding:
+
+	-> By declaring data member (Variable) as private we can acheive data hiding. 
+	
+
+Abstraction:
+
+	-> Abstraction means displaying only essential information and hiding the details. Data abstraction refers to providing only essential information about the data to the outside world, hiding the background details or implementation.
+	
+	-> By using interfaces and abstract classes we can implement abstraction.
+	
+Encapsulation:
+
+	-> The process of binding data and corresposnding methods into a single unit is nothing but encapsulation.
+		Ex: 
+			class Student{
+					data members;
+
+					methods();
+			}
+			
+is-a relationship (also called inheritence):
+
+	-> the main advatgae of is-a relationship is code reusaubility.
+
+Polymorphism
+
+	Definition: “Many forms” — an object can behave in different ways.
+
+	Types:
+
+	Compile-time (method overloading)
+
+	Runtime (method overriding)
+
+		Compile-time example (overloading):
+
+		class MathUtils {
+			int add(int a, int b) { return a + b; }
+			double add(double a, double b) { return a + b; }
+		}
+	
+	Runtime example (overriding):
+
+		class Animal {
+			void sound() { System.out.println("Animal sound"); }
+		}
+
+		class Dog extends Animal {
+			void sound() { System.out.println("Dog barks"); }
+		}
+
+		Animal a = new Dog();
+		a.sound(); // Dog barks → runtime polymorphism
+		
+Association – “uses-a” relationship
+
+	Definition: One class uses another class, but no ownership.
+
+	Lifeline: Both objects can exist independently.
+
+	Example:
+
+	class Engine {
+		void start() {
+			System.out.println("Engine starts");
+		}
+	}
+
+	class Car {
+		void drive() {
+			Engine engine = new Engine(); // Car *uses* Engine
+			engine.start();
+			System.out.println("Car drives");
+		}
+	}
+
+	public class Test {
+		public static void main(String[] args) {
+			Car car = new Car();
+			car.drive();
+		}
+	}
+
+
+	Key: Car uses Engine, but Engine can exist independently.
+
+Aggregation – “has-a” relationship (weak)
+
+	Definition: One class has a reference to another class, but lifetime is independent.
+
+	Key: Weak ownership. Child can exist without parent.
+
+	Example:
+
+	class Department {
+		String name;
+		Department(String name) { this.name = name; }
+	}
+
+	class Employee {
+		String name;
+		Department dept; // Employee *has-a* Department
+
+		Employee(String name, Department dept) {
+			this.name = name;
+			this.dept = dept;
+		}
+
+		void display() {
+			System.out.println(name + " works in " + dept.name);
+		}
+	}
+
+	public class Test {
+		public static void main(String[] args) {
+			Department d = new Department("IT");
+			Employee e = new Employee("Alice", d);
+			e.display();
+		}
+	}
+
+
+	Key: If Employee is deleted, Department still exists.
+
+Composition – “has-a” relationship (strong, lifecycle bound)
+
+	Definition: One class owns another class, and child cannot exist without parent.
+
+	Key: Strong ownership, lifecycle bound.
+
+	Example:
+
+	class Engine {
+		Engine() {
+			System.out.println("Engine created");
+		}
+	}
+
+	class Car {
+		private Engine engine; // Car *has-a* Engine (composition)
+
+		Car() {
+			engine = new Engine(); // Engine created as part of Car
+		}
+	}
+
+	public class Test {
+		public static void main(String[] args) {
+			Car car = new Car();
+		}
+	}
+
+
+	Key: When Car is destroyed, its Engine is destroyed too.
+	
+	

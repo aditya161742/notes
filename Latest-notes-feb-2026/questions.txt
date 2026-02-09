@@ -1,0 +1,584 @@
+flatMap() Example:
+
+		// making the arraylist object of List of Integer
+				List<List<Integer> > number = new ArrayList<>();
+				
+				// adding the elements to number arraylist
+				number.add(Arrays.asList(1, 3));
+				number.add(Arrays.asList(3, 8));
+				number.add(Arrays.asList(5, 4));
+				number.add(Arrays.asList(7, 8));
+				
+				System.out.println("List of list-" + number);
+				
+				// using flatmap() to flatten this list
+				List<Integer> flatList
+					= number.stream()
+						  .flatMap(list -> list.stream())
+						  .collect(Collectors.toList());
+				
+				// printing the list
+				System.out.println("List generate by flatMap-"
+								   + flatList);
+
+		Output:
+
+		List of list-[[1, 3], [3, 8], [5, 4], [7, 8]]
+		List generate by flatMap-[1, 3, 3, 8, 5, 4, 7, 8]
+
+		Use (for sorting):
+
+		number.stream()
+						  .flatMap(list -> list.stream())
+						  .sorted()
+						  .collect(Collectors.toList());
+
+		Use (for reverse sorting):
+
+		number.sorted( Comparator.reverseOrder() )
+						 .forEach(System.out::println);
+						 
+Q) what is idempotent ?
+
+	If same endpoint hit multiple time then also API behaves same, that is update, return same. @Put, @Get, @Delete are idempotent
+
+Q) @PAtch vs @Option
+	
+	@Patch:
+
+		Partially updates a resource
+
+		Changes only specific fields
+		
+		@PATCH
+		@Path("/users/{id}")
+		public User updateUserEmail(@PathParam("id") int id, UserPatchDto dto) {
+			return userService.updateEmail(id, dto.getEmail());
+		}
+
+
+	@OPTIONS: 
+	
+		Tells the client what HTTP methods are allowed.
+		
+		It only asks:
+
+			Which HTTP methods are allowed?
+
+			Which headers are allowed?
+
+			Is cross-origin access allowed?
+		
+		@OPTIONS
+		@Path("/users")
+		public Response options() {
+			return Response.ok()
+					.header("Allow", "GET,POST,PUT,PATCH,DELETE")
+					.build();
+		}
+
+	@Put:
+	
+		It replaces entire resource.
+		
+
+Q) Concurrent modification exception ?
+
+	-> When one or more thread is iterating over the collection, in between, one thread changes the structure of the collection (either adding the element to the collection or by deleting the element in the collection or by updating the value at particular position in the collection) is known as Concurrent Modification
+	-> Or when iterator is terating and something added or removed from collection then also concurrent modification exception occurs.
+	
+	Example: 
+		
+		for (Integer i : list) {  // internally uses Iterator
+			if (i == 2) {
+				list.remove(i);    // ❌ modifies collection directly
+			}
+		} 
+				
+Q) Difference between Fail Fast iterator and Fail Safe iterator ?
+
+	-> Fail fast iterator while iterating through the collection , instantly throws Concurrent Modification Exception if there is structural modification  of the collection
+	-> Example of fail fast iterator is Map, HashMap
+	
+	-> Fail Safe Iterator makes copy of the internal data structure (object array) and iterates over the copied data structure. 
+	-> Two  issues associated with Fail Safe Iterator are :
+
+		1. Overhead of maintaining the copied data structure i.e memory.
+
+		2.  Fail safe iterator does not guarantee that the data being read is the data currently in the original data structure.
+
+		Example of fail safe iterator is ConcurrentHashMap.
+		
+Q)  Explain about internal working of hashmap?
+
+	-> hashCode() function  which returns an integer value is the Hash function.
+	-> A bucket is used to store key value pairs . A bucket can have multiple key-value pairs . In hash map, bucket is using Binary Tree for lookup for value.
+	-> HashMap get(Key k) method calls hashCode method on the key object to find bucket location.
+	-> In Map ,Any class(String etc.) can serve as a key if and only if it overrides the equals() and hashCode() method
+	-> when two keys have same hashCode() it is called Hash collision.
+	-> If two objects are equal according to the equals(Object) method, then calling the hashCode method on each of the two objects must produce the same integer result.
+	-> Key in HAshMap should be immutable.
+	
+	Example:
+	
+		class Geek 
+		{
+			  
+			String name;
+			int id;
+			  
+			Geek(String name, int id)
+			{
+				  
+				this.name = name;
+				this.id = id;
+			}
+			  
+			@Override
+			public boolean equals(Object obj)
+			{
+				Geek geek = (Geek) obj;
+				return (geek.name.equals(this.name)  && geek.id == this.id);
+			}
+			
+			@Override
+			public int hashCode()
+			{
+				return this.id;
+			}
+		}
+		
+Q)  Explain about internal working of Concurrent hashmap?
+
+	-> ConcurrentHashMap is an enhancement of HashMap as we know that while dealing with Threads in our application HashMap is not a good choice.
+	-> ConcurrentHashMap class is thread-safe i.e. multiple threads can operate on a single object.	
+	-> At a time any number of threads are applicable for a read operation without locking the ConcurrentHashMap object which is not there in HashMap.
+	-> 
+		why need ConcurrentHashMap if we have HashTable ??
+		
+		Hashtable provides concurrent access to the Map.Entries objects by locking the entire map to perform any sort of operation (update,delete,read,create).
+	-> In ConcurrentHashMap, at a time any number of threads can perform retrieval operation but for updated in the object, the thread must lock the particular segment in which the thread wants to operate. This type of locking mechanism is known as Segment locking or bucket locking. Hence at a time, 16 update operations can be performed by threads.
+	-> This indicates that 16 threads (number of threads equal to the concurrency level , which is by  default 16) can modify the collection at the same time , given ,each thread works on different bucket. So unlike hashtable, we perform any sort of operation ( update ,delete ,read ,create) without locking on entire map in ConcurrentHashMap.
+	-> when two objects lie in the same segment or same partition (entry), then parallel write would not be possible
+	
+Q) Why ConcurrentHashMap does not allow null keys and null values ?
+
+	-> Reason is that if map.get(key) returns null, you can't detect whether the key explicitly maps to null vs the key isn't mapped. In a non-concurrent map, you can check this via map.contains(key), but in a concurrent one, the map might have changed between 
+		calls.
+	
+Q) Can multiple threads read from the Hashtable concurrently ?
+
+	-> No multiple threads can not read simultaneously from Hashtable. Reason, the get() method of  Hashtable is synchronized. As a result , at a time only one thread can access the get() method .
+	
+Q) Explain about internal working of hashset?
+
+	-> All values of hashSet is unqiue, ie duplicate is not allowed.
+
+		Example:
+
+			HashSet<Object> hashset = new HashSet<Object>();
+			hashset.add(3);
+			hashset.add("Java Hungry");
+			hashset.add("Blogspot");
+			hashset.add(3);                     // duplicate elements
+			hashset.add("Java Hungry");              // duplicate elements
+			System.out.println("Set is "+hashset);
+
+			Output: Set is [3, Java Hungry, Blogspot]
+
+	-> Now , what happens internally when you pass duplicate elements in the  add() method of the Set object , It will return false and do not add to the HashSet , as the element is already present
+
+	-> Internally HashSet uses HashMap to check if value already present or not.
+
+			public boolean add(E e) {
+				return map.put(e, PRESENT)==null;
+		   }
+
+	-> So , if map.put(key,value) returns null ,then
+	map.put(e, PRESENT)==null      will return true and element is added to the HashSet.
+
+	So , if map.put(key,value) returns old value of the key ,then
+	map.put(e, PRESENT)==null      will return false and element is  not added to the HashSet .
+	
+	
+Q) How to remove duplicates from ArrayList? 
+
+	Example 1: list.stream().distinct().collect(Collectors.toList()); // distinct removes duplicate values
+	Example 2: 
+		
+			public static void main(String[] args) {
+				List<Integer> list = new ArrayList<>(Arrays.asList(1, 2, 2, 3, 4, 4, 5));
+
+				// Convert to Set
+				Set<Integer> set = new HashSet<>(list);
+
+				// Back to list if needed
+				list = new ArrayList<>(set);
+			}
+			
+Q) Write a program and create singleton class and related questions ??  And which is safe in multithreaded environment
+
+
+	public class Singleton {
+
+		// 1. Create instance at class loading
+		private static final Singleton instance = new Singleton();
+
+		// 2. Private constructor
+		private Singleton() {
+			System.out.println("Singleton instance created");
+		}
+
+		// 3. Public method to get instance
+		public static Singleton getInstance() {
+			return instance;
+		}
+	}
+
+	-> Because constructor is private so new instance cannot be created. But declaring static method we can directly call it.
+	
+		Singleton s = Singleton.getInstance(); // ✅ correct
+
+	-> Declare constructor as private and create getInstance() method to create object.
+
+	-> A singleton class itself is not thread safe. Multiple threads can access the singleton same time and create multiple objects.
+	
+	-> For thread safe use synchronized :
+	
+		public static synchronized Singleton getInstance() {
+			return instance;
+		}
+		
+Q) If parent is having singleton scope and child is having prototype scope and when i m getting parent bean , then how many instances will get created for child bean ?
+
+	Example:
+	
+		@Component
+		@Scope("singleton")
+		class Parent {
+
+			@Autowired
+			private Child child;
+		}
+
+		@Component
+		@Scope("prototype")
+		class Child { }
+
+	Step: 1
+		Spring creates the singleton Parent once at startup.
+
+		While creating Parent, Spring injects the Child bean.
+
+		Child is prototype, so Spring creates a new Child instance at injection time.
+
+		✅ So one Child instance is injected into the Parent.
+		
+	Step 2: 
+		
+		What happens if you call context.getBean(Parent.class) multiple times?
+		Parent p1 = context.getBean(Parent.class);
+		Parent p2 = context.getBean(Parent.class);
+
+
+		Parent is singleton → same object returned (p1 == p2)
+
+		Child was injected at Parent creation → same Child instance for both
+
+		❌ Even though Child is prototype, only 1 instance was created here.
+		
+	Step 3:
+	
+		How to really get a new Child instance each time?
+		Option 1️⃣ Use @Lookup method
+		@Component
+		class Parent {
+
+			@Lookup
+			public Child getChild() {
+				return null; // Spring overrides this method
+			}
+		}
+		
+Q) What all things to consider before creating microservice ?
+
+Ans)
+
+    1) Single Responsibility Principal
+
+    A microservice should have single responsibility so that it will be easy to maintain and be reusable. When the microservice has a single responsibility, we can easily choose the best way to implement it to accomplish that particular responsibility.
+    Which also means each microservice maintains its own database and no other service should access the other service's database directly.
+
+    2) Programming frameworks
+
+    Microservices are exposed using an API so the underlying programming framework used, may be different for different microservices. It is definitely great flexibility but if we are not cautious then we may end up using too many frameworks and it might be unmanageable as it increases deployment cost by having to write and maintain different scrips for deploying different frameworks. So choose only a couple of programming frameworks which suits your needs.
+
+    3) Secrets Management
+    
+    Microservices might require access to various resources like databases, file servers, and third-party services. Credentials are required to access these resources and how are we going to manage these credentials? Copying credentials in each microservice pose a serious security risk and also when we rotate credentials, we need to change in many services. It is recommended to create a few microservice to manage and distribute these secrets other services.
+
+    4) Dependency graph
+    
+    Understanding how each microservices depend on each other is important to achieve better performance and reliability. 
+
+    5) Versioning
+    
+    Microservices talk to each other using API and overtime API will change and it may not be possible to make changes to all the dependent microservices at once and we need support backward compatibility so make sure you have thought about versioning of API from the beginning.
+
+Q) Saga pattern:
+
+	-> Saga Pattern is a microservices transaction management pattern.
+		Used when you have distributed transactions across multiple services.
+		Instead of one global transaction (which is hard in microservices), Saga uses local transactions with compensating actions if something fails.
+	-> Central coordinator (Saga orchestrator) tells each service what to do.
+		Keeps track of success/failure of each step.
+		Triggers compensating actions automatically if needed.
+
+		Example:
+
+			Orchestrator → Order Service: create order
+
+			Order Service → Orchestrator: success
+
+			Orchestrator → Payment Service: process payment
+
+			If Payment fails → Orchestrator → Order Service: cancel order
+			
+Q) why non-static variables are not allowed in static block ??
+
+Ans)
+
+    Before getting into the error, lets first understand what each of the methods means: 
+ 
+
+    Static Method: A static method is a method that belongs to a class, but it does not belong to an instance of that class and this method can be called without the instance or object of that class. In the static method, the method can only access only static data members and static methods of another class or same class but cannot access non-static methods and variables.
+
+    Non-static method: Any method whose definition doesn’t contain the static keyword is a non-static method. In the non-static method, the method can access static data members and static methods as well as non-static members and method of another class or same class, also can change the values of any static data member.
+
+    Static variable initialized when class is loaded into JVM on the other hand instance variable has a different value for each instance and they get created when an instance of an object is created either by using the new() operator
+
+
+Q)  Different http codes like 404, 401, 500 etc
+
+	-> HTTP Status Code 503 - Service Unavailable
+		401 - Unauthorized 
+		200 - Ok, Success
+		201 – This is the status code that confirms that the request was successful and, as a result, a new resource was created. Typically, this is the status code that is sent after a POST/PUT request.
+		204 – This status code confirms that the server has fulfilled the request but does not need to return information. Examples of this status code include delete requests or if a request was sent via a form and the response should not cause the form to be refreshed or for a new page to load.
+		400 – The server cannot understand and process a request due to a client error. Missing data, domain validation, and invalid formatting are some examples that cause the status code 400 to be sent.
+		410 – Resource requested is no longer available and will not be available again.
+
+Q) Store procedure ?
+
+	Code reusability.
+    
+    Lesser Network transfer – E.g. for web applications -instead of calling individual queries, a procedure that can directly return the desired result can be executed.
+	
+Q)  thread local??
+
+Ans)
+	
+	The Java ThreadLocal class enables you to create variables that can only be read and written by the same thread. Thus, even if two threads are executing the same code, and the code has a reference to the same ThreadLocal variable, the two threads cannot see each other's ThreadLocal variables
+
+    -> You create a ThreadLocal instance just like you create any other Java object - via the new operator. Here is an example that shows how to create a ThreadLocal variable:
+
+        private ThreadLocal threadLocal = new ThreadLocal();
+
+Q) Benefits of streams:
+
+	1) Parallelism in streams :
+
+		-> Works on fork and join (i.e, divide and then rejoin) 
+		-> Example: System.out.println(myList.parallelStream().filter(value -> value % 2 == 0).collect(Collectors.toList()));
+	
+	2) 3) Short-Circuit Behavior:
+
+		-> This is another way of optimizing the Streams processing. Short-circuiting will terminate the processing once condition met. There are a number of short-circuiting operations available. For e.g. anyMatch, allMatch, findFirst, findAny, limit, etc.
+		-> Example:
+		
+			employeeNameStreams = employees.stream().filter(e -> e.getId() % 2 == 0)
+           .map(employee -> {
+            System.out.println("In Map - " + employee.getName());
+            return employee.getName();
+           }).limit(100).collect(Collectors.toList());
+		   
+		   
+Q) Exception thrown in Parent class but not in Child class,  then does exception handled by parent or not?? 
+
+Ans)
+        An overriding method (the method of child class) can throw any unchecked exceptions, regardless of whether the overridden method (method of base class) throws exceptions or not. However the overriding method should not throw checked exceptions that are new or broader than the ones declared by the overridden method. The overriding method can throw those checked exceptions, which have less scope than the exception(s) declared in the overridden method.
+
+
+Q) Comparator chaining??  Write a code?? 
+
+	Example:
+	
+		Comparator<Person> sortByArea = Comparator.comparing((Person p)->p.getArea());  // way of before java 8
+        Comparator<Person> sortBySex = Comparator.comparing(Person::getSex); 
+        Comparator<Person> sortByAge = Comparator.comparing(Person::getAge);
+        
+        List<Person> persons = Arrays.asList(p1,p2,p3,p4,p5);
+        persons.sort(sortByArea.thenComparing(sortByAge).thenComparing(sortBySex));
+		
+Q)  program to find non duplicate numbers  iterating only once ?? Input = [1,1,2,3,3,4,4,8,8]
+
+	list.stream()
+              .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+              .entrySet()
+              .stream()
+              .filter(e -> e.getValue() == 1)
+              .map(Map.Entry::getKey)
+              .collect(Collectors.toList());
+			  
+Q)  String s = aacccdd
+
+	Output = a:2 ,c:3, d:2
+	
+Ans) String s = "aacccdd";
+		System.out.println(s.chars()                       // IntStream
+             .mapToObj(c -> (char) c)   .collect(Collectors
+		.groupingBy(Function.identity(), Collectors.counting())));))
+	
+	
+Q)  primary key vs unique key?? 
+
+Asn)
+
+  Primary key will not accept NULL values whereas Unique key can accept NULL values.
+
+  A table can have only one primary key whereas there can be multiple unique key on a table
+  
+  
+Q) print first non repeating characters of string??
+
+	List<String> g
+                = Arrays.asList("geeks", "for", "geeks");
+     
+            // Collect the list as map
+            // by groupingBy() method
+            Map<String, Long> result
+                = g.stream().collect(
+                    Collectors.groupingBy(
+                        Function.identity(),    // element itself is the key geeks, for, geeks
+                        Collectors.counting())); //
+						
+	Output: {geeks=2, for=1}
+	
+Q) program to sort hashmap by value??
+
+			Map<String, Integer> map = new HashMap<>();
+			map.put("apple", 3);
+			map.put("banana", 1);
+			map.put("orange", 2);
+
+			// Sort by value ascending
+			Map<String, Integer> sortedMap = map.entrySet()
+				.stream()
+				.sorted(Map.Entry.comparingByValue())  // sort by value
+				.collect(Collectors.toMap(
+					Map.Entry::getKey,
+					Map.Entry::getValue,
+					(e1, e2) -> e1,          // merge function for duplicates
+					LinkedHashMap::new        // preserve order
+				));
+
+			System.out.println(sortedMap);
+		
+		{banana=1, orange=2, apple=3}
+		
+Q)  what changes you will do in a class to use it as key in hashmap??
+
+Ans)   use immutable objects as keys in a HashMap Or we will need to override hashcode and equals method.
+
+Q)  using streams find second highest salary of employee?? Find oldest employee in organization?? using java 8
+
+
+Ans)
+            List<Employee> sortedList = employeeList.stream()
+            .sorted(Comparator.comparingDouble(Employee::getSalary).reversed()).collect(Collectors.toList());    
+
+            sortedList.get(1); // as second highest salary
+
+Q) Parallel array sorting:
+
+		Java 8 introduced a new method called as parallelSort() in java.util.Arrays Class. It uses Parallel Sorting of array elements.
+
+		1)    The array is divided into sub-arrays and that 
+		   sub-arrays is again divided into their sub-arrays, 
+		   until the minimum level of detail in a set of array.
+		2. Arrays are sorted individually by multiple thread. 
+		3. The parallel sort uses Fork/Join Concept for sorting.
+		4. Sorted sub-arrays are then merged.
+
+		Ex:
+
+			// Creating an array
+			int numbers[] = { 9, 8, 7, 6, 3, 1 };
+	  
+			// Printing unsorted Array
+			System.out.print("Unsorted Array: ");
+			// Iterating the Elements using stream
+			Arrays.stream(numbers)
+				.forEach(n -> System.out.print(n + " "));
+			System.out.println();
+	  
+			// Using Arrays.parallelSort()
+			Arrays.parallelSort(numbers);
+	  
+			// Printing sorted Array
+			System.out.print("Sorted Array: ");
+			// Iterating the Elements using stream
+			Arrays.stream(numbers)
+				.forEach(n -> System.out.print(n + " "));
+
+		// For reverse sort array use , Arrays.sort(array, Collections.reverseOrder());
+		// For reverse sort list use , Collections.sort(list, Collections.reverseOrder());
+
+Q)  Why String is immutable??
+
+Ans)
+    
+    A String is used as an argument for class loading. Let’s imagine what will happen if String is mutable. In that case, the value of the object can be changed and wrong class can be loaded.
+	
+Q)  write hashMap, then iterate and write output to console??
+
+Ans)
+    Ex 1:
+    Map<String,String> gfg = new HashMap<String,String>();
+     
+        // enter name/url pair
+        gfg.put("GFG", "geeksforgeeks.org");
+        gfg.put("Practice", "practice.geeksforgeeks.org");
+        gfg.put("Code", "code.geeksforgeeks.org");
+        gfg.put("Quiz", "quiz.geeksforgeeks.org");
+         
+        // using for-each loop for iteration over Map.entrySet()
+        for (Map.Entry<String,String> entry : gfg.entrySet())
+            System.out.println("Key = " + entry.getKey() +
+                             ", Value = " + entry.getValue());
+							 
+							 
+Q)  what is runtime polymorphism and compile time polymorphism ??  Write a program for both??
+
+Ans) polymorphism means having many forms.
+    
+        In Compile time Polymorphism, the call is resolved by the compiler. We can acheive this by method overloading. Method overloading is the compile-time polymorphism where more than one methods share the same name with different parameters or signature and different return type.    
+
+            Ex:
+
+                // First addition function
+                public static int add(int a, int b)
+                {
+                    return a + b;
+                }
+				
+		In Run time Polymorphism, the call is not resolved by the compiler. We can achieve this by method overriding. Method overriding is the runtime polymorphism having same method with same parameters or signature, but associated in different classes.
+
+
+Q) program to find vowels count ??
+
+Ans)  String input = "hello hello";
+
+		Long count = input.chars().filter((x) ->{
+		return (x == 'a'  || x == 'e' ||  x == 'i'  ||  x == 'o'|| x == 'u');
+		}).count();
