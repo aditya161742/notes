@@ -1,0 +1,889 @@
+Coding interview questions 
+
+Below are the patterns they ask from:
+
+1️⃣ Frequency Pattern
+2️⃣ Two Pointer Pattern
+3️⃣ Sliding Window
+4️⃣ Sort + Solve
+5️⃣ Recursion
+6️⃣ Binart search tree
+
+Today we start with:
+
+
+---
+
+🥇 FREQUENCY PATTERN — MASTER CLASS
+
+🔍 HOW TO RECOGNIZE FREQUENCY PROBLEMS
+
+The problem statement contains words like:
+
+	count
+
+	frequency
+
+	how many times
+
+	first unique
+
+	duplicates
+
+	anagram (example : earth" → "heart," "debit card" → "bad credit,")
+
+	repeating
+
+
+Or logically you feel:
+
+> I need to know how often something appears.
+
+
+
+That moment → HashMap.
+
+
+---
+
+🎯 STRUCTURE OF EVERY FREQUENCY SOLUTION
+
+	Always 2 passes:
+
+
+	---
+
+	PASS 1 — Count
+
+	Loop input and count:
+
+	element → count
+
+
+	---
+
+	PASS 2 — Decide
+
+	Loop again and apply rule:
+
+	first count == 1
+
+	count > 1
+
+	etc
+
+---
+
+🧩 PROBLEM 1 — First Non-Repeating Character
+
+	Input:
+
+	javaiseasy
+
+
+---
+
+	THINK (not code):
+
+	Step 1
+	Count:
+
+	j=1
+	a=3
+	v=1
+	i=1
+	s=2
+	e=1
+	y=1
+
+
+	---
+
+	Step 2
+	Traverse original string:
+
+	j → count 1 → STOP
+
+	Answer: j
+
+---
+
+So tool:
+
+	> LinkedHashMap (if order needs to persist)
+
+---
+
+🧩 PROBLEM 2 — Find duplicates
+
+	Input:
+
+	[a,b,c,a,b]
+
+---
+
+Think:
+
+	Count first.
+
+	Then print elements where count > 1.
+
+	Same pattern.
+	
+---
+
+🧩 PROBLEM 3 — Anagram
+
+	"listen" vs "silent"
+
+---
+
+Think:
+
+	Count characters of both strings.
+
+	Compare maps.
+
+	Same pattern.
+
+---
+
+🧩 PROBLEM 4 — Two Sum
+
+[2,7,11,15], target=9
+
+	Example:
+		
+		Logic:
+		
+			For each number, compute the complement:
+
+			complement = target - nums[i]
+
+
+			If the complement exists in the map → we found the pair.
+
+			Otherwise, store the current number in the map.
+
+		Solution:
+		
+			Map<Integer, Integer> map = new HashMap<>();
+        
+			for (int i = 0; i < nums.length; i++) {
+				int complement = target - nums[i];
+				
+				if (map.containsKey(complement)) {
+					return new int[] { map.get(complement), i };
+				}
+				
+				map.put(nums[i], i);
+			}
+			
+			throw new IllegalArgumentException("No two sum solution");
+
+---
+
+Think:
+
+Store seen numbers.
+
+For each number: target - current
+
+Check in map.
+
+Again frequency.
+
+---
+
+🧠 WHICH DATA STRUCTURE?
+
+Situation	Use
+
+Order matters	LinkedHashMap
+Order doesn't matter	HashMap
+
+------------------------------
+
+🥈 TWO POINTER PATTERN — MASTER CLASS
+
+---
+
+🧠 CORE IDEA (one line)
+
+> Use two indices moving toward each other (or same direction) instead of nested loops.
+
+---
+
+🔍 HOW TO RECOGNIZE TWO POINTER PROBLEMS
+
+You’ll usually see:
+
+	Reverse something
+
+	Palindrome check
+
+	Compare from both ends
+
+	Sorted array + find pair
+
+	Move zeros
+
+	Remove duplicates
+
+---
+
+🎯 STRUCTURE OF TWO POINTER
+
+	You create:
+
+		left = 0
+		right = n-1
+
+	Then:
+
+		while(left < right){
+		   compare / swap
+		   left++
+		   right--
+		}
+
+That’s the whole pattern.
+
+---
+
+🧩 PROBLEM 1 — Reverse String
+
+Input:
+
+	java
+
+---
+
+THINK (not code):
+
+	j a v a
+	↑     ↑
+	swap
+
+	a a v j
+	  ↑ ↑
+	swap
+
+	done
+
+---
+
+🧩 PROBLEM 2 — Palindrome
+
+Input:
+
+	madam
+
+---
+
+Think:
+
+	Compare:
+
+	m == m
+	a == a
+
+	Continue until pointers meet.
+
+	If mismatch → not palindrome.
+
+---
+
+🧩 PROBLEM 3 — Move zeros to end
+
+	[0,1,0,3,12]
+
+---
+
+Goal:
+
+	[1,3,12,0,0]
+
+---
+
+Think:
+
+	One pointer tracks next non-zero
+	Other scans array.
+
+	Still two pointers.
+
+	Example:
+	
+		int left = 0;  // position for next non-zero
+
+        for (int right = 0; right < nums.length; right++) {
+            if (nums[right] != 0) {
+                // swap nums[left] and nums[right]
+                int temp = nums[left];
+                nums[left] = nums[right];
+                nums[right] = temp;
+
+                left++;
+            }
+        }
+		
+	Step by step output:
+	
+		right	nums[right]	left	Array State
+		
+		0	    0		 	0		[0,1,0,3,12]
+		1		1			0		swap → [1,0,0,3,12], left=1
+		2		0			1		no change
+		3		3			1		swap → [1,3,0,0,12], left=2
+		4		12			2		swap → [1,3,12,0,0], left=3
+
+---
+
+🧩 PROBLEM 4 — Two Sum (sorted array)
+
+[1,3,4,6,8]
+target=7
+
+
+---
+
+Think:
+
+1 + 8 = 9 → too big → move right
+1 + 6 = 7 → found
+
+---------------------------
+
+---
+
+🥉 SLIDING WINDOW — MASTER CLASS
+
+
+---
+
+🧠 CORE IDEA (one line)
+
+> Maintain a moving window over continuous data, expand it, shrink it, and track the best result.
+
+Unlike two pointers (which usually move from ends), sliding window works on:
+
+👉 continuous segments
+
+---
+
+🔍 HOW TO RECOGNIZE SLIDING WINDOW
+
+The problem statement contains words like:
+
+	longest
+
+	shortest
+
+	substring
+
+	subarray
+
+	continuous
+
+	window
+
+	max/min in range
+
+---
+
+🎯 STRUCTURE (MENTAL TEMPLATE)
+
+	You always have:
+
+		left = 0
+		right = 0
+
+	Then:
+
+		expand right
+		check condition
+		if invalid → shrink left
+		update answer
+
+	That’s the whole pattern.
+
+
+---
+
+🧠 VISUAL MODEL
+
+	Imagine a glass window moving over data:
+
+	j a v a i s e a s y
+	^       ^
+	left    right
+
+	You:
+
+	grow window by moving right
+
+	fix window by moving left
+
+	track max/min
+
+---
+
+🧩 PROBLEM 1 — Longest Non-Repeating Substring
+
+	Input:
+
+	javaiseasy
+
+	Goal:
+
+	vaise
+
+
+	---
+
+	THINKING (NO CODE)
+
+	Start empty window.
+
+
+	---
+
+	Step 1
+
+	Add j
+
+	Window: j
+
+
+	---
+
+	Step 2
+
+	Add a
+
+	Window: ja
+
+
+	---
+
+	Step 3
+
+	Add v
+
+	Window: jav
+
+
+	---
+
+	Step 4
+
+	Add a
+
+	Oops — duplicate a.
+
+	So:
+
+	Move LEFT until a removed.
+
+	Window becomes:
+
+	va
+
+	Then continue.
+
+
+---
+
+You repeat:
+
+expand right
+
+if duplicate → shrink left
+
+update max length
+
+---
+
+🧩 PROBLEM 2 — Max sum subarray of size K
+
+[2,1,5,1,3,2], K=3
+
+
+---
+
+	Window size fixed = 3
+
+	Slide:
+
+	[2,1,5] sum=8
+	[1,5,1] sum=7
+	[5,1,3] sum=9
+	[1,3,2] sum=6
+
+	Max = 9
+
+	Same pattern.
+	
+---
+
+🧩 PROBLEM 3 — Smallest subarray with sum ≥ target
+
+Again:
+
+	expand right until sum ≥ target
+
+	shrink left to minimize
+
+	track smallest
+
+
+	Sliding window.
+
+
+---
+
+🛠 TOOLS USED
+
+Depending on problem:
+
+	HashSet (uniqueness)
+
+	HashMap (frequency inside window)
+
+	Sum variable
+
+----------------------
+
+🏗️ SORT + SOLVE PATTERN — MASTER CLASS
+	
+	This one is very common in second highest, kth element, interval problems, etc.
+
+🧠 CORE IDEA (one line)
+
+	Sort the data first, then apply simple logic.
+
+Sorted :
+
+	Integer and character sort:
+
+	for i from 0 to n:
+	   for j from i+1 to n:
+		   if arr[i] > arr[j]:
+			   swap(arr[i], arr[j])
+
+String sort:
+
+	Only if condition changes
+
+	-> if(str[i].compareTo(str[j]) > 0)
+
+	Example: 
+
+	"cat".compareTo("bat")   // positive → cat > bat
+	"ant".compareTo("bat")   // negative → ant < bat
+
+
+Merge Overlapping Intervals
+
+Example:
+
+	Input: [1,3], [2,6], [8,10]
+	After sorting: [1,3], [2,6], [8,10]
+
+	Now compare neighbors:
+	[1,3] overlaps [2,6] → merge → [1,6]
+	[1,6] does NOT overlap [8,10]
+
+	Final: [1,6], [8,10]
+
+------------------------------
+
+🔁 RECURSION — MASTER CLASS
+
+
+🧠 CORE IDEA (one line)
+
+> Solve a problem by solving a smaller version of the same problem.
+
+---
+
+🎯 Every recursive solution has ONLY TWO parts
+
+You must memorize this:
+
+---
+
+1️) Base Case (STOP)
+
+	When recursion should end.
+
+	Example:
+
+	if(n == 0) return;
+	
+---
+
+2️) Recursive Case (REDUCE)
+
+	Call same function with smaller input.
+
+	Example:
+
+	func(n-1);
+
+---
+
+If either is missing → infinite recursion → stack overflow.
+
+
+---
+
+🧠 UNIVERSAL TEMPLATE
+
+Every recursion follows:
+
+	if(base case)
+	   return;
+
+	do something
+
+	call same function with smaller problem
+
+That’s it.
+
+
+---
+
+🔍 HOW TO RECOGNIZE RECURSION PROBLEMS
+
+You’ll hear:
+
+	factorial
+
+	fibonacci
+
+	reverse recursively
+
+	tree traversal
+
+	permutations
+
+	combinations
+	
+---
+
+🧩 PROBLEM 1 — Factorial
+
+	5! = 5 * 4!
+	4! = 4 * 3!
+	...
+	1! = 1   ← base
+
+	Pattern:
+
+		base: n==1
+
+		recursive: n * fact(n-1)
+
+---
+
+🧩 PROBLEM 2 — Reverse String
+
+	Input:
+
+	java
+
+	Think:
+
+		reverse("java")
+		= reverse("ava") + "j"
+
+		Keep reducing until empty.
+
+---
+
+🧩 PROBLEM 3 — Fibonacci
+
+	fib(n) = fib(n-1) + fib(n-2)
+
+	Base:
+
+		fib(0)=0
+		fib(1)=1
+
+---
+
+Problem 4: sort int[] array using recursion 
+
+	sort(arr, n):
+	   if n == 1 → done
+
+	   find max in first n
+	   swap with last
+
+	   sort(arr, n-1)
+---
+
+---------------------------
+ Binary search tree:
+
+Core pseudo code:
+
+	function insert(root, value):
+
+		if root is null:
+			return new Node(value)
+
+		if value < root.value:
+			root.left = insert(root.left, value)
+		else:
+			root.right = insert(root.right, value)
+
+		return root
+
+------------------------
+
+Perfect — now that you’ve learned the patterns, here’s a focused practice set (moderate → moderately hard) that maps directly to what service-company + client rounds usually test.
+
+Don’t try to solve everything at once.
+Do 10–12 well, explaining your pattern choice out loud.
+
+---
+
+🎯 Pattern-Based Interview Practice Set (Moderate → Difficult)
+
+🥇 Frequency Pattern (HashMap / Counting)
+
+	1. First non-repeating character in a string
+
+
+	2. Find all duplicates in an array
+
+
+	3. Check if two strings are anagrams
+
+
+	4. Group anagrams (list of strings)
+
+
+	5. Two Sum (unsorted array)
+
+
+	6. Longest palindrome that can be built from a string
+
+
+	7. Top K frequent elements
+
+
+
+	👉 Goal: master count → decide
+
+
+---
+
+🥈 Two Pointer
+
+	8. Reverse a string / char array in place
+
+
+	9. Check palindrome (ignore case + non-alphanumerics)
+
+
+	10. Move zeros to end (in-place)
+
+
+	11. Remove duplicates from sorted array
+
+
+	12. Two Sum (sorted array)
+
+
+	13. 3Sum (find triplets = 0)
+
+
+
+	👉 Goal: master ends move / inward logic
+
+
+---
+
+🥉 Sliding Window
+
+	14. Longest substring without repeating characters
+
+
+	15. Longest substring with at most K distinct characters
+
+
+	16. Maximum sum subarray of size K
+
+
+	17. Minimum window substring (classic)
+
+
+	18. Smallest subarray with sum ≥ target
+
+
+
+	👉 Goal: master expand right → shrink left
+
+
+---
+
+🏗️ Sort + Solve
+
+	19. Second largest / kth largest element
+
+
+	20. Merge overlapping intervals
+
+
+	21. Insert interval
+
+
+	22. Find closest pair to target after sorting
+
+
+	23. Sort characters in a string (manual logic)
+
+
+
+	👉 Goal: master sort → index / neighbor / merge / two pointers
+
+
+---
+
+🔁 Recursion
+
+	24. Reverse string recursively
+
+
+	25. Factorial / Fibonacci
+
+
+	26. Print all subsets of a string
+
+
+	27. Permutations of a string
+
+
+	28. Height of binary tree
+
+
+
+	👉 Goal: master base + reduce
+
+---
+
+🌳 Light Tree (optional but good)
+
+	33. Inorder / Preorder / Postorder traversal
+
+
+	34. Validate Binary Search Tree
+
+
+	35. Lowest Common Ancestor (basic)
+
+---
