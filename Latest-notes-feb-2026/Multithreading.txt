@@ -419,3 +419,93 @@ Starvation:
 
 
 	-> Starvation of thread in java is said to occur when a particular thread does not get access to the object or the resource which leads to an increase in waiting and execution time.
+
+
+--------------------------------------------------------------------------------------------------------------------------
+
+More questions on concurrency:
+
+
+Q1) How Multiple Downstream Services were called from BFF (backend for frontend) ? 
+
+Ans) 
+	
+	-> BFF (backend for frontend) backend layer built specifically for a particular frontend (Web / Mobile / Admin UI).
+	
+	-> It sites between : Frontend → BFF → Multiple Microservices
+	
+	-> It:
+
+			Aggregates multiple services
+
+			Shapes response specifically for that UI
+
+			Reduces frontend complexity
+
+			Handles client-specific logic
+
+	Example:
+	
+		ExecutorService executor = Executors.newFixedThreadPool(10); // create thread pool
+	
+			//What happens:
+
+			//A task is submitted to the executor.
+
+			// One thread from the pool picks it.
+
+			//userService.getUser(id) runs in that thread.
+
+			// The result is stored inside userFuture.
+		CompletableFuture<User> userFuture =
+			CompletableFuture.supplyAsync(() -> userService.getUser(id), executor);
+
+		CompletableFuture<Orders> ordersFuture =
+			CompletableFuture.supplyAsync(() -> orderService.getOrders(id), executor);
+		
+		//What thenCombine() does:
+
+			// Waits for BOTH futures to complete
+
+			//When both are done:
+
+			//It executes the lambda
+
+			//Combines results
+
+			//Produces new CompletableFuture<Response>
+
+			//Important:
+
+			//thenCombine() itself is non-blocking
+
+			//It just registers a callback
+
+			//No thread is blocked waiting
+		CompletableFuture<Response> result =
+			userFuture.thenCombine(ordersFuture, (user, orders) ->
+				new Response(user, orders)
+			);
+	
+	
+			//join() Waits if result not ready
+
+			//Returns the final Response
+
+			//Throws unchecked exception if something fails
+
+			//Difference from get():
+
+			//join() throws unchecked exceptions
+
+			//get() throws checked exceptions
+		return result.join();
+
+
+	-> In above example thread pool will not shutdown automaticall. After completing all tasks thread pool will still be alive. To shutdown do "executor.shutdown();"
+
+Q2) How completable future works internally ?
+
+Ans)
+
+	

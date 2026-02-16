@@ -1,0 +1,19 @@
+Extra doubts I have :
+
+Q) so my current job is to write code, trailblazing stories on jira with product owner / stackholder, tech design, backlog grooming.
+
+So what should I show case my job in the interview?
+
+And )
+
+If interviewer asks:
+“Tell me about your current role.”
+You say something like:
+“As a Staff Engineer, my role goes beyond implementation. I work closely with product and stakeholders to understand business workflows — particularly around order handling and billing flows — and translate them into reliable system designs. I own the end-to-end behavior of services, including exception handling, integration points, and production reliability. My focus is ensuring that the system supports business outcomes, not just feature delivery.”
+
+If they ask:
+“Have you handled exception scenarios?”
+You say:
+“Yes. For example, when payment or billing mismatches occur, we ensure the system detects discrepancies, flags exceptions, and routes tasks appropriately. My role involves designing these state transitions and automation boundaries so manual effort is minimized while control remains with business users.”
+
+---------------------------
